@@ -1,7 +1,7 @@
 ---
 title: "DeepSTAMP Engineering Report: Rational Optimization of a Plant Cyclotide Scaffold for Antibacterial Potency Against Vibrio cholerae"
 subtitle: "Multi-Target Structural Pharmacology, 650M ESM-2 Representation Learning, and In Silico Mutagenesis"
-author: "BRIC - National Institute of Plant Genome Research (NIPGR) & Computational Structural Biology Team"
+author: "Ankur Singh (BRIC - National Institute of Plant Genome Research)"
 date: "November 3, 2026"
 mainfont: "DejaVu Sans"
 monofont: "DejaVu Sans Mono"

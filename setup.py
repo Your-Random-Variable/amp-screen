@@ -6,7 +6,7 @@ setup(
     description="High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    author="Antigravity Computational Science Team",
+    author="Ankur Singh",
     packages=find_packages(),
     python_requires=">=3.9",
     install_requires=[

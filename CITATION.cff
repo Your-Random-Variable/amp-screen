@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software in your research, please cite it as below."
 authors:
-  - family-names: "ESM-AMP-Screen Contributors"
-    given-names: "Computational Structural Biology Team"
+  - family-names: "Singh"
+    given-names: "Ankur"
 title: "AMP-Screen: High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer"
 version: 1.7.1
 date-released: 2026-11-12

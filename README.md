@@ -536,14 +536,14 @@ python -m pytest -q
 
 ## 📚 Citation
 
-If you use **ESM-AMP-Screen** in your research, please cite:
+If you use **AMP-Screen** in your research, please cite:
 
 ```bibtex
-@software{esm_amp_screen_2026,
-  author = {ESM-AMP-Screen Computational Biology Team},
-  title = {ESM-AMP-Screen: High-Throughput ESM-Powered Protein-Peptide Virtual Screening, Physics Engine, & In Silico Lead Optimizer},
+@software{amp_screen_2026,
+  author = {Singh, Ankur},
+  title = {AMP-Screen: High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer},
   url = {https://github.com/Your-Random-Variable/esm-amp-screen},
-  version = {1.4.0},
+  version = {1.7.1},
   year = {2026}
 }
 ```

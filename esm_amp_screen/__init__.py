@@ -4,7 +4,7 @@ AF-AMP-Screen / AMP-Screen: High-Throughput AlphaFold & Biophysics-Grounded Prot
 """
 
 __version__ = "1.7.1"
-__author__ = "Antigravity Computational Science Team"
+__author__ = "Ankur Singh"
 
 from esm_amp_screen.alphafold import (
     fetch_alphafold_target,

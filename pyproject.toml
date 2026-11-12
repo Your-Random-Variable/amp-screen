@@ -7,7 +7,7 @@ name = "esm_amp_screen"
 version = "1.7.1"
 description = "High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer"
 readme = "README.md"
-authors = [{ name = "Antigravity Computational Science Team" }]
+authors = [{ name = "Ankur Singh" }]
 license = { text = "MIT" }
 requires-python = ">=3.9"
 dependencies = [
