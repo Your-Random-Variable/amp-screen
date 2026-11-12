@@ -1,5 +1,5 @@
 """
-AlphaFold Integration Module for ESM-AMP-Screen.
+AlphaFold Integration Module for AMP-Screen.
 Enables end-to-end AlphaFold workflows for unknown peptides and targets:
 1. Fetch AlphaFold predicted receptor structures from AlphaFold Database (AFDB / EBI).
 2. Generate AlphaFold-Multimer & AlphaFold 3 input files (paired FASTA, AF3 JSON, ColabFold runners).

@@ -1,5 +1,5 @@
 """
-Model Training & Cluster-Stratified Cross-Validation Utility for ESM-AMP-Screen.
+Model Training & Cluster-Stratified Cross-Validation Utility for AMP-Screen.
 Extracts 56D structural, physical, and sequence feature vectors from a dataset of
 381 protein-peptide co-complexes across 40 distinct receptor families with known
 experimental affinities (pKd, Kd, DeltaG).
@@ -129,7 +129,7 @@ def train_and_evaluate(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Train custom 56-parameter ML affinity model for ESM-AMP-Screen")
+    parser = argparse.ArgumentParser(description="Train custom 56-parameter ML affinity model for AMP-Screen")
     parser.add_argument("--data", default="data/pdbbind_peptide_affinity_dataset.csv", help="Dataset CSV with experimental affinities and features")
     parser.add_argument("--output", default="data/trained_complex_ensemble.joblib", help="Output model path")
     args = parser.parse_args()

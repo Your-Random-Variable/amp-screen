@@ -1,5 +1,5 @@
 """
-Command-Line Interface (CLI) for AMP-Screen (ESM-AMP-Screen).
+Command-Line Interface (CLI) for AMP-Screen.
 High-throughput Protein-Peptide & AMP Virtual Screening Pipeline with AlphaFold integration.
 """
 
@@ -1449,7 +1449,7 @@ def run_alphafold_cli(args: argparse.Namespace) -> None:
     subcmd = getattr(args, "af_subcommand", None)
     if not subcmd:
         print("Please specify an AlphaFold subcommand: fetch, prep, or score.")
-        print("Run 'esm-amp-screen alphafold --help' for usage.")
+        print("Run 'amp-screen alphafold --help' for usage.")
         return
 
     from esm_amp_screen.alphafold import (
@@ -1526,7 +1526,7 @@ def run_alphafold_cli(args: argparse.Namespace) -> None:
         print("  1. To run on AlphaFold 3 Server: Upload the JSON to https://alphafoldserver.com")
         print(f"  2. To run with ColabFold: Execute 'bash {inputs['runner_script'].name}' or upload FASTA to Google ColabFold")
         print("  3. Once folded, score the complex with:")
-        print(f"     esm-amp-screen alphafold score --complex <predicted_complex.pdb> --target-chain A --pep-chain B\n")
+        print(f"     amp-screen alphafold score --complex <predicted_complex.pdb> --target-chain A --pep-chain B\n")
 
     elif subcmd == "score":
         import pandas as pd

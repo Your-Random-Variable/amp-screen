@@ -1,4 +1,4 @@
-# AMP-Screen (formerly ESM-AMP-Screen)
+# AMP-Screen
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11-blue?logo=python" alt="Python Version">
@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/Tests-36%20Passing-brightgreen" alt="Tests">
 </p>
 
-**AMP-Screen** (`amp-screen` / `af-amp-screen` / `esm-amp-screen`) is a high-throughput, physics-grounded computational framework for peptide virtual screening, protein-peptide interaction modeling, and rational lead optimization:
+**AMP-Screen** (`amp-screen` / `af-amp-screen`) is a high-throughput, physics-grounded computational framework for peptide virtual screening, protein-peptide interaction modeling, and rational lead optimization:
 1. **AlphaFold Suite (`amp-screen alphafold`)**: Full integration with the AlphaFold ecosystem—automatic AlphaFold Database (AFDB) receptor fetching via UniProt IDs, AlphaFold-Multimer / AlphaFold 3 input preparation, and co-complex evaluation (interface pLDDT, HADDOCK force fields, 56D ML calibrated binding affinity, and toxicity triage).
 2. **Membrane Mode (`amp-screen membrane`)**: Ultra-fast sequence-first peptide membrane biophysical profiling leveraging **Wimley-White interfacial thermodynamics** ($\Delta G_{\text{w}\to\text{if}}$, $\Delta G_{\text{w}\to\text{oct}}$, Eisenberg amphipathic moments $\mu_H$, Membrane Permeabilization Index MPI, and in silico therapeutic index)—screening **>100,000 peptides/hour** with pure biophysics (no external model weights required).
 3. **Target Mode (`amp-screen target` / `run`)**: Pure **Native 3D Geometric Surface Docking Engine** operating 100% in Cartesian coordinates ($\text{\AA}$) via Gemmi & NumPy—completely replacing AutoDock Vina, PDBQT files, and Meeko. Integrates longitudinal pocket cleft alignment, continuous soft-core Lennard-Jones, distance-dependent Coulomb electrostatics, downhill simplex interface refinement, and **HADDOCK 2.4 explicit physics**.
@@ -113,44 +113,44 @@ The physics and solution thermodynamics engines are evaluated on **14 standardiz
 > [!IMPORTANT]
 > **Scientific Rigor & Scope:** The 12 experimentally quantified co-crystals serve as a gold-standard sanity check validating that calibrated predictions closely track wet-lab solution affinities across diverse peptide lengths (5–13 residues) and receptor families (SH3, SH2, PDZ, Chaperone, Apoptosis). The GroupKFold cross-validation across 40 distinct protein families verifies generalization to novel receptor targets.
 >
-> 100% reproducible via `python run_benchmarks.py` or `esm-amp-screen benchmark --run-all`.
+> 100% reproducible via `python run_benchmarks.py` or `amp-screen benchmark --run-all`.
 
 ---
 
 ### 🔬 Comparison with Published Peptide Docking Literature
 
-To understand how ESM-AMP-Screen compares against the latest published protein-peptide (PP) docking literature (e.g. **PepPCBench** *J. Chem. Inf. Model.* 2025, **AutoDock CrankPep** *J. Chem. Theory Comput.* 2020, **Rosetta FlexPepDock** *PLoS ONE* 2011, and **AlphaFold-Multimer / AlphaFold 3** *Nature* 2024):
+To understand how AMP-Screen compares against the latest published protein-peptide (PP) docking literature (e.g. **PepPCBench** *J. Chem. Inf. Model.* 2025, **AutoDock CrankPep** *J. Chem. Theory Comput.* 2020, **Rosetta FlexPepDock** *PLoS ONE* 2011, and **AlphaFold-Multimer / AlphaFold 3** *Nature* 2024):
 
-| Feature / Criterion | AutoDock CrankPep (ADCP) | Rosetta FlexPepDock | AlphaFold-Multimer / AF3 (PepPCBench 2025) | **ESM-AMP-Screen (v1.4.0)** |
+| Feature / Criterion | AutoDock CrankPep (ADCP) | Rosetta FlexPepDock | AlphaFold-Multimer / AF3 (PepPCBench 2025) | **AMP-Screen (v1.7.1)** |
 | :--- | :--- | :--- | :--- | :--- |
 | **Primary Method** | Rigid-body fragment assembly + Monte Carlo | High-resolution Monte Carlo + all-atom minimization | End-to-end deep learning (Evoformer / Diffusion) | Conformational priors + Native 3D Geometric Docking + HADDOCK Physics + 56D ML Ensemble |
 | **Typical Pose Accuracy ($L$-RMSD)** | $2.0 - 4.5\text{ \AA}$ (blind pocket) | $1.0 - 2.5\text{ \AA}$ (requires initial pose) | **$1.0 - 1.8\text{ \AA}$** (state-of-the-art folding) | $1.5 - 3.2\text{ \AA}$ (with native geometric cleft alignment) |
 | **Binding Affinity Output ($\Delta G$ / $K_d$)** | Empirical contact score only (no solution $\Delta G$) | Rosetta Energy Units (REU, gas/solvent empirical) | **None** (outputs $\text{pLDDT}$ & $\text{ipTM}$ confidence, not $\Delta G$ or $K_d$) | **Calibrated solution $\Delta G$ & $K_d$** (Physical & 56D ML Ensemble) |
 | **Compute Time per Peptide** | 15–60 minutes | 30–120 minutes | 5–15 minutes (multi-GPU) | **2–5 seconds (Pure CPU)** |
 | **Virtual Screening Throughput** | ~50 peptides / day | ~20 peptides / day | ~100–200 / day (requires GPU cluster) | **~10,000+ / day (CPU workstation)** |
-| **Antimicrobial Membrane Mode** | Not supported | Not supported | Not supported | **>50,000 peptides / hour (ESM-2 + Wimley-White)** |
+| **Antimicrobial Membrane Mode** | Not supported | Not supported | Not supported | **>100,000 peptides / hour (Wimley-White + DeepSTAMP)** |
 | **Pose Rescoring Engine** | Single top Monte Carlo pose | Cluster energy min | Top rank by $\text{ipTM} \times \text{pLDDT}$ | **Multi-Mode HADDOCK Physics Rescoring (M1..M5)** |
 | **Lead Optimization (Scan)** | Not built-in | Manual point mutations | Not built-in | **Automated In Silico Alanine & Mutation Scan** |
 
 #### Key Insights from Literature Comparison:
 1. **Structural Folding vs. Quantitative Affinity:**
    - Deep learning methods like **AlphaFold 3** and **AlphaFold-Multimer** excel at de novo coordinate folding ($L$-RMSD $\le 1.5\text{ \AA}$ on defined interfaces in PepPCBench). However, their confidence outputs ($\text{pLDDT}$, $\text{ipTM}$) reflect structural prediction certainty, not physical binding affinity ($\Delta G$ or $K_d$). They cannot quantitatively rank candidate binders by potency.
-2. **Complete Elimination of AutoDock Vina (v1.4.0):**
+2. **Complete Elimination of AutoDock Vina:**
    - Standard AutoDock Vina was parameterized on rigid small molecules (20–50 atoms). On flexible peptides (100–300 atoms), Vina's empirical scoring merely counts contacts, frequently ranking non-native folded knots or distorted poses as Mode 1.
-   - **ESM-AMP-Screen v1.4.0 Solution:** AutoDock Vina, PDBQT united-atom conversions, and Meeko have been **completely eliminated**. In their place, ESM-AMP-Screen employs a **Pure Native 3D Geometric Surface Docking Engine**:
+   - **AMP-Screen Solution:** AutoDock Vina, PDBQT united-atom conversions, and Meeko have been **completely eliminated**. In their place, AMP-Screen employs a **Pure Native 3D Geometric Surface Docking Engine**:
      - Operates 100% in Cartesian coordinates ($\text{\AA}$) directly on standard PDB files via Gemmi & NumPy.
      - Aligns peptide longitudinal axis with pocket cleft eigenvectors ($u_{\text{long}} \parallel \pm v_{\text{long}}$).
      - Samples longitudinal rolls and solvent outward normal depths.
      - Evaluates poses with continuous soft-core Lennard-Jones ($15 \times (1.8 - r)$ wall) and distance-dependent Coulomb electrostatics ($\varepsilon(r) = 4r$).
      - Refines interface contacts via 6-DOF Nelder-Mead downhill simplex minimization in seconds on CPU.
 3. **High-Throughput Virtual Screening Funnel:**
-   - Traditional peptide dockers (CrankPep, FlexPepDock) require 15–120 minutes per peptide, making virtual screening of thousands of peptides impractical. ESM-AMP-Screen completes target docking in 2–5 seconds per peptide on CPU while outputting calibrated thermodynamic affinities and genuine physical chemistry features.
+   - Traditional peptide dockers (CrankPep, FlexPepDock) require 15–120 minutes per peptide, making virtual screening of thousands of peptides impractical. AMP-Screen completes target docking in 2–5 seconds per peptide on CPU while outputting calibrated thermodynamic affinities and genuine physical chemistry features.
 
 ---
 
 ## ⚡ Multi-Threading & CPU Resource Management
 
-ESM-AMP-Screen is built for high-throughput concurrency, scaling seamlessly from 4-core laptops to 128-core HPC compute nodes.
+AMP-Screen is built for high-throughput concurrency, scaling seamlessly from 4-core laptops to 128-core HPC compute nodes.
 
 ### Thread Budgeting Architecture (`--threads` / `-t` & `--max-workers`)
 
@@ -196,12 +196,12 @@ cd esm-amp-screen
 
 # Create and activate environment
 conda env create -f environment.yml
-conda activate esm-amp-screen
+conda activate amp-screen
 ```
 
 ### Method 2: Pip & System Tools
 
-ESM-AMP-Screen v1.4.0 requires **no external docking binaries** (AutoDock Vina is completely removed). Standard Python packages handle all docking, coordinates, and biophysics:
+AMP-Screen requires **no external docking binaries** (AutoDock Vina is completely removed). Standard Python packages handle all docking, coordinates, and biophysics:
 
 ```bash
 # Optional: install OpenBabel if interface force-field relaxation (UFF) is desired:
@@ -211,8 +211,8 @@ sudo apt-get update && sudo apt-get install -y openbabel python3-openbabel
 # Or with Conda:
 conda install -c conda-forge openbabel
 
-# Install ESM-AMP-Screen package with optional native force-field relaxation:
-pip install "esm-amp-screen[relaxation]"
+# Install AMP-Screen package with optional native force-field relaxation:
+pip install ".[relaxation]"
 # Or base installation:
 pip install -e .
 ```
@@ -221,29 +221,30 @@ pip install -e .
 
 Verify installation:
 ```bash
-esm-amp-screen --version
+amp-screen --version
 ```
 
 ---
 
 ## 📖 Complete CLI Options Reference
 
-The `esm-amp-screen` CLI provides six core subcommands:
-1. `membrane`: Sequence-first peptide membrane biophysical profiling using ESM-2 neural representations & Wimley-White thermodynamics (no docking required)
+The `amp-screen` CLI provides seven core subcommands:
+1. `membrane`: Sequence-first peptide membrane biophysical profiling using Wimley-White thermodynamics & amphipathic moments (no docking required)
 2. `target` (or `run` / `screen`): End-to-end automated multi-stage target-directed virtual screening pipeline
 3. `optimize-hit`: In silico alanine scanning & affinity-maturing lead optimization
 4. `score`: Standalone physics and solution thermodynamics rescoring for existing complexes
 5. `benchmark`: CAPRI structural evaluation and affinity validation across 14 reference co-crystal benchmarks
 6. `pockets`: Surface cavity discovery, profiling, and 0–100 Druggability scoring using 7-ray PSP LIGSITE grid concavity
+7. `alphafold`: Fetch AlphaFold target structures, prepare AF-Multimer / AF3 inputs, and evaluate co-complexes
 
 ---
 
-### 1. `esm-amp-screen membrane` (Direct Sequence-First Screening)
+### 1. `amp-screen membrane` (Direct Sequence-First Screening)
 
-Screens large peptide libraries (>50,000 peptides/hour) using local Meta AI ESM-2 representations coupled with Wimley-White interfacial partitioning ($\Delta G_{\text{w}\to\text{if}}$), octanol transfer free energy ($\Delta G_{\text{w}\to\text{oct}}$), Eisenberg amphipathic moments ($\mu_H$), Membrane Permeabilization Index (MPI), and in silico therapeutic index.
+Screens large peptide libraries (>100,000 peptides/hour) using Wimley-White interfacial partitioning ($\Delta G_{\text{w}\to\text{if}}$), octanol transfer free energy ($\Delta G_{\text{w}\to\text{oct}}$), Eisenberg amphipathic moments ($\mu_H$), Membrane Permeabilization Index (MPI), and in silico therapeutic index.
 
 ```bash
-esm-amp-screen membrane \
+amp-screen membrane \
   --library examples/peptides/benchmark_amps.fasta \
   --output ./membrane_screening_results \
   --top 20
@@ -263,12 +264,12 @@ esm-amp-screen membrane \
 
 ---
 
-### 2. `esm-amp-screen target` / `esm-amp-screen run`
+### 2. `amp-screen target` / `amp-screen run`
 
 Runs the end-to-end multi-stage virtual screening funnel against a target protein binding pocket.
 
 ```bash
-esm-amp-screen target \
+amp-screen target \
   --receptor examples/receptors/target.pdb \
   --library examples/peptides/benchmark_amps.fasta \
   --output ./screening_results \
@@ -301,7 +302,6 @@ esm-amp-screen target \
 | `--num-modes` | | Int | `9` | Maximum binding modes generated per peptide. |
 | `--rescore-modes` | | Int | `5` | Number of candidate modes to evaluate with explicit HADDOCK physics & ML affinity. |
 | `--top` | | Int | `5` | Number of top candidates to export co-complex PDBs for. |
-| `--hf-token` | | String | Env `HF_TOKEN` | HuggingFace API token for ESMFold cloud inference endpoint. |
 | `--obabel-bin` | | Path | From PATH | Custom path to OpenBabel binary. |
 | `--ml-model` | | Path | `Auto-load` | Path to trained complex ensemble model (`data/trained_complex_ensemble.joblib` loaded automatically). |
 | `--relax` | | Flag | `False` | Perform interface force-field relaxation (UFF) before Stage 3 physics scoring. |
@@ -309,16 +309,16 @@ esm-amp-screen target \
 | `--blind-pockets` | | Int | `1` | Number of top druggable surface pockets to dock against in blind docking mode (e.g. `5`). |
 | `--blind-docking` | | Flag | `False` | Enable comprehensive multi-pocket blind docking across the top 5 predicted receptor surface cavities. |
 
-> **Structure Generation & ESMFold:** By default, ESM-AMP-Screen builds 3D peptide conformers locally using its high-speed biophysical conformer engine with Ramachandran secondary-structure dihedrals (PeptideBuilder). To use a hosted ESMFold service, configure a custom private/dedicated endpoint via the `ESMFOLD_API_URL` environment variable and set `HF_TOKEN`.
+> **Structure Generation:** By default, AMP-Screen builds 3D peptide conformers locally using its high-speed biophysical conformer engine with Ramachandran secondary-structure dihedrals (PeptideBuilder), or directly scores co-folded complexes generated via AlphaFold-Multimer or AlphaFold 3.
 
 ---
 
-### 3. `esm-amp-screen optimize-hit`
+### 3. `amp-screen optimize-hit`
 
 Performs alanine scanning to map hotspot residues and mutation scanning to engineer affinity gains.
 
 ```bash
-esm-amp-screen optimize-hit \
+amp-screen optimize-hit \
   --complex screening_results/top_complexes/complex_Hit1.pdb \
   --rec-chain A \
   --pep-chain B \
@@ -345,12 +345,12 @@ esm-amp-screen optimize-hit \
 
 ---
 
-### 4. `esm-amp-screen score`
+### 4. `amp-screen score`
 
 Standalone rescoring of any existing protein-peptide complex PDB using the full HADDOCK physics engine.
 
 ```bash
-esm-amp-screen score \
+amp-screen score \
   --complex benchmarks/1ycr.pdb \
   --rec-chain A \
   --pep-chain B \
@@ -370,16 +370,16 @@ esm-amp-screen score \
 
 ---
 
-### 5. `esm-amp-screen benchmark`
+### 5. `amp-screen benchmark`
 
 Calculates CAPRI evaluation metrics against reference crystal structures or executes the validation suites.
 
 ```bash
 # Option A: Run complete reproducible co-crystal docking benchmark across 14 complexes
-esm-amp-screen benchmark --run-all
+amp-screen benchmark --run-all
 
 # Option B: Evaluate a specific predicted complex against reference crystal
-esm-amp-screen benchmark \
+amp-screen benchmark \
   --complex predicted_pose.pdb \
   --reference reference_crystal.pdb \
   --rec-chain A \
@@ -404,12 +404,12 @@ esm-amp-screen benchmark \
 
 ---
 
-### 6. `esm-amp-screen pockets`
+### 6. `amp-screen pockets`
 
 Standalone cavity discovery, profiling, and 0–100 Druggability scoring using 7-ray Protein-Solvent-Protein (PSP / LIGSITE standard) grid concavity:
 
 ```bash
-esm-amp-screen pockets \
+amp-screen pockets \
   --receptor benchmarks/1ycr.pdb \
   --rec-chain A \
   --top-pockets 5 \
@@ -429,21 +429,21 @@ esm-amp-screen pockets \
 
 ---
 
-### 7. `esm-amp-screen alphafold` (AlphaFold Suite for Unknown Targets & Peptides)
+### 7. `amp-screen alphafold` (AlphaFold Suite for Unknown Targets & Peptides)
 
 Replaces ESM with an end-to-end AlphaFold workflow for uncharacterized targets and de novo designed peptides:
 
 #### Step 1: Fetch Unknown Target from AlphaFold Database (AFDB)
 Directly query the AlphaFold Database by UniProt accession ID (e.g. `Q9KPW0`), extract structural confidence (pLDDT), and clean the coordinates:
 ```bash
-esm-amp-screen alphafold fetch --uniprot Q9KPW0 --output ./target_receptors/
+amp-screen alphafold fetch --uniprot Q9KPW0 --output ./target_receptors/
 ```
-*Tip:* You can also pass a UniProt ID directly to `--receptor` in `esm-amp-screen run` or `esm-amp-screen target` (e.g. `--receptor Q9KPW0`), and the pipeline will automatically resolve and download the AlphaFold structure from AFDB.
+*Tip:* You can also pass a UniProt ID directly to `--receptor` in `amp-screen run` or `amp-screen target` (e.g. `--receptor Q9KPW0`), and the pipeline will automatically resolve and download the AlphaFold structure from AFDB.
 
 #### Step 2: Prepare AlphaFold-Multimer & AlphaFold 3 Co-Folding Inputs
 Generate co-folding job inputs for candidate peptides against the target receptor:
 ```bash
-esm-amp-screen alphafold prep \
+amp-screen alphafold prep \
   --target-seq "<TARGET_SEQUENCE>" \
   --peptide-seq "KIFCGETCKFIPCITKVPGTCKCKSKVCYFN" \
   --job-name Vcholerae_BamA_DesignB \
@@ -455,7 +455,7 @@ esm-amp-screen alphafold prep \
 #### Step 3: Evaluate & Triage Co-Complex Structures
 Score co-folded AlphaFold-Multimer / AF3 complex PDB models with HADDOCK explicit physics, 56D ML calibrated binding affinity, and peptide safety profiling:
 ```bash
-esm-amp-screen alphafold score \
+amp-screen alphafold score \
   --complex-pdb complex_Design_B.pdb \
   --target-chain A \
   --peptide-chain B
@@ -494,7 +494,7 @@ screening_results/
 
 ## 🧠 Machine Learning Training & Datasets
 
-ESM-AMP-Screen ships with curated, reproducible training and validation datasets in `data/`, allowing all machine learning components to be retrained, verified, or fine-tuned on custom experimental data:
+AMP-Screen ships with curated, reproducible training and validation datasets in `data/`, allowing all machine learning components to be retrained, verified, or fine-tuned on custom experimental data:
 
 ### Protein-Peptide Complex Affinity Dataset (`data/pdbbind_peptide_affinity_dataset.csv`)
 - **Sample Cohort ($N=381$):** Curated protein-peptide complexes from PDBbind and BioLiP across 40 distinct receptor families (SH3, SH2, PDZ, Serine/Cysteine/Aspartic Proteases, Chaperones, Bromodomains, Chromodomains, Apoptosis regulators MDM2/Bcl-2, MHC Class I/II, Nuclear Receptors, and Kinases) with experimentally measured $K_d$/$K_i$/$\text{IC}_{50}$ ($\text{p}K_d$ values).
@@ -525,7 +525,7 @@ python run_benchmarks.py
 # 3. Run Comprehensive Physics & Biochemical Audit Suite (18 verification checks)
 python test_all_18_bugs.py
 
-# 4. Run Automated Unit Test Suite (32 unit tests across physics, biophysics, multi-pocket detection, and ESM-2)
+# 4. Run Automated Unit Test Suite (36 unit tests across physics, biophysics, multi-pocket detection, and AlphaFold)
 python -m unittest discover -s tests
 
 # 5. Run Pytest Suite

@@ -24,7 +24,7 @@ header-includes:
 
 This report documents the computational dissection, rational re-engineering, and multi-target structural validation of the 31-amino-acid plant cyclotide **`DIFCGETCAFIPCITHVPGTCSCKSKVCYFN`** to maximize its antibacterial efficacy against the enteric pathogen *Vibrio cholerae*.
 
-Using the **DeepSTAMP** two-tier neural architecture (comprising a frozen 650M ESM-2 foundation layer, residue-level graph neural network, and calibrated task-specific classification heads) coupled with the **ESM-AMP-Screen v1.4.0** Cartesian physics and 3D docking engine, we conducted single-residue saturation and combinatorial multi-point mutagenesis across 1,619 variants. We identified **Design B (`KIFCGETCKFIPCITKVPGTCKCKSKVCYFN`)** as the lead candidate:
+Using the **DeepSTAMP** two-tier neural architecture (comprising a frozen 650M ESM-2 foundation layer, residue-level graph neural network, and calibrated task-specific classification heads) coupled with the **AMP-Screen** Cartesian physics and 3D docking engine, we conducted single-residue saturation and combinatorial multi-point mutagenesis across 1,619 variants. We identified **Design B (`KIFCGETCKFIPCITKVPGTCKCKSKVCYFN`)** as the lead candidate:
 
 * **Antibacterial Probability:** Elevated from $0.8520 \to 0.8962$ ($\Delta P = +0.0442$).
 * **Tier-1 Scaffold Integrity:** Preserved at **$0.9969$** confidence score.
@@ -200,9 +200,9 @@ Design D:  K1  .   .   C4  .   K6  .   C8  K9  .   .   P12 C13 .   .   K16 .   P
 
 ---
 
-# 6. ESM-AMP-Screen 3D Multi-Target Virtual Screening Benchmark
+# 6. AMP-Screen 3D Multi-Target Virtual Screening Benchmark
 
-To experimentally and physically validate target engagement, all 5 variants were docked across the 3 top target pockets using **ESM-AMP-Screen v1.4.0** with cylindrical depth-offset Cartesian simplex docking, full-atom HADDOCK 2.4 physics, and 56D gradient-boosted ML scoring:
+To experimentally and physically validate target engagement, all 5 variants were docked across the 3 top target pockets using **AMP-Screen** with cylindrical depth-offset Cartesian simplex docking, full-atom HADDOCK 2.4 physics, and 56D gradient-boosted ML scoring:
 
 ## 6.1 Results on BamA (4N75, Pocket #2 — Lateral Gate Seam)
 
@@ -300,9 +300,9 @@ Residue-level parsing of the Design B – *V. cholerae* BamA complex (`model_1.p
 
 ---
 
-# 8. Native ESM-AMP-Screen Docking & Physics Benchmark on Full-Length *Vibrio cholerae* BamA AlphaFold Complex (`Q9KPW0`)
+# 8. Native AMP-Screen Docking & Physics Benchmark on Full-Length *Vibrio cholerae* BamA AlphaFold Complex (`Q9KPW0`)
 
-To provide direct in-tool validation on the exact pathogen target, we executed our full **ESM-AMP-Screen v1.4.0** docking pipeline directly on the full-length **AlphaFold structure of _Vibrio cholerae_ BamA** ([UniProt: Q9KPW0](https://alphafold.ebi.ac.uk/entry/Q9KPW0), 803 residues, download: `vc_bama_af_q9kpw0.pdb`).
+To provide direct in-tool validation on the exact pathogen target, we executed our full **AMP-Screen** docking pipeline directly on the full-length **AlphaFold structure of _Vibrio cholerae_ BamA** ([UniProt: Q9KPW0](https://alphafold.ebi.ac.uk/entry/Q9KPW0), 803 residues, download: `vc_bama_af_q9kpw0.pdb`).
 
 ## 8.1 Docking Configuration & Lateral Gate Pocket Targeting
 * **Target Locus:** The primary bactericidal Lateral Gate Seam ($\beta1-\beta16$ translocon groove, extracellular loops L4/L6, and POTRA5 hinge).
@@ -359,7 +359,7 @@ To advance Design B (`KIFCGETCKFIPCITKVPGTCKCKSKVCYFN`) from in silico design to
 
 # 10. Conclusions
 
-The computational engineering of the plant cyclotide scaffold via the **DeepSTAMP** platform coupled with **ESM-AMP-Screen** and validated across both **HDOCK** and **native Cartesian docking on *Vibrio cholerae* BamA (`Q9KPW0`)** successfully eliminated the primary biophysical deficiency of the wild-type template. **Design B (`KIFCGETCKFIPCITKVPGTCKCKSKVCYFN`)** represents a high-priority drug candidate exhibiting:
+The computational engineering of the plant cyclotide scaffold via the **DeepSTAMP** platform coupled with **AMP-Screen** and validated across both **HDOCK** and **native Cartesian docking on *Vibrio cholerae* BamA (`Q9KPW0`)** successfully eliminated the primary biophysical deficiency of the wild-type template. **Design B (`KIFCGETCKFIPCITKVPGTCKCKSKVCYFN`)** represents a high-priority drug candidate exhibiting:
 
 * **Superior Predicted Antibacterial Potency:** DeepSTAMP $P(\text{AntiB}) = 0.8962$ ($\Delta P = +0.0442$).
 * **Preserved Structural Fold:** Tier-1 Knottin fold probability of $0.9969$.

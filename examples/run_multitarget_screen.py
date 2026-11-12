@@ -6,7 +6,7 @@ Evaluates WT, Design A, Design B, Design C, and Design D across:
   2. OmpU (Constriction Eyelet Pocket #1) - V. cholerae Specific Virulence Disarming
   3. LptD (Lateral LPS Gate Pocket #2) - LPS Assembly & Outer Membrane Biogenesis
 
-Powered by ESM-AMP-Screen:
+Powered by AMP-Screen:
   - High-Resolution 7-Ray PSP LIGSITE Cavity Profiling
   - Cylindrical Normal Depth Offset Geometric Simplex Docking
   - Full-Atom HADDOCK 2.4 Physics (Evdw, Eelec, Edesolv, BSA)
@@ -238,7 +238,7 @@ def run_screening():
 
     # Print nicely formatted summary tables
     print("\n" + "=" * 135)
-    print("                    ESM-AMP-SCREEN: MULTI-TARGET VIRTUAL SCREENING SUMMARY RESULTS")
+    print("                    AMP-SCREEN: MULTI-TARGET VIRTUAL SCREENING SUMMARY RESULTS")
     print("=" * 135)
 
     for target_key in TARGETS.keys():

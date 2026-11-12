@@ -2,7 +2,7 @@
 """
 Docking of Designed AMPs against Vibrio cholerae BamA (AlphaFold Q9KPW0)
 Target: Lateral Gate Seam (beta1-beta16, Loops L4/L6, POTRA5 Hinge)
-Engine: ESM-AMP-Screen v1.4.0 (Cartesian Simplex + HADDOCK Physics + Calibrated 56D ML Scorer)
+Engine: AMP-Screen (Cartesian Simplex + HADDOCK Physics + Calibrated 56D ML Scorer)
 """
 
 import sys

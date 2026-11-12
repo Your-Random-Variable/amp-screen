@@ -1,5 +1,5 @@
 """
-Benchmark and Validation Module for ESM-AMP-Screen.
+Benchmark and Validation Module for AMP-Screen.
 Quantifies docking prediction accuracy against experimental co-crystal structures
 or external tools (HADDOCK, AutoDock CrankPep, Rosetta FlexPepDock)
 using official CAPRI (Critical Assessment of PRediction of Interactions) standards:

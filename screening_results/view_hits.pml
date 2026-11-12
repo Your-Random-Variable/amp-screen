@@ -1,4 +1,4 @@
-# PyMOL Visualization Script for ESM-AMP-Screen Hits
+# PyMOL Visualization Script for AMP-Screen Hits
 reinitialize
 bg_color white
 set ray_shadows, 0
@@ -35,4 +35,4 @@ color yellow, contacts_2
 zoom pocket_1, 6.0
 set dash_gap, 0.2
 set dash_width, 2.5
-message 'Loaded ESM-AMP-Screen top hits successfully!'
+message 'Loaded AMP-Screen top hits successfully!'

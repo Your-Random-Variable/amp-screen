@@ -456,7 +456,7 @@ EXPANDED_COMPLEX_ENTRIES = [
 
 def generate_dataset():
     print("=" * 105)
-    print("      ESM-AMP-SCREEN: EXPANDED 56-PARAMETER PROTEIN-PEPTIDE DATASET GENERATOR")
+    print("      AMP-SCREEN: EXPANDED 56-PARAMETER PROTEIN-PEPTIDE DATASET GENERATOR")
     print("=" * 105)
     print(f"Curated {len(EXPANDED_COMPLEX_ENTRIES)} protein-peptide co-crystals with experimental affinities.")
 

@@ -1,5 +1,5 @@
 """
-Automated Comprehensive Integration & Feature Test for ESM-AMP-Screen.
+Automated Comprehensive Integration & Feature Test for AMP-Screen.
 Validates:
 1. Auto-Pocket geometric cavity detector
 2. Disulfide bond and macrocycle locking

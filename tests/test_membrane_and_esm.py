@@ -1,5 +1,5 @@
 """
-Unit Tests for ESM-AMP-Screen Membrane Biophysics and ESM-2 Embedding Modules.
+Unit Tests for AMP-Screen Membrane Biophysics and ESM-2 Embedding Modules.
 Tests Wimley-White thermodynamics, Eisenberg amphipathic moments,
 Henderson-Hasselbalch charge calculations, and ESM-2 neural inference.
 """

@@ -1,5 +1,5 @@
 """
-Comprehensive Verification Test Suite for ESM-AMP-Screen.
+Comprehensive Verification Test Suite for AMP-Screen.
 Validates all physical, thermodynamic, and biochemical components with real assertions:
 - P0-1: Heavy-atom / united-atom implicit hydrogen partial charge model
 - P0-2: Continuous electrostatics switching function (9 to 12 A)
@@ -317,7 +317,7 @@ def test_p1_separate_pdbs_chain_a_contacts():
 
 if __name__ == "__main__":
     print("\n" + "="*85)
-    print("      RUNNING ESM-AMP-SCREEN LOGICAL, PHYSICAL & THEORETICAL AUDIT SUITE")
+    print("      RUNNING AMP-SCREEN LOGICAL, PHYSICAL & THEORETICAL AUDIT SUITE")
     print("="*85 + "\n")
     test_p0_1_residue_formal_charges()
     test_p0_2_switching_function()

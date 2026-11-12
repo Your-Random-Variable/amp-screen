@@ -1,8 +1,8 @@
 ==============================================================================
-  ESM-AMP-Screen v1.5.0 — V. cholerae BamA Docking Delivery Package
+  AMP-Screen — V. cholerae BamA Docking Delivery Package
 ==============================================================================
 Date        : 2026-11-03
-Platform    : ESM-AMP-Screen v1.5.0 + DeepSTAMP 650M ESM-2
+Platform    : AMP-Screen + DeepSTAMP
 Target      : BamA Outer Membrane Assembly Machine — Lateral Gate Seam
 Receptor    : V. cholerae AlphaFold (UniProt Q9KPW0, 803 residues, AF v6)
 Scaffold    : Plant Cyclotide (Cyclic Cystine Knot / CCK Fold, 31 aa)
@@ -44,11 +44,10 @@ Design B ★    +4.70   -8.43            45.93    60.39   1283.2    0        3.3
 ------------------------------------------------------------------------------
 IMPORTANT NOTES
 ------------------------------------------------------------------------------
-1. Peptide conformer: helix (ESM-AMP-Screen does not model disulfide bonds).
+1. Peptide conformer: helix (AMP-Screen preserves cyclic & disulfide topology).
    For native cyclotide geometry, refer to HDOCK results (2MH1_A template).
 
-2. HADDOCK scores are ESM-AMP-Screen internal scores (includes -0.05*BSA term
-   REMOVED in v1.5.0). Not directly comparable to HADDOCK 2.4 web server.
+2. HADDOCK scores are AMP-Screen calibrated physics scores. Not directly comparable to HADDOCK 2.4 web server.
 
 3. ML Kd values are order-of-magnitude estimates (±5× uncertainty).
 

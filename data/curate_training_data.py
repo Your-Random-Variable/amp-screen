@@ -1,5 +1,5 @@
 """
-Dataset Curation & Assembly Utility for ESM-AMP-Screen.
+Dataset Curation & Assembly Utility for AMP-Screen.
 Curates:
 1. data/amp_training_dataset.csv (180 diverse, validated active AMPs)
 2. data/decoy_training_dataset.csv (180 negative controls: 90 composition-matched scrambled + 90 natural non-AMPs)

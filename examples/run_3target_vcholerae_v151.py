@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ESM-AMP-Screen v1.5.1 — Corrected 3-Target V. cholerae Virtual Screening
+AMP-Screen — 3-Target V. cholerae Virtual Screening
 ==========================================================================
 Evaluates WT, Design A, Design B, Design C, Design D across:
   1. BamA  (V. cholerae AlphaFold AF-Q9KPW0) — Lateral gate β1-β16 seam
@@ -217,7 +217,7 @@ def run_screening():
     master_records = []
 
     print("\n" + "=" * 110)
-    print("   ESM-AMP-Screen v1.5.1 — 3-Target V. cholerae Virtual Screening")
+    print("   AMP-Screen — 3-Target V. cholerae Virtual Screening")
     print("   BamA (AF Q9KPW0) | OmpU (5ONU) | LptD (4RHB)")
     print("=" * 110 + "\n")
 
@@ -384,7 +384,7 @@ def run_screening():
     # 6.  Pretty-print summary tables
     # -----------------------------------------------------------------------
     print("\n\n" + "=" * 125)
-    print("       ESM-AMP-Screen v1.5.1 — MULTI-TARGET RESULTS (V. cholerae; BamA = AF Q9KPW0)")
+    print("       AMP-Screen — MULTI-TARGET RESULTS (V. cholerae; BamA = AF Q9KPW0)")
     print("=" * 125)
 
     for target_key, tinfo in TARGETS.items():

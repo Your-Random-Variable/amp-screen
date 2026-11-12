@@ -150,7 +150,7 @@ def generate_pymol_script(
     ensure_dir(script_path.parent)
 
     lines = [
-        "# PyMOL Visualization Script for ESM-AMP-Screen Hits",
+        "# PyMOL Visualization Script for AMP-Screen Hits",
         "reinitialize",
         "bg_color white",
         "set ray_shadows, 0",
@@ -195,7 +195,7 @@ def generate_pymol_script(
         "zoom pocket_1, 6.0",
         "set dash_gap, 0.2",
         "set dash_width, 2.5",
-        "message 'Loaded ESM-AMP-Screen top hits successfully!'"
+        "message 'Loaded AMP-Screen top hits successfully!'"
     ])
 
     script_path.write_text("\n".join(lines), encoding="utf-8")
@@ -321,7 +321,7 @@ def generate_pockets_pymol_script(
     ]
 
     lines = [
-        "# PyMOL Visualization Script for ESM-AMP-Screen Multi-Pocket Cavities",
+        "# PyMOL Visualization Script for AMP-Screen Multi-Pocket Cavities",
         "reinitialize",
         "bg_color white",
         "set ray_shadows, 0",

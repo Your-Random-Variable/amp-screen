@@ -1,4 +1,4 @@
-name: esm-amp-screen
+name: amp-screen
 channels:
   - conda-forge
   - bioconda

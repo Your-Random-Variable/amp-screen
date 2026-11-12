@@ -1,5 +1,5 @@
 """
-Interactive Standalone HTML 3D Report Generator for ESM-AMP-Screen.
+Interactive Standalone HTML 3D Report Generator for AMP-Screen.
 Generates an all-in-one HTML report with 3Dmol.js molecular visualization,
 interactive consensus leaderboard, and biophysical distribution charts.
 Embeds PDB coordinate structures directly to bypass browser CORS restrictions.
@@ -87,7 +87,7 @@ def generate_interactive_html_report(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESM-AMP-Screen: 3D Screening Report</title>
+  <title>AMP-Screen: 3D Screening Report</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.4.2/3Dmol-min.js"></script>
   <style>
     :root {{
@@ -261,7 +261,7 @@ def generate_interactive_html_report(
 
   <div class="header">
     <div>
-      <h1>ESM-AMP-Screen Interactive 3D Report</h1>
+      <h1>AMP-Screen Interactive 3D Report</h1>
       <div class="subtitle">Multi-Stage Protein-Peptide Screening Funnel (Native 3D Geometric Docking + HADDOCK Physics + ML Rescoring)</div>
     </div>
     <div style="text-align: right;">

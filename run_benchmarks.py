@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ESM-AMP-Screen Benchmark: Bound Co-Crystal Pose Rescoring & Sanity Check.
+AMP-Screen Benchmark: Bound Co-Crystal Pose Rescoring & Sanity Check.
 Evaluates the physics engine, solution thermodynamics, and contact analysis
 on bound co-crystal poses across 14 standardized reference complexes from PepBDB / RCSB PDB:
 1. 1AWR: Cyclophilin A + HAGPIA (6 aa)
@@ -180,7 +180,7 @@ def run_all_benchmarks(benchmarks_dir: Path = Path("benchmarks"), out_csv: Path 
     results = []
 
     print("\n" + "="*115)
-    print("      ESM-AMP-SCREEN: STANDARDIZED CO-CRYSTAL BENCHMARK VALIDATION SUITE")
+    print("      AMP-SCREEN: STANDARDIZED CO-CRYSTAL BENCHMARK VALIDATION SUITE")
     print("="*115)
     print(f"Scanning benchmark directory: {benchmarks_dir} ({len(pdb_files)} complexes)\n")
 

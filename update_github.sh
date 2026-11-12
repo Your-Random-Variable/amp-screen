@@ -6,7 +6,7 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$REPO_DIR"
 
 echo "==========================================="
-echo "   ESM-AMP-Screen GitHub Update Script"
+echo "   AMP-Screen GitHub Update Script"
 echo "==========================================="
 
 # Ensure SSH over port 443 is configured (avoids firewall timeout on port 22)
