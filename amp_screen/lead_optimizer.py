@@ -25,9 +25,9 @@ HAS_OPENBABEL = _HAS_OPENBABEL
 
 import PeptideBuilder
 
-from esm_amp_screen.utils import logger, ensure_dir, clean_sequence
-from esm_amp_screen.physics_engine import calculate_haddock_physics_score
-from esm_amp_screen.amp_analyzer import (
+from amp_screen.utils import logger, ensure_dir, clean_sequence
+from amp_screen.physics_engine import calculate_haddock_physics_score
+from amp_screen.amp_analyzer import (
     analyze_complex_contacts,
     analyze_cocomplex_contacts,
     calculate_conformational_entropy_penalty,

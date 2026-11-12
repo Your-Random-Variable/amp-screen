@@ -16,9 +16,9 @@ import shutil
 import pytest
 import gemmi
 
-from esm_amp_screen.receptor_prep import detect_surface_cavities, calculate_grid_box
-from esm_amp_screen.peptide_prep import detect_and_annotate_disulfides, prepare_peptide_pdbqt
-from esm_amp_screen.esm_folder import batch_fold_peptides
+from amp_screen.receptor_prep import detect_surface_cavities, calculate_grid_box
+from amp_screen.peptide_prep import detect_and_annotate_disulfides, prepare_peptide_pdbqt
+from amp_screen.structure_builder import batch_fold_peptides
 
 ROOT = Path(__file__).resolve().parent
 PYTHON = sys.executable
@@ -116,7 +116,7 @@ def test_end_to_end_pipeline():
     out_dir = ROOT / "screening_results_test"
 
     cmd = [
-        PYTHON, "-m", "esm_amp_screen.cli", "run",
+        PYTHON, "-m", "amp_screen.cli", "run",
         "--receptor", str(target_pdb),
         "--library", str(peptides_fa),
         "--output", str(out_dir),

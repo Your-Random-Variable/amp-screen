@@ -16,7 +16,7 @@ try:
 except ImportError:
     meeko = None
 
-from esm_amp_screen.utils import logger, ensure_dir
+from amp_screen.utils import logger, ensure_dir
 
 
 def create_docked_pristine_pdb(orig_pdb: Path, docked_pose_pdb: Path, out_pdb: Path) -> Path:

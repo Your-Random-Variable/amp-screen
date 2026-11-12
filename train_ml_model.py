@@ -24,14 +24,14 @@ from scipy.stats import pearsonr, spearmanr
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, ExtraTreesRegressor
 from sklearn.model_selection import KFold, GroupKFold
 
-from esm_amp_screen.ml_scorer import (
+from amp_screen.ml_scorer import (
     FEATURE_NAMES,
     extract_structural_fingerprint,
     extract_complex_features,
     ELEMENT_PAIRS
 )
-from esm_amp_screen.physics_engine import calculate_haddock_physics_score
-from esm_amp_screen.utils import logger, ensure_dir
+from amp_screen.physics_engine import calculate_haddock_physics_score
+from amp_screen.utils import logger, ensure_dir
 
 
 def featurize_complex(complex_pdb: Path, meta_row: dict) -> list:

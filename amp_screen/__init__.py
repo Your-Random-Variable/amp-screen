@@ -6,13 +6,13 @@ AF-AMP-Screen / AMP-Screen: High-Throughput AlphaFold & Biophysics-Grounded Prot
 __version__ = "1.7.1"
 __author__ = "Ankur Singh"
 
-from esm_amp_screen.alphafold import (
+from amp_screen.alphafold import (
     fetch_alphafold_target,
     fetch_uniprot_sequence,
     prepare_alphafold_multimer_inputs,
     score_alphafold_complex
 )
-from esm_amp_screen.structure_builder import (
+from amp_screen.structure_builder import (
     build_biophysical_peptide,
     fold_peptide,
     batch_fold_peptides,

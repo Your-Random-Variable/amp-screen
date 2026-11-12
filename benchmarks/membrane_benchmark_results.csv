@@ -1,4 +1,4 @@
-id,name,sequence,length,label,group,net_charge_z,charge_density,dg_interfacial,mu_h_alpha,mu_h_beta,mpi_score,hemolysis_risk,therapeutic_index,esm_prob,composite_score,verdict,experimental_mic
+id,name,sequence,length,label,group,net_charge_z,charge_density,dg_interfacial,mu_h_alpha,mu_h_beta,mpi_score,hemolysis_risk,therapeutic_index,deepstamp_prob,composite_score,verdict,experimental_mic
 AMP01,Aurein_1.2,GLFDIIKKIAESF,13,1,DBAASP_AMP,-0.01,-0.0,0.138,0.416,0.028,29.1,0.44,0.66,0.9338,0.6124,Tier 4: Inactive / Poor Membrane Affinity,4.0 µg/ml (2.7 µM)
 AMP02,Temporin_A,FLPLIGRVLSGIL,13,1,DBAASP_AMP,0.99,0.077,-0.193,0.357,0.151,35.9,0.778,0.46,0.9191,0.6391,Tier 4: Inactive / Poor Membrane Affinity,2.5 µg/ml (1.8 µM)
 AMP03,Indolicidin,ILPWKWPWWPWRR,13,1,DBAASP_AMP,2.99,0.23,-0.474,0.19,0.167,43.6,0.662,0.66,0.6902,0.5631,Tier 3: Weak / Marginal Permeabilization,8.0 µg/ml (4.2 µM)

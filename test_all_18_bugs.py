@@ -15,7 +15,7 @@ import numpy as np
 from pathlib import Path
 import gemmi
 
-from esm_amp_screen.physics_engine import (
+from amp_screen.physics_engine import (
     VDW_PARAMS,
     SOLVATION_PARAMS,
     PARTIAL_CHARGES,
@@ -24,7 +24,7 @@ from esm_amp_screen.physics_engine import (
     get_residue_formal_charge,
     calculate_haddock_physics_score
 )
-from esm_amp_screen.amp_analyzer import (
+from amp_screen.amp_analyzer import (
     calculate_net_charge,
     calculate_hydrophobic_moment,
     calculate_mean_hydrophobicity,
@@ -36,15 +36,15 @@ from esm_amp_screen.amp_analyzer import (
     analyze_cocomplex_contacts,
     estimate_solution_affinity
 )
-from esm_amp_screen.ml_scorer import (
+from amp_screen.ml_scorer import (
     ELEMENT_PAIRS,
     MLPeptideScorer,
     RT_LN10
 )
-from esm_amp_screen.lead_optimizer import HADDOCK_TO_DG
-from esm_amp_screen.benchmark import evaluate_docked_complex
-from esm_amp_screen.esm_folder import SECONDARY_STRUCTURE_DIHEDRALS
-from esm_amp_screen.utils import clean_sequence, AA_3TO1
+from amp_screen.lead_optimizer import HADDOCK_TO_DG
+from amp_screen.benchmark import evaluate_docked_complex
+from amp_screen.structure_builder import SECONDARY_STRUCTURE_DIHEDRALS
+from amp_screen.utils import clean_sequence, AA_3TO1
 
 
 def test_p0_1_residue_formal_charges():

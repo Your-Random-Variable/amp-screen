@@ -19,7 +19,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from esm_amp_screen.amp_analyzer import (
+from amp_screen.amp_analyzer import (
     calculate_net_charge,
     calculate_hydrophobic_moment,
     calculate_boman_index,
@@ -27,14 +27,14 @@ from esm_amp_screen.amp_analyzer import (
     clean_sequence,
     analyze_cocomplex_contacts
 )
-from esm_amp_screen.ml_scorer import (
+from amp_screen.ml_scorer import (
     FEATURE_NAMES,
     ELEMENT_PAIRS,
     extract_structural_fingerprint,
     extract_complex_features
 )
-from esm_amp_screen.physics_engine import calculate_haddock_physics_score
-from esm_amp_screen.utils import AA_3TO1
+from amp_screen.physics_engine import calculate_haddock_physics_score
+from amp_screen.utils import AA_3TO1
 import gemmi
 
 OUT_CSV = Path(__file__).resolve().parent / "pdbbind_peptide_affinity_dataset.csv"

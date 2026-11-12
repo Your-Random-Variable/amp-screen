@@ -26,7 +26,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%H:%M:%S"
 )
-logger = logging.getLogger("esm_amp_screen")
+logger = logging.getLogger("amp_screen")
 
 VALID_AMINO_ACIDS = set("ACDEFGHIKLMNPQRSTVWY")
 

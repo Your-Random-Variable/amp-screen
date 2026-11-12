@@ -2,7 +2,7 @@ import unittest
 import tempfile
 from pathlib import Path
 
-from esm_amp_screen.structure_builder import (
+from amp_screen.structure_builder import (
     build_biophysical_peptide,
     fold_peptide,
     predict_secondary_structure_propensity,

@@ -14,7 +14,7 @@ import urllib.error
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
-from esm_amp_screen.utils import logger, clean_sequence, ensure_dir
+from amp_screen.utils import logger, clean_sequence, ensure_dir
 
 # Standard Ramachandran angles for idealized secondary structures.
 # References:

@@ -2,7 +2,7 @@
 """
 AlphaFold-Driven Virtual Screening Pipeline for Unknown Targets and Peptides.
 =============================================================================
-Replaces ESM with an end-to-end AlphaFold workflow:
+End-to-end AlphaFold workflow for unknown targets and peptides:
 1. Unknown Target: Fetches high-confidence predicted structure from AlphaFold Database (AFDB).
 2. Unknown Peptides: Prepares AlphaFold-Multimer & AlphaFold 3 co-folding inputs.
 3. Scoring & Triage: Evaluates co-folded complexes for interface pLDDT, HADDOCK physics,
@@ -15,12 +15,12 @@ Usage:
 from pathlib import Path
 import pandas as pd
 
-from esm_amp_screen.alphafold import (
+from amp_screen.alphafold import (
     fetch_alphafold_target,
     prepare_alphafold_multimer_inputs,
     score_alphafold_complex
 )
-from esm_amp_screen.utils import ensure_dir
+from amp_screen.utils import ensure_dir
 
 # 1. Target Definition (Unknown Target can be specified by UniProt Accession)
 TARGET_UNIPROT = "Q9KPW0"  # Vibrio cholerae BamA Outer Membrane Assembly Factor

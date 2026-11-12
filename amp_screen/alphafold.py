@@ -17,10 +17,10 @@ from typing import Dict, Any, Optional, List, Tuple
 import gemmi
 import numpy as np
 
-from esm_amp_screen.utils import logger, ensure_dir, clean_sequence, AA_3TO1
-from esm_amp_screen.receptor_prep import clean_receptor_pdb
-from esm_amp_screen.physics_engine import calculate_haddock_physics_score
-from esm_amp_screen.amp_analyzer import (
+from amp_screen.utils import logger, ensure_dir, clean_sequence, AA_3TO1
+from amp_screen.receptor_prep import clean_receptor_pdb
+from amp_screen.physics_engine import calculate_haddock_physics_score
+from amp_screen.amp_analyzer import (
     analyze_cocomplex_contacts,
     calculate_net_charge,
     calculate_hydrophobic_moment,
@@ -28,7 +28,7 @@ from esm_amp_screen.amp_analyzer import (
     calculate_boman_index,
     predict_hemolytic_risk_and_selectivity
 )
-from esm_amp_screen.ml_scorer import MLPeptideScorer
+from amp_screen.ml_scorer import MLPeptideScorer
 
 
 # ---------------------------------------------------------------------------

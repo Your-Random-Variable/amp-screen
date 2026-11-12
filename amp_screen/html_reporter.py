@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Any
 import json
 import html
 
-from esm_amp_screen.utils import logger, ensure_dir
+from amp_screen.utils import logger, ensure_dir
 
 
 def generate_interactive_html_report(

@@ -11,7 +11,7 @@ from typing import Dict, List, Optional, Tuple, Any
 import gemmi
 import numpy as np
 
-from esm_amp_screen.utils import logger, clean_sequence
+from amp_screen.utils import logger, clean_sequence
 
 # Eisenberg Consensus Hydrophobicity Scale (normalized, kcal/mol).
 # Reference: Eisenberg et al., J. Mol. Biol. 179:125-142 (1984).

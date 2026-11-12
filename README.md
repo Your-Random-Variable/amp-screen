@@ -256,11 +256,7 @@ amp-screen membrane \
 | :--- | :--- | :--- | :--- | :--- |
 | `--library` | `-l` | Path / Str | *Required* | Peptide library FASTA file, CSV containing a `'sequence'` column, or raw sequence. |
 | `--output` | `-o` | Path | `./membrane_screening_results` | Output directory for membrane screening leaderboard CSV. |
-| `--model` | | String | `facebook/esm2_t12_35M_UR50D` | ESM-2 model checkpoint (cached locally offline). |
-| `--device` | | Choice | `cpu` | Device for ESM-2 inference (`cpu` or `cuda`). |
 | `--top` | | Int | `20` | Number of top candidates to display in the CLI leaderboard. |
-| `--batch-size` | | Int | `32` | ESM-2 batch embedding size for high throughput. |
-| `--no-esm` | | Flag | `False` | Disable ESM-2 and use pure Wimley-White biophysics. |
 
 ---
 
@@ -431,7 +427,7 @@ amp-screen pockets \
 
 ### 7. `amp-screen alphafold` (AlphaFold Suite for Unknown Targets & Peptides)
 
-Replaces ESM with an end-to-end AlphaFold workflow for uncharacterized targets and de novo designed peptides:
+End-to-end AlphaFold workflow for uncharacterized targets and de novo designed peptides:
 
 #### Step 1: Fetch Unknown Target from AlphaFold Database (AFDB)
 Directly query the AlphaFold Database by UniProt accession ID (e.g. `Q9KPW0`), extract structural confidence (pLDDT), and clean the coordinates:

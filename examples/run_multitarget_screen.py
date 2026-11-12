@@ -20,13 +20,13 @@ import pandas as pd
 import numpy as np
 import gemmi
 
-from esm_amp_screen.esm_folder import fold_peptide
-from esm_amp_screen.receptor_prep import detect_surface_cavities
-from esm_amp_screen.docking_engine import dock_single_peptide_geometric
-from esm_amp_screen.physics_engine import calculate_haddock_physics_score
-from esm_amp_screen.amp_analyzer import analyze_cocomplex_contacts, estimate_solution_affinity
-from esm_amp_screen.ml_scorer import MLPeptideScorer
-from esm_amp_screen.utils import logger, ensure_dir
+from amp_screen.structure_builder import fold_peptide
+from amp_screen.receptor_prep import detect_surface_cavities
+from amp_screen.docking_engine import dock_single_peptide_geometric
+from amp_screen.physics_engine import calculate_haddock_physics_score
+from amp_screen.amp_analyzer import analyze_cocomplex_contacts, estimate_solution_affinity
+from amp_screen.ml_scorer import MLPeptideScorer
+from amp_screen.utils import logger, ensure_dir
 
 # --- 1. Define AMP Variants ---
 AMP_VARIANTS = {

@@ -1,11 +1,11 @@
 import unittest
 import tempfile
 from pathlib import Path
-from esm_amp_screen.benchmark import evaluate_docked_complex
+from amp_screen.benchmark import evaluate_docked_complex
 try:
     from run_benchmarks import run_all_benchmarks
 except ImportError:
-    from esm_amp_screen.benchmark import run_all_benchmarks
+    from amp_screen.benchmark import run_all_benchmarks
 
 class TestBenchmark(unittest.TestCase):
     def test_capri_evaluation_benchmark(self):

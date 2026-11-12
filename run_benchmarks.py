@@ -27,16 +27,16 @@ import numpy as np
 from scipy.stats import pearsonr, spearmanr
 import gemmi
 
-from esm_amp_screen.physics_engine import calculate_haddock_physics_score
-from esm_amp_screen.amp_analyzer import (
+from amp_screen.physics_engine import calculate_haddock_physics_score
+from amp_screen.amp_analyzer import (
     analyze_cocomplex_contacts,
     estimate_solution_affinity,
     calculate_net_charge,
     calculate_hydrophobic_moment,
     calculate_boman_index
 )
-from esm_amp_screen.utils import AA_3TO1, logger
-from esm_amp_screen.ml_scorer import MLPeptideScorer
+from amp_screen.utils import AA_3TO1, logger
+from amp_screen.ml_scorer import MLPeptideScorer
 
 # Curated literature experimental reference data and structural provenance:
 # 1AWR: Vajdos et al., Protein Sci 6:2297-2307 (1997) [structure]; CypA active site + HIV-1 CA (HAGPIA, 6 aa; residues 87-92).

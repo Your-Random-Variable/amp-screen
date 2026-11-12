@@ -1,14 +1,14 @@
 """
-Unit Tests for AMP-Screen Membrane Biophysics and ESM-2 Embedding Modules.
+Unit Tests for AMP-Screen Membrane Biophysics Module.
 Tests Wimley-White thermodynamics, Eisenberg amphipathic moments,
-Henderson-Hasselbalch charge calculations, and ESM-2 neural inference.
+and Henderson-Hasselbalch charge calculations.
 """
 
 import unittest
 import numpy as np
 from pathlib import Path
 
-from esm_amp_screen.membrane_scorer import (
+from amp_screen.membrane_scorer import (
     WIMLEY_WHITE_INTERFACIAL,
     WIMLEY_WHITE_OCTANOL,
     EISENBERG_CONSENSUS,
@@ -19,14 +19,6 @@ from esm_amp_screen.membrane_scorer import (
     calculate_amphipathic_moment,
     evaluate_membrane_activity
 )
-try:
-    import torch
-    import transformers
-    from esm_amp_screen.esm_embedder import ESM2Embedder
-    HAS_ESM = True
-except ImportError:
-    HAS_ESM = False
-    ESM2Embedder = None
 
 
 class TestMembraneBiophysics(unittest.TestCase):
@@ -122,40 +114,6 @@ class TestMembraneBiophysics(unittest.TestCase):
             evaluate_membrane_activity("KWK")
 
 
-@unittest.skipUnless(HAS_ESM, "PyTorch/Transformers not installed; ESM optional")
-class TestESMEmbedder(unittest.TestCase):
-    """Verifies ESM-2 model inference, batching, and calibrated sequence predictions."""
-
-    @classmethod
-    def setUpClass(cls):
-        cls.embedder = ESM2Embedder(model_name="facebook/esm2_t12_35M_UR50D", device="cpu")
-
-    def test_embedding_dimensions(self):
-        """Verifies 480-dimensional mean pooling from 35M ESM-2."""
-        seq = "KWKLFKKIEKVGQNIRDGIIK"
-        emb = self.embedder.embed_sequence(seq)
-        self.assertIsInstance(emb, np.ndarray)
-        self.assertEqual(emb.shape, (480,))
-        self.assertFalse(np.isnan(emb).any())
-
-    def test_sequence_embedding_statistics(self):
-        """Verifies neural representation statistics from ESM-2."""
-        seq = "KWKLFKKIEKVGQNIRDGIIKAGPAVAVVGQATQIAK"
-        res = self.embedder.analyze_sequence_embedding(seq)
-        self.assertIn("embedding", res)
-        self.assertEqual(res["embedding_dim"], 480)
-        self.assertGreater(res["embedding_norm"], 0.0)
-        self.assertIsInstance(res["embedding"], np.ndarray)
-
-    def test_batch_embedding_consistency(self):
-        """Verifies that batch embeddings match single sequence embeddings."""
-        seqs = ["ALAKALAK", "KKLLKKLL", "WWFFWWFF"]
-        batch_embs = self.embedder.batch_embed_sequences(seqs)
-        self.assertEqual(len(batch_embs), 3)
-
-        for seq, b_emb in zip(seqs, batch_embs):
-            s_emb = self.embedder.embed_sequence(seq)
-            np.testing.assert_allclose(b_emb, s_emb, rtol=1e-4, atol=1e-4)
 
 
 if __name__ == "__main__":

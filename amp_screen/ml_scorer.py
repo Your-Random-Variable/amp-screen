@@ -15,9 +15,9 @@ import gemmi
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, ExtraTreesRegressor
 import joblib
 
-from esm_amp_screen.utils import logger, AA_3TO1
-from esm_amp_screen.physics_engine import calculate_haddock_physics_score
-from esm_amp_screen.amp_analyzer import (
+from amp_screen.utils import logger, AA_3TO1
+from amp_screen.physics_engine import calculate_haddock_physics_score
+from amp_screen.amp_analyzer import (
     analyze_cocomplex_contacts,
     calculate_net_charge,
     calculate_hydrophobic_moment,

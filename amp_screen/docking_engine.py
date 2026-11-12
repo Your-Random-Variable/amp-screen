@@ -30,8 +30,8 @@ from scipy.optimize import minimize
 import gemmi
 from tqdm import tqdm
 
-from esm_amp_screen.utils import logger, ensure_dir
-from esm_amp_screen.physics_engine import (
+from amp_screen.utils import logger, ensure_dir
+from amp_screen.physics_engine import (
     HEAVY_ATOM_CHARGES,
     VDW_PARAMS
 )

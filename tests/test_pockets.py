@@ -7,8 +7,8 @@ from pathlib import Path
 import tempfile
 import gemmi
 
-from esm_amp_screen.receptor_prep import detect_surface_cavities, calculate_grid_box
-from esm_amp_screen.reporter import generate_pockets_pymol_script
+from amp_screen.receptor_prep import detect_surface_cavities, calculate_grid_box
+from amp_screen.reporter import generate_pockets_pymol_script
 
 
 class TestPocketDetection(unittest.TestCase):

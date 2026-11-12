@@ -13,7 +13,7 @@ import numpy as np
 from scipy.spatial import cKDTree
 from sklearn.cluster import DBSCAN
 
-from esm_amp_screen.utils import logger, ensure_dir, which_tool
+from amp_screen.utils import logger, ensure_dir, which_tool
 
 
 def clean_receptor_pdb(

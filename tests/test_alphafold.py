@@ -1,7 +1,7 @@
 import unittest
 import tempfile
 from pathlib import Path
-from esm_amp_screen.alphafold import (
+from amp_screen.alphafold import (
     prepare_alphafold_multimer_inputs,
     score_alphafold_complex
 )

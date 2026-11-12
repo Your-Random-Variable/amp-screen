@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 import tempfile
 import gemmi
-from esm_amp_screen.amp_analyzer import (
+from amp_screen.amp_analyzer import (
     calculate_net_charge,
     calculate_hydrophobic_moment,
     calculate_mean_hydrophobicity,
@@ -11,7 +11,7 @@ from esm_amp_screen.amp_analyzer import (
     analyze_cocomplex_contacts,
     analyze_complex_contacts
 )
-from esm_amp_screen.utils import clean_sequence
+from amp_screen.utils import clean_sequence
 
 class TestAMPAnalyzer(unittest.TestCase):
     def test_net_charge(self):

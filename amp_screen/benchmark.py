@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import gemmi
 import numpy as np
 
-from esm_amp_screen.utils import logger, ensure_dir
+from amp_screen.utils import logger, ensure_dir
 
 
 def kabsch_superposition(p: np.ndarray, q: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:

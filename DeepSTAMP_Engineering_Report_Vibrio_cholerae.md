@@ -1,6 +1,6 @@
 ---
 title: "DeepSTAMP Engineering Report: Rational Optimization of a Plant Cyclotide Scaffold for Antibacterial Potency Against Vibrio cholerae"
-subtitle: "Multi-Target Structural Pharmacology, 650M ESM-2 Representation Learning, and In Silico Mutagenesis"
+subtitle: "Multi-Target Structural Pharmacology, Neural Representation Learning, and In Silico Mutagenesis"
 author: "Ankur Singh (BRIC - National Institute of Plant Genome Research)"
 date: "November 3, 2026"
 mainfont: "DejaVu Sans"
@@ -24,7 +24,7 @@ header-includes:
 
 This report documents the computational dissection, rational re-engineering, and multi-target structural validation of the 31-amino-acid plant cyclotide **`DIFCGETCAFIPCITHVPGTCSCKSKVCYFN`** to maximize its antibacterial efficacy against the enteric pathogen *Vibrio cholerae*.
 
-Using the **DeepSTAMP** two-tier neural architecture (comprising a frozen 650M ESM-2 foundation layer, residue-level graph neural network, and calibrated task-specific classification heads) coupled with the **AMP-Screen** Cartesian physics and 3D docking engine, we conducted single-residue saturation and combinatorial multi-point mutagenesis across 1,619 variants. We identified **Design B (`KIFCGETCKFIPCITKVPGTCKCKSKVCYFN`)** as the lead candidate:
+Using the **DeepSTAMP** two-tier neural architecture (comprising a protein language foundation layer, residue-level graph neural network, and calibrated task-specific classification heads) coupled with the **AMP-Screen** Cartesian physics and 3D docking engine, we conducted single-residue saturation and combinatorial multi-point mutagenesis across 1,619 variants. We identified **Design B (`KIFCGETCKFIPCITKVPGTCKCKSKVCYFN`)** as the lead candidate:
 
 * **Antibacterial Probability:** Elevated from $0.8520 \to 0.8962$ ($\Delta P = +0.0442$).
 * **Tier-1 Scaffold Integrity:** Preserved at **$0.9969$** confidence score.

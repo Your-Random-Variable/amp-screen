@@ -3,13 +3,13 @@ reinitialize
 bg_color white
 set ray_shadows, 0
 set antialias, 2
-load /home/lab202/.gemini/antigravity/scratch/esm_amp_screen/screening_results/target_receptor.pdb, receptor
+load /home/lab202/.gemini/antigravity/scratch/amp_screen/screening_results/target_receptor.pdb, receptor
 color gray80, receptor
 show cartoon, receptor
 set cartoon_transparency, 0.2, receptor
 
 # Hit 1: Magainin_2_frag (Vina: -12.99 kcal/mol, HADDOCK: -95.4, ML-Kd: 236.1 nM, Composite: 15.84)
-load /home/lab202/.gemini/antigravity/scratch/esm_amp_screen/screening_results/top_complexes/complex_Magainin_2_frag.pdb, hit_1_Magainin_2_frag
+load /home/lab202/.gemini/antigravity/scratch/amp_screen/screening_results/top_complexes/complex_Magainin_2_frag.pdb, hit_1_Magainin_2_frag
 hide everything, hit_1_Magainin_2_frag
 show cartoon, hit_1_Magainin_2_frag and chain B
 show sticks, hit_1_Magainin_2_frag and chain B and not (name c,n,o)
@@ -21,7 +21,7 @@ distance contacts_1, (hit_1_Magainin_2_frag and chain B and (name NZ,NH1,NH2)), 
 color yellow, contacts_1
 
 # Hit 2: Indolicidin (Vina: -11.41 kcal/mol, HADDOCK: -77.8, ML-Kd: 2.0 uM, Composite: 14.36)
-load /home/lab202/.gemini/antigravity/scratch/esm_amp_screen/screening_results/top_complexes/complex_Indolicidin.pdb, hit_2_Indolicidin
+load /home/lab202/.gemini/antigravity/scratch/amp_screen/screening_results/top_complexes/complex_Indolicidin.pdb, hit_2_Indolicidin
 hide everything, hit_2_Indolicidin
 show cartoon, hit_2_Indolicidin and chain B
 show sticks, hit_2_Indolicidin and chain B and not (name c,n,o)

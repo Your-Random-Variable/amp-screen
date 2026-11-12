@@ -16,7 +16,7 @@ from scipy.spatial import cKDTree
 from scipy.spatial.distance import cdist
 import gemmi
 
-from esm_amp_screen.utils import logger
+from amp_screen.utils import logger
 
 # Van der Waals parameters (sigma in Angstroms, epsilon in kcal/mol) — OPLS-AA (Jorgensen et al. JACS 1996)
 # Sigma is the Lennard-Jones collision diameter (zero-energy distance).

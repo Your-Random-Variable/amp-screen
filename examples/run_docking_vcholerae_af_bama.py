@@ -14,11 +14,11 @@ import gemmi
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from esm_amp_screen.docking_engine import dock_single_peptide_geometric
-from esm_amp_screen.physics_engine import calculate_haddock_physics_score
-from esm_amp_screen.amp_analyzer import analyze_cocomplex_contacts
-from esm_amp_screen.ml_scorer import MLPeptideScorer
-from esm_amp_screen.utils import logger, ensure_dir
+from amp_screen.docking_engine import dock_single_peptide_geometric
+from amp_screen.physics_engine import calculate_haddock_physics_score
+from amp_screen.amp_analyzer import analyze_cocomplex_contacts
+from amp_screen.ml_scorer import MLPeptideScorer
+from amp_screen.utils import logger, ensure_dir
 
 # 1. Define AMP Variants
 AMP_VARIANTS = {

@@ -23,24 +23,17 @@ setup(
         "joblib>=1.3.0"
     ],
     extras_require={
-        "esm": [
-            "torch>=2.0.0",
-            "transformers>=4.30.0"
-        ],
         "relaxation": [
             "openbabel-wheel>=3.1.1.20"
         ],
         "all": [
-            "openbabel-wheel>=3.1.1.20",
-            "torch>=2.0.0",
-            "transformers>=4.30.0"
+            "openbabel-wheel>=3.1.1.20"
         ]
     },
     entry_points={
         "console_scripts": [
             "amp-screen = amp_screen.cli:main",
             "af-amp-screen = amp_screen.cli:main",
-            "esm-amp-screen = amp_screen.cli:main",
         ],
     },
     classifiers=[

@@ -27,17 +27,10 @@ dependencies = [
 relaxation = [
     "openbabel-wheel>=3.1.1.20"
 ]
-esm = [
-    "torch>=2.0.0",
-    "transformers>=4.30.0"
-]
 all = [
-    "openbabel-wheel>=3.1.1.20",
-    "torch>=2.0.0",
-    "transformers>=4.30.0"
+    "openbabel-wheel>=3.1.1.20"
 ]
 
 [project.scripts]
 amp-screen = "amp_screen.cli:main"
 af-amp-screen = "amp_screen.cli:main"
-esm-amp-screen = "amp_screen.cli:main"

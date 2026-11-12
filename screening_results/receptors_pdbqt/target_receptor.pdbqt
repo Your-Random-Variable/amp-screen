@@ -1,4 +1,4 @@
-REMARK  Name = /home/lab202/.gemini/antigravity/scratch/esm_amp_screen/screening_results/target_receptor.pdb
+REMARK  Name = /home/lab202/.gemini/antigravity/scratch/amp-screen/screening_results/target_receptor.pdb
 REMARK                            x       y       z     vdW  Elec       q    Type
 REMARK                         _______ _______ _______ _____ _____    ______ ____
 ATOM      1  N   CYS A   1      -6.791  -8.301 -10.211  0.00  0.00    +0.000 N 

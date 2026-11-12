@@ -10,14 +10,14 @@ from pathlib import Path
 from typing import List, Optional, Dict, Any
 import gemmi
 
-from esm_amp_screen import __version__
-from esm_amp_screen.utils import logger, read_fasta, ensure_dir, which_tool, AA_3TO1, is_uniprot_accession
-from esm_amp_screen.structure_builder import batch_fold_peptides, fetch_rcsb_pdb, predict_secondary_structure_propensity
-from esm_amp_screen.receptor_prep import clean_receptor_pdb, calculate_grid_box, detect_surface_cavities
-from esm_amp_screen.peptide_prep import prepare_native_peptides, create_docked_pristine_pdb
-from esm_amp_screen.docking_engine import run_parallel_screening
-from esm_amp_screen.physics_engine import calculate_haddock_physics_score
-from esm_amp_screen.amp_analyzer import (
+from amp_screen import __version__
+from amp_screen.utils import logger, read_fasta, ensure_dir, which_tool, AA_3TO1, is_uniprot_accession
+from amp_screen.structure_builder import batch_fold_peptides, fetch_rcsb_pdb, predict_secondary_structure_propensity
+from amp_screen.receptor_prep import clean_receptor_pdb, calculate_grid_box, detect_surface_cavities
+from amp_screen.peptide_prep import prepare_native_peptides, create_docked_pristine_pdb
+from amp_screen.docking_engine import run_parallel_screening
+from amp_screen.physics_engine import calculate_haddock_physics_score
+from amp_screen.amp_analyzer import (
     calculate_net_charge,
     calculate_hydrophobic_moment,
     calculate_mean_hydrophobicity,
@@ -31,12 +31,12 @@ from esm_amp_screen.amp_analyzer import (
     predict_hemolytic_risk_and_selectivity,
     estimate_solution_affinity
 )
-from esm_amp_screen.reporter import (
+from amp_screen.reporter import (
     export_screening_report,
     create_cocomplex_pdb,
     generate_pockets_pymol_script
 )
-from esm_amp_screen.ml_scorer import MLPeptideScorer
+from amp_screen.ml_scorer import MLPeptideScorer
 
 
 def run_multi_pocket_blind_docking(
@@ -56,9 +56,9 @@ def run_multi_pocket_blind_docking(
     4. Produces a comparative multi-pocket leaderboard, CSV summary, and color-coded PyMOL visualization.
     """
     import pandas as pd
-    from esm_amp_screen.physics_engine import calculate_haddock_physics_score
-    from esm_amp_screen.ml_scorer import MLPeptideScorer
-    from esm_amp_screen.reporter import generate_pockets_pymol_script
+    from amp_screen.physics_engine import calculate_haddock_physics_score
+    from amp_screen.ml_scorer import MLPeptideScorer
+    from amp_screen.reporter import generate_pockets_pymol_script
 
     print("\n" + "="*125)
     print(f"      MULTI-POCKET BLIND DOCKING: SCREENING ACROSS {len(detected_pockets)} DRUGGABLE RECEPTOR POCKETS")
@@ -262,7 +262,7 @@ def run_pipeline(args: argparse.Namespace) -> None:
         rec_pdb_path = clean_receptor_pdb(Path(receptor_arg), rec_pdb_path, receptor_chain=rec_chain)
     elif is_uniprot_accession(receptor_arg):
         # AlphaFold Database UniProt accession (e.g. Q9KPW0 or AF:Q9KPW0)
-        from esm_amp_screen.alphafold import fetch_alphafold_target
+        from amp_screen.alphafold import fetch_alphafold_target
         uid = receptor_arg.split(":")[-1].strip().upper()
         af_res = fetch_alphafold_target(uid, out_pdb=rec_pdb_path, clean=True)
         rec_pdb_path = af_res["pdb_path"]
@@ -695,7 +695,7 @@ def run_pipeline(args: argparse.Namespace) -> None:
                 try:
                     cpx_to_eval = Path(mode_cpx)
                     if getattr(args, "relax", False) and mode_idx == 1:
-                        from esm_amp_screen.lead_optimizer import relax_complex_interface
+                        from amp_screen.lead_optimizer import relax_complex_interface
                         relaxed_cpx = cpx_to_eval.with_name(f"{cpx_to_eval.stem}_relaxed.pdb")
                         cpx_to_eval = relax_complex_interface(
                             cpx_to_eval,
@@ -811,7 +811,7 @@ def run_pipeline(args: argparse.Namespace) -> None:
 
     # AlphaFold-Multimer auto-preparation for top hits
     if getattr(args, "af_multimer", False):
-        from esm_amp_screen.alphafold import prepare_alphafold_multimer_inputs
+        from amp_screen.alphafold import prepare_alphafold_multimer_inputs
         af_out_dir = out_dir / "alphafold_multimer_inputs"
         ensure_dir(af_out_dir)
         st_rec = gemmi.read_structure(str(rec_pdb_path))
@@ -987,9 +987,9 @@ def main():
 def run_pockets_cli(args: argparse.Namespace) -> None:
     """CLI runner to detect, profile, and score the top druggable binding pockets on a receptor."""
     import pandas as pd
-    from esm_amp_screen.receptor_prep import clean_receptor_pdb, detect_surface_cavities
-    from esm_amp_screen.structure_builder import fetch_rcsb_pdb
-    from esm_amp_screen.reporter import generate_pockets_pymol_script
+    from amp_screen.receptor_prep import clean_receptor_pdb, detect_surface_cavities
+    from amp_screen.structure_builder import fetch_rcsb_pdb
+    from amp_screen.reporter import generate_pockets_pymol_script
 
     out_dir = Path(args.output).resolve()
     ensure_dir(out_dir)
@@ -1006,7 +1006,7 @@ def run_pockets_cli(args: argparse.Namespace) -> None:
         rec_pdb_path = clean_receptor_pdb(Path(receptor_arg), rec_pdb_path, receptor_chain=rec_chain)
     elif is_uniprot_accession(receptor_arg):
         # AlphaFold Database UniProt accession (e.g. Q9KPW0 or AF:Q9KPW0)
-        from esm_amp_screen.alphafold import fetch_alphafold_target
+        from amp_screen.alphafold import fetch_alphafold_target
         uid = receptor_arg.split(":")[-1].strip().upper()
         af_res = fetch_alphafold_target(uid, out_pdb=rec_pdb_path, clean=True)
         rec_pdb_path = af_res["pdb_path"]
@@ -1081,7 +1081,7 @@ def run_benchmark_cli(args: argparse.Namespace) -> None:
         try:
             from run_benchmarks import run_all_benchmarks
         except ImportError:
-            from esm_amp_screen.benchmark import run_all_benchmarks
+            from amp_screen.benchmark import run_all_benchmarks
         b_dir = Path(args.benchmarks_dir).resolve()
         o_csv = b_dir / "benchmark_results.csv"
         run_all_benchmarks(b_dir, o_csv)
@@ -1091,7 +1091,7 @@ def run_benchmark_cli(args: argparse.Namespace) -> None:
         logger.error("Both --complex and --reference must be specified, or use --run-all to run the benchmark suite.")
         sys.exit(1)
 
-    from esm_amp_screen.benchmark import evaluate_docked_complex
+    from amp_screen.benchmark import evaluate_docked_complex
     complex_pdb = Path(args.complex).resolve()
     ref_pdb = Path(args.reference).resolve()
     out_super = Path(args.out_superimposed).resolve() if args.out_superimposed else None
@@ -1125,7 +1125,7 @@ def run_benchmark_cli(args: argparse.Namespace) -> None:
 def run_lead_optimization_cli(args: argparse.Namespace) -> None:
     """CLI runner for in silico alanine scanning and lead optimization."""
     import pandas as pd
-    from esm_amp_screen.lead_optimizer import LeadOptimizer
+    from amp_screen.lead_optimizer import LeadOptimizer
 
     complex_pdb = Path(args.complex).resolve()
     out_dir = Path(args.output).resolve() if args.output else complex_pdb.parent / "lead_optimization"
@@ -1216,13 +1216,13 @@ def run_lead_optimization_cli(args: argparse.Namespace) -> None:
 def run_score_cli(args: argparse.Namespace) -> None:
     """CLI runner to score an existing protein-peptide complex."""
     import gemmi
-    from esm_amp_screen.physics_engine import calculate_haddock_physics_score
-    from esm_amp_screen.amp_analyzer import (
+    from amp_screen.physics_engine import calculate_haddock_physics_score
+    from amp_screen.amp_analyzer import (
         analyze_complex_contacts,
         estimate_solution_affinity
     )
-    from esm_amp_screen.ml_scorer import MLPeptideScorer
-    from esm_amp_screen.lead_optimizer import relax_complex_interface, AA_3TO1
+    from amp_screen.ml_scorer import MLPeptideScorer
+    from amp_screen.lead_optimizer import relax_complex_interface, AA_3TO1
 
     complex_pdb = Path(args.complex).resolve()
     if not complex_pdb.exists():
@@ -1323,7 +1323,7 @@ def run_score_cli(args: argparse.Namespace) -> None:
 def run_membrane_screening_cli(args: argparse.Namespace) -> None:
     """CLI runner for direct sequence-first membrane AMP screening."""
     import pandas as pd
-    from esm_amp_screen.membrane_scorer import evaluate_membrane_activity
+    from amp_screen.membrane_scorer import evaluate_membrane_activity
 
     out_dir = Path(args.output).resolve()
     ensure_dir(out_dir)
@@ -1452,7 +1452,7 @@ def run_alphafold_cli(args: argparse.Namespace) -> None:
         print("Run 'amp-screen alphafold --help' for usage.")
         return
 
-    from esm_amp_screen.alphafold import (
+    from amp_screen.alphafold import (
         fetch_alphafold_target,
         fetch_uniprot_sequence,
         prepare_alphafold_multimer_inputs,

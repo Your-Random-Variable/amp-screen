@@ -18,8 +18,8 @@ AutoDock Vina v1.2.5
 #################################################################
 
 Scoring function : vina
-Rigid receptor: /home/lab202/.gemini/antigravity/scratch/esm_amp_screen/screening_results/receptors_pdbqt/target_receptor.pdbqt
-Ligand: /home/lab202/.gemini/antigravity/scratch/esm_amp_screen/screening_results/peptides_pdbqt_stage2/Pexiganan_MSI78.pdbqt
+Rigid receptor: /home/lab202/.gemini/antigravity/scratch/amp-screen/screening_results/receptors_pdbqt/target_receptor.pdbqt
+Ligand: /home/lab202/.gemini/antigravity/scratch/amp-screen/screening_results/peptides_pdbqt_stage2/Pexiganan_MSI78.pdbqt
 Grid center: ligand center (autobox)
 Grid size  : ligand size + 4 A in each dimension (autobox)
 Grid space : 0.375

@@ -6,14 +6,14 @@ from pathlib import Path
 import gemmi
 import numpy as np
 
-from esm_amp_screen.lead_optimizer import (
+from amp_screen.lead_optimizer import (
     relax_complex_interface,
     mutate_peptide_residue,
     LeadOptimizer,
     AA_1TO3,
     HAS_OPENBABEL
 )
-from esm_amp_screen.physics_engine import calculate_haddock_physics_score
+from amp_screen.physics_engine import calculate_haddock_physics_score
 
 def test_mutate_peptide_residue():
     cpx_path = Path("benchmarks/1cka.pdb")

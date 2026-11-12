@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from pathlib import Path
 import tempfile
-from esm_amp_screen.physics_engine import (
+from amp_screen.physics_engine import (
     VDW_PARAMS,
     SOLVATION_PARAMS,
     ALL_ATOM_CHARGES,

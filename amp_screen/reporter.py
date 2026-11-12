@@ -13,9 +13,9 @@ from typing import Dict, List, Optional, Any, Tuple
 import pandas as pd
 import gemmi
 
-from esm_amp_screen.utils import logger, ensure_dir
-from esm_amp_screen.peptide_prep import create_docked_pristine_pdb
-from esm_amp_screen.html_reporter import generate_interactive_html_report
+from amp_screen.utils import logger, ensure_dir
+from amp_screen.peptide_prep import create_docked_pristine_pdb
+from amp_screen.html_reporter import generate_interactive_html_report
 
 
 def estimate_kd(affinity_kcal_mol: float, temp_kelvin: float = 300.0) -> str:
