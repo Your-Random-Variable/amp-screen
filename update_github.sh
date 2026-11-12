@@ -9,12 +9,8 @@ echo "==========================================="
 echo "   AMP-Screen GitHub Update Script"
 echo "==========================================="
 
-# Ensure SSH over port 443 is configured (auto-detects amp-screen with fallback to esm-amp-screen)
-if git ls-remote ssh://git@ssh.github.com:443/Your-Random-Variable/amp-screen.git &>/dev/null; then
-    git remote set-url origin ssh://git@ssh.github.com:443/Your-Random-Variable/amp-screen.git
-else
-    git remote set-url origin ssh://git@ssh.github.com:443/Your-Random-Variable/esm-amp-screen.git
-fi
+# Ensure SSH over port 443 is configured for amp-screen
+git remote set-url origin ssh://git@ssh.github.com:443/Your-Random-Variable/amp-screen.git
 
 # Check if there are any changes
 if [ -z "$(git status --porcelain)" ]; then
