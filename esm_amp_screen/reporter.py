@@ -88,11 +88,15 @@ def convert_docked_pdbqt_to_pdb(
                 return None
             dock_source = docked_pdbqt
 
-        cmd = [obabel_bin, "-ipdbqt", str(dock_source), "-opdb", "-O", str(out_pdb)]
-        res = subprocess.run(cmd, capture_output=True, text=True)
-        if res.returncode == 0 and out_pdb.exists() and out_pdb.stat().st_size > 0:
-            return out_pdb
-        return None
+        try:
+            cmd = [obabel_bin, "-ipdbqt", str(dock_source), "-opdb", "-O", str(out_pdb)]
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            if res.returncode == 0 and out_pdb.exists() and out_pdb.stat().st_size > 0:
+                return out_pdb
+            return None
+        except (FileNotFoundError, Exception) as exc:
+            logger.warning(f"Error executing '{obabel_bin}': {exc}")
+            return None
     finally:
         if temp_pdbqt.exists():
             temp_pdbqt.unlink(missing_ok=True)
@@ -106,6 +110,7 @@ def create_cocomplex_pdb(
     """
     Merges target receptor PDB (Chain A) and docked peptide PDB (Chain B)
     into a single valid co-complex structure.
+    Standardizes peptide chain to 'B' for downstream compatibility.
     """
     out_complex_pdb = Path(out_complex_pdb)
     ensure_dir(out_complex_pdb.parent)
@@ -113,20 +118,17 @@ def create_cocomplex_pdb(
     rec_st = gemmi.read_structure(str(receptor_pdb))
     pep_st = gemmi.read_structure(str(peptide_pose_pdb))
 
-    # Detect existing receptor chain IDs to prevent collisions
-    existing_chains = {chain.name for model in rec_st for chain in model}
-    available_chains = [c for c in "BCDEFGHIJKLMNOPQRSTUVWXYZ" if c not in existing_chains]
-    pep_chain_id = available_chains[0] if available_chains else "Z"
-
-    # Assign non-colliding chain ID to peptide
-    for model in pep_st:
-        for chain in model:
-            chain.name = pep_chain_id
-
-    # Merge into receptor model 0
     if len(rec_st) > 0 and len(pep_st) > 0:
+        model = rec_st[0]
+        # Remove any existing Chain B in receptor to avoid collision with docked peptide
+        if "B" in [c.name for c in model]:
+            model.remove_chain("B")
+
+        # Add peptide chains to receptor model 0 as Chain B
         for chain in pep_st[0]:
-            rec_st[0].add_chain(chain)
+            c_clone = chain.clone()
+            c_clone.name = "B"
+            model.add_chain(c_clone)
 
     rec_st.write_minimal_pdb(str(out_complex_pdb))
     return out_complex_pdb
@@ -342,17 +344,22 @@ def generate_pockets_pymol_script(
         # Contact residue selection
         c_res = p.get("contact_residues", [])
         if c_res:
-            res_nums = []
+            chain_resi_map = {}
             for r in c_res:
                 parts = r.split(":")
-                num = parts[-1]
+                if len(parts) >= 2:
+                    c_id, num = parts[0], parts[-1]
+                else:
+                    c_id, num = "A", parts[0]
                 if num.lstrip("-").isdigit():
-                    res_nums.append(num)
-            if res_nums:
-                res_str = "+".join(res_nums)
+                    chain_resi_map.setdefault(c_id, []).append(num)
+            
+            sel_clauses = [f"(chain {c_id} and resi {'+'.join(nums)})" for c_id, nums in chain_resi_map.items()]
+            if sel_clauses:
+                sel_str = " or ".join(sel_clauses)
                 lines.extend([
                     f"# Pocket {p_id} (Druggability: {score}/100, Vol: {vol} A^3)",
-                    f"select pocket_{p_id}_res, receptor and resi {res_str}",
+                    f"select pocket_{p_id}_res, receptor and ({sel_str})",
                     f"show sticks, pocket_{p_id}_res",
                     f"color {color}, pocket_{p_id}_res",
                     f"set stick_radius, 0.22, pocket_{p_id}_res",

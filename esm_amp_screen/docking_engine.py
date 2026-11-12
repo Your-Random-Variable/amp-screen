@@ -32,17 +32,16 @@ from tqdm import tqdm
 
 from esm_amp_screen.utils import logger, ensure_dir
 from esm_amp_screen.physics_engine import (
-    calculate_haddock_physics_score,
     HEAVY_ATOM_CHARGES,
     VDW_PARAMS
 )
-from esm_amp_screen.amp_analyzer import analyze_cocomplex_contacts
 
 
 def extract_heavy_atoms_and_coords(st: gemmi.Structure, chain_id: Optional[str] = None) -> Dict[str, Any]:
     """
     Extracts heavy atoms (non-H), 3D Cartesian coordinates, Amber united-atom partial charges,
     and Lennard-Jones (sigma, epsilon) parameters from a Gemmi structure.
+    Only analyzes the first model (model 0) to prevent duplicate atoms from NMR ensembles.
     """
     atoms = []
     coords = []
@@ -50,11 +49,20 @@ def extract_heavy_atoms_and_coords(st: gemmi.Structure, chain_id: Optional[str] 
     sigmas = []
     epsilons = []
 
-    for m in st:
-        for c in m:
-            if chain_id is not None and c.name != chain_id:
-                continue
-            for r in c:
+    if len(st) == 0:
+        return {
+            "atoms": [],
+            "coords": np.empty((0, 3)),
+            "charges": np.empty(0),
+            "sigmas": np.empty(0),
+            "epsilons": np.empty(0)
+        }
+
+    m = st[0]
+    for c in m:
+        if chain_id is not None and c.name != chain_id:
+            continue
+        for r in c:
                 res_name = r.name.upper()
                 for a in r:
                     el = a.element.name
@@ -86,7 +94,8 @@ def dock_single_peptide_geometric(
     num_rotations: int = 36,
     num_depths: int = 6,
     num_modes: int = 5,
-    local_only: bool = False
+    local_only: bool = False,
+    receptor_chain: str = "A"
 ) -> Dict[str, Any]:
     """
     Docks a single peptide into a target receptor pocket using native geometric surface matching
@@ -104,8 +113,11 @@ def dock_single_peptide_geometric(
         logger.error(f"Failed to read PDBs for {pep_id}: {exc}")
         return {"pep_id": pep_id, "success": False, "best_affinity": 0.0, "scores": []}
 
-    # Extract receptor Chain A heavy atoms
-    rec = extract_heavy_atoms_and_coords(st_rec, chain_id="A")
+    # Extract receptor heavy atoms (prefer specified receptor chain, else first chain)
+    rec_chains = [c.name for c in st_rec[0]] if len(st_rec) > 0 else []
+    target_rec_chain = receptor_chain if receptor_chain in rec_chains else (rec_chains[0] if rec_chains else "A")
+    rec = extract_heavy_atoms_and_coords(st_rec, chain_id=target_rec_chain)
+
     # Extract peptide heavy atoms (use Chain B if present, else first chain)
     pep_chain_id = "B" if any(c.name == "B" for m in st_pep for c in m) else None
     pep = extract_heavy_atoms_and_coords(st_pep, chain_id=pep_chain_id)
@@ -389,20 +401,20 @@ def dock_single_peptide_geometric(
     st_complex = gemmi.Structure()
     cpx_model = gemmi.Model("1")
 
-    # Add receptor Chain A
-    for m in st_rec:
-        for c in m:
-            if c.name == "A":
-                cpx_model.add_chain(c.clone())
+    # Add receptor chain (standardized to Chain A in complex)
+    if len(st_rec) > 0:
+        for c in st_rec[0]:
+            if c.name == target_rec_chain:
+                c_clone = c.clone()
+                c_clone.name = "A"
+                cpx_model.add_chain(c_clone)
                 break
-        if len(cpx_model) > 0:
-            break
 
     # Add peptide Chain B from pose 1
     if pose_files:
         st_p1 = gemmi.read_structure(str(pose_files[0]))
-        for m in st_p1:
-            for c in m:
+        if len(st_p1) > 0:
+            for c in st_p1[0]:
                 if c.name == "B":
                     cpx_model.add_chain(c.clone())
                     break
@@ -412,18 +424,16 @@ def dock_single_peptide_geometric(
 
     # Binding affinity proxy (scaled negative interaction energy into standard kcal/mol range)
     # Calibrated so that typical good peptide poses land in -7 to -12 kcal/mol range.
-    # Poses with raw_score > 60 are clash-dominated and are hard-floored at -3.0 kcal/mol
-    # (the minimum ceiling value) to distinguish them from genuine weak binders.
+    # Poses with raw_score > 60 are clash-dominated and are floored at 0.0 kcal/mol (non-binding).
     raw_best_score = top_modes[0]["score"]
     if raw_best_score > 60.0:
-        # Clash-rejected pose: hard floor, do not apply continuous calibration
-        estimated_affinity = -3.0
+        estimated_affinity = 0.0
     else:
         estimated_affinity = round(float(np.clip(-6.0 + (raw_best_score / 20.0), -15.0, -3.0)), 2)
 
     def _score_to_affinity(raw: float) -> float:
         if raw > 60.0:
-            return -3.0
+            return 0.0
         return round(float(np.clip(-6.0 + (raw / 20.0), -15.0, -3.0)), 2)
 
     scores_list = [_score_to_affinity(m["score"]) for m in top_modes]
@@ -452,6 +462,7 @@ def run_parallel_screening(
     exhaustiveness: int = 4,
     num_modes: int = 5,
     local_only: bool = False,
+    receptor_chain: str = "A",
     **kwargs
 ) -> Dict[str, Dict[str, Any]]:
     """
@@ -486,7 +497,8 @@ def run_parallel_screening(
                 num_rotations=num_rotations,
                 num_depths=num_depths,
                 num_modes=num_modes,
-                local_only=local_only
+                local_only=local_only,
+                receptor_chain=receptor_chain
             ): pep_id
             for pep_id, lig_path in ligands.items()
         }

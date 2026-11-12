@@ -35,27 +35,37 @@ def clean_receptor_pdb(
 
     doc = gemmi.read_structure(str(input_pdb))
     doc.setup_entities()
+    
+    MODIFIED_AMINO_ACIDS = {
+        "MSE", "SEP", "TPO", "PTR", "CME", "CSO", "CSD", "KCX", "LLP", "PCA", "HYP"
+    }
+    
     try:
         if remove_hetero:
             doc.remove_ligands_and_waters()
         else:
             doc.remove_waters()
     except Exception:
-        # Fallback manual cleaning of crystallographic waters and heteroatoms
+        # Fallback manual cleaning of crystallographic waters and non-standard heteroatoms
         for model in doc:
             for chain in model:
                 to_remove = []
                 for i, res in enumerate(chain):
                     if res.name.upper() in ["HOH", "WAT", "DOD", "H2O", "TIP3"]:
                         to_remove.append(i)
-                    elif remove_hetero and res.het_flag == 'H':
+                    elif remove_hetero and res.het_flag == 'H' and res.name.upper() not in MODIFIED_AMINO_ACIDS:
                         to_remove.append(i)
                 for i in reversed(to_remove):
                     del chain[i]
 
-    # If specific receptor chain requested, filter out extraneous chains (e.g. bound co-crystal peptides)
-    # gemmi Models do not support del model[chain_name] — use remove_chain() method instead.
+    # If specific receptor chain requested, filter out extraneous chains
     if receptor_chain:
+        available_chains = {chain.name for model in doc for chain in model}
+        if receptor_chain not in available_chains:
+            raise ValueError(
+                f"Requested receptor chain '{receptor_chain}' not found in {input_pdb.name}. "
+                f"Available chains: {sorted(list(available_chains))}"
+            )
         for model in doc:
             chains_to_del = [chain.name for chain in model if chain.name != receptor_chain]
             for c_name in chains_to_del:
@@ -94,16 +104,16 @@ def detect_surface_cavities(
     res_id_map = []
     res_name_map = []
 
-    for model in st:
-        for chain in model:
-            for res in chain:
-                if res.name.upper() in ("HOH", "WAT", "TIP3", "SOL", "DOD"):
-                    continue
-                for atom in res:
-                    if atom.element.name != "H":
-                        coords.append([atom.pos.x, atom.pos.y, atom.pos.z])
-                        res_id_map.append(f"{chain.name}:{res.seqid.num}")
-                        res_name_map.append(f"{chain.name}:{res.seqid.num}:{res.name}")
+    model = st[0]
+    for chain in model:
+        for res in chain:
+            if res.name.upper() in ("HOH", "WAT", "TIP3", "SOL", "DOD"):
+                continue
+            for atom in res:
+                if atom.element.name != "H":
+                    coords.append([atom.pos.x, atom.pos.y, atom.pos.z])
+                    res_id_map.append(f"{chain.name}:{res.seqid.num}")
+                    res_name_map.append(f"{chain.name}:{res.seqid.num}:{res.name}")
 
     if not coords:
         return []
@@ -342,11 +352,11 @@ def calculate_grid_box(
             logger.warning(f"Auto-Pocket detection failed: {e}; defaulting to whole-protein center.")
 
     if not coords:
-        for model in st:
-            for chain in model:
-                for res in chain:
-                    for atom in res:
-                        coords.append([atom.pos.x, atom.pos.y, atom.pos.z])
+        model = st[0]
+        for chain in model:
+            for res in chain:
+                for atom in res:
+                    coords.append([atom.pos.x, atom.pos.y, atom.pos.z])
 
     arr = np.array(coords)
     min_pt = arr.min(axis=0)
@@ -368,6 +378,9 @@ def calculate_grid_box(
         "size_y": round(float(dims[1]), 1),
         "size_z": round(float(dims[2]), 1),
     }
+    if pocket_residues:
+        grid["detected_pocket_residues"] = pocket_residues
+
     logger.info(
         f"Search Box: Center=({grid['center_x']}, {grid['center_y']}, {grid['center_z']}), "
         f"Size=({grid['size_x']} x {grid['size_y']} x {grid['size_z']}) Å"

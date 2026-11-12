@@ -1,6 +1,6 @@
 """
 Peptide 3D Preparation Module.
-Freezes peptide backbone dihedrals (phi, psi, omega) in the ESM 3D conformation
+Freezes peptide backbone dihedrals (phi, psi, omega) in the native 3D conformation
 while keeping functional sidechain torsions fully flexible.
 """
 
@@ -184,7 +184,7 @@ def prepare_peptide_pdbqt(
 ) -> Tuple[Path, int]:
     """
     Converts a 3D peptide PDB into a PDBQT with configurable flexibility:
-    - 'rigid': Freezes all internal bonds for ultra-fast screening of ESM folded structures.
+    - 'rigid': Freezes all internal bonds for ultra-fast screening of folded structures.
     - 'sidechain': Freezes backbone dihedrals (phi, psi, omega) while keeping sidechains flexible.
     - Locks disulfide bonds and macrocycles when detected.
     Returns (out_pdbqt_path, num_rotatable_bonds).
@@ -220,6 +220,11 @@ def prepare_peptide_pdbqt(
         has_macro = bool(macro_bonds)
 
         # Step 3: Meeko preparation with configured flexibility and macrocycle locking
+        if meeko is None:
+            raise ImportError(
+                "The 'meeko' package is required for PDBQT preparation. Install it with: pip install meeko"
+            )
+
         if flexibility == "rigid":
             rigid_smarts = ['[*]~[*]']
             rigid_indices = [(0, 1)]

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "esm_amp_screen"
-version = "1.7.0"
+version = "1.7.1"
 description = "High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer"
 readme = "README.md"
 authors = [{ name = "Antigravity Computational Science Team" }]

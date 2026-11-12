@@ -79,14 +79,21 @@ def fetch_rcsb_pdb(pdb_id: str, out_path: Path) -> Path:
 
     logger.info(f"Downloading PDB structure '{pdb_id}' from RCSB...")
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        if resp.status == 200:
-            content = resp.read().decode("utf-8")
-            out_path.write_text(content, encoding="utf-8")
-            logger.info(f"Saved {pdb_id} to {out_path}")
-            return out_path
-        else:
-            raise RuntimeError(f"Failed to fetch PDB {pdb_id} (HTTP {resp.status})")
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            if resp.status == 200:
+                content = resp.read().decode("utf-8")
+                out_path.write_text(content, encoding="utf-8")
+                logger.info(f"Saved {pdb_id} to {out_path}")
+                return out_path
+            else:
+                raise RuntimeError(f"Failed to fetch PDB {pdb_id} (HTTP {resp.status})")
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"PDB structure '{pdb_id}' not found on RCSB (HTTP {e.code}). Verify PDB ID.")
+    except urllib.error.URLError as e:
+        raise RuntimeError(f"Network error connecting to RCSB for PDB '{pdb_id}': {e.reason}")
+    except TimeoutError:
+        raise RuntimeError(f"Connection timed out while downloading PDB '{pdb_id}' from RCSB.")
 
 
 def build_biophysical_peptide(sequence: str, out_pdb: Path, conformation: str = "helix") -> Path:
@@ -98,6 +105,9 @@ def build_biophysical_peptide(sequence: str, out_pdb: Path, conformation: str = 
     from Bio.PDB import PDBIO
 
     seq = clean_sequence(sequence)
+    if not seq:
+        raise ValueError("Cannot build 3D peptide from empty or invalid sequence.")
+
     cfg = SECONDARY_STRUCTURE_DIHEDRALS.get(conformation, SECONDARY_STRUCTURE_DIHEDRALS["helix"])
     phi = cfg["phi"]
     psi = cfg["psi"]
@@ -136,11 +146,16 @@ def fold_peptide(
     out_pdb = Path(out_pdb)
     ensure_dir(out_pdb.parent)
     seq = clean_sequence(sequence)
+    if not seq:
+        raise ValueError(f"Cannot fold peptide '{pep_id}': sequence is empty.")
 
     target_conf = conformation
     if target_conf == "auto":
         target_conf = predict_secondary_structure_propensity(seq)
         logger.info(f"[{pep_id}] Auto-detected optimal conformational prior: '{target_conf}'")
+    elif target_conf == "ensemble":
+        logger.warning(f"[{pep_id}] Single-peptide fold received 'ensemble'; defaulting to 'helix'. Use batch_fold_peptides for full ensemble.")
+        target_conf = "helix"
 
     build_biophysical_peptide(seq, out_pdb, conformation=target_conf)
     

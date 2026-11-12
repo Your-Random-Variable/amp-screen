@@ -3,7 +3,7 @@ AF-AMP-Screen / AMP-Screen: High-Throughput AlphaFold & Biophysics-Grounded Prot
 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer.
 """
 
-__version__ = "1.7.0"
+__version__ = "1.7.1"
 __author__ = "Antigravity Computational Science Team"
 
 from esm_amp_screen.alphafold import (

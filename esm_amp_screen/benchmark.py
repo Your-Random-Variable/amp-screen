@@ -52,7 +52,8 @@ def extract_chain_atoms(
     """
     atoms = {}
     bb_names = {"N", "CA", "C", "O"}
-    for model in structure:
+    if len(structure) > 0:
+        model = structure[0]
         for chain in model:
             if chain.name == chain_name:
                 for res in chain:
@@ -89,16 +90,16 @@ def evaluate_docked_complex(
     docked_rec_cas = {}
     ref_rec_cas = {}
 
-    for model in st_docked:
-        for chain in model:
+    if len(st_docked) > 0:
+        for chain in st_docked[0]:
             if chain.name == docked_rec_chain:
                 for res in chain:
                     for atom in res:
                         if atom.name == "CA":
                             docked_rec_cas[res.seqid.num] = np.array([atom.pos.x, atom.pos.y, atom.pos.z])
 
-    for model in st_ref:
-        for chain in model:
+    if len(st_ref) > 0:
+        for chain in st_ref[0]:
             if chain.name == ref_rec_chain:
                 for res in chain:
                     for atom in res:
@@ -282,3 +283,18 @@ def evaluate_docked_complex(
         "native_contacts_count": len(native_pairs)
     }
     return metrics
+
+
+def run_all_benchmarks(benchmarks_dir: Path = Path("benchmarks"), out_csv: Optional[Path] = None):
+    """
+    Evaluates all standardized reference complexes in benchmarks_dir.
+    Provides a robust loader that works regardless of working directory or installation mode.
+    """
+    import sys
+    benchmarks_dir = Path(benchmarks_dir).resolve()
+    repo_root = benchmarks_dir.parent
+    if str(repo_root) not in sys.path:
+        sys.path.insert(0, str(repo_root))
+    from run_benchmarks import run_all_benchmarks as _run_all
+    return _run_all(benchmarks_dir=benchmarks_dir, out_csv=out_csv or (benchmarks_dir / "benchmark_results.csv"))
+

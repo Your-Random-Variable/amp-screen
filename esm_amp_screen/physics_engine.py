@@ -263,7 +263,9 @@ def calculate_haddock_physics_score(
     # Universal Coarse-Grained United-Atom Scoring:
     # Explicit hydrogens are ignored in distance calculations and charge assignments,
     # as non-polar hydrogens are implicitly parameterized in heavy-atom VDW and united-atom charges.
-    for model in st:
+    # Only model 0 is analyzed to prevent coordinate duplication in multi-model NMR structures.
+    if len(st) > 0:
+        model = st[0]
         for chain in model:
             for res in chain:
                 res_atom_names = {a.name for a in res}

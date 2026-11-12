@@ -36,8 +36,8 @@ ELEMENT_PAIRS = [
 
 # Physical constants for pKd <-> Delta G conversion (Gibbs-Helmholtz / van 't Hoff)
 R_GAS_KCAL = 0.001987204   # Gas constant R in kcal / (mol * K)
-TEMP_KELVIN = 300.0        # Calibration temperature (300 K, ~27 °C; matches training dataset)
-RT_LN10 = R_GAS_KCAL * TEMP_KELVIN * np.log(10.0)  # ~ 1.3727 kcal/mol per pKd unit at 300 K
+TEMP_KELVIN = 298.15       # Standard biochemical temperature (298.15 K, 25 °C)
+RT_LN10 = R_GAS_KCAL * TEMP_KELVIN * np.log(10.0)  # ~ 1.3642 kcal/mol per pKd unit at 298.15 K
 
 # Complete 56-Dimensional Physical Chemistry & Structural Interface Feature Space
 FEATURE_NAMES = []
@@ -155,7 +155,7 @@ def extract_complex_features(
     edesolv = float(physics.get("e_desolv", 10.0))
     bsa = float(physics.get("bsa", 1000.0))
     haddock = float(physics.get("haddock_score", -40.0))
-    e_air = float(physics.get("e_air", -10.0))
+    e_air = float(physics.get("e_air", 0.0))
 
     feat_vec.extend([evdw, eelec, edesolv, bsa, haddock, e_air])
 
@@ -302,7 +302,7 @@ class MLPeptideScorer:
         Each component is mapped to [0, 10] scale before weighting — prevents
         HADDOCK spikes (e.g. +790 for clashing poses) from dominating the score.
         """
-        dock_val = docking_energy if docking_energy is not None else kwargs.get("docking_affinity", kwargs.get("docking_energy", -8.0))
+        dock_val = docking_energy if docking_energy is not None else kwargs.get("vina_affinity", kwargs.get("docking_affinity", kwargs.get("docking_energy", -8.0)))
         sol_dg = sol_delta_g if sol_delta_g is not None else float(dock_val)
         ml_pkd = max(3.0, min(12.0, -sol_dg / RT_LN10))
 

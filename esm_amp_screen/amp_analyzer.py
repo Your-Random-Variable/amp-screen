@@ -67,6 +67,8 @@ def calculate_net_charge(sequence: str, ph: float = 7.4) -> float:
     Reference: Henderson-Hasselbalch; Bjellqvist et al. Electrophoresis 1993.
     """
     seq = clean_sequence(sequence)
+    if not seq:
+        return 0.0
 
     # Positive contributions (protonated = charged at low pH)
     pos = (1.0 / (1.0 + 10 ** (ph - PKA_VALUES["N_term"])))       # N-terminus α-NH3+
@@ -324,6 +326,27 @@ def _compute_pairwise_contacts(
         "GLU": {"OE1", "OE2"}
     }
     _polar_elements = {"N", "O"}
+    _salt_bridge_residue_pairs = set()
+
+    # Heavy atom donor & acceptor definitions for hydrogen bonding
+    _DONORS = {
+        ("ALL", "N"), ("ARG", "NE"), ("ARG", "NH1"), ("ARG", "NH2"),
+        ("LYS", "NZ"), ("HIS", "ND1"), ("HIS", "NE2"), ("HIE", "NE2"), ("HID", "ND1"), ("HIP", "ND1"), ("HIP", "NE2"),
+        ("TRP", "NE1"), ("ASN", "ND2"), ("GLN", "NE2"),
+        ("SER", "OG"), ("THR", "OG1"), ("TYR", "OH"), ("CYS", "SG")
+    }
+    _ACCEPTORS = {
+        ("ALL", "O"), ("ALL", "OXT"), ("ASP", "OD1"), ("ASP", "OD2"),
+        ("GLU", "OE1"), ("GLU", "OE2"), ("ASN", "OD1"), ("GLN", "OE1"),
+        ("HIS", "ND1"), ("HIS", "NE2"), ("HIE", "ND1"), ("HID", "NE2"),
+        ("SER", "OG"), ("THR", "OG1"), ("TYR", "OH")
+    }
+
+    def _is_donor(res: str, atom: str, elem: str) -> bool:
+        return (res, atom) in _DONORS or ("ALL", atom) in _DONORS or (elem == "N" and atom == "N")
+
+    def _is_acceptor(res: str, atom: str, elem: str) -> bool:
+        return (res, atom) in _ACCEPTORS or ("ALL", atom) in _ACCEPTORS or (elem == "O" and atom in ("O", "OXT"))
 
     for latom in lig_atoms:
         lpos = latom["pos"]
@@ -339,7 +362,7 @@ def _compute_pairwise_contacts(
 
             dist = float(np.linalg.norm(lpos - rpos))
 
-            # ── 1. Clash check (<= 1.9 A for non-H heavy atom pairs) ───────
+            # ── 1. Clash check (<= clash_dist for non-H heavy atom pairs) ──
             if dist <= clash_dist:
                 num_clashes += 1
                 continue
@@ -354,18 +377,24 @@ def _compute_pairwise_contacts(
 
                 is_salt = (lig_is_pos and rec_is_neg) or (lig_is_neg and rec_is_pos)
                 if is_salt:
-                    num_salt_bridges += 1
-                    contact_pairs.append(
-                        f"{lres}:{latom_name}--{ratom['chain']}:{rres}{ratom['res_num']}"
-                    )
+                    pair_key = (ratom["chain"], ratom["res_num"], latom["chain"], latom["res_num"])
+                    if pair_key not in _salt_bridge_residue_pairs:
+                        _salt_bridge_residue_pairs.add(pair_key)
+                        num_salt_bridges += 1
+                        contact_pairs.append(
+                            f"{lres}:{latom_name}--{ratom['chain']}:{rres}{ratom['res_num']}"
+                        )
 
             # ── 3. Hydrogen Bond (donor-acceptor heavy atoms: 2.4 A <= d <= 3.5 A) ──
             # Salt bridge pairs are not double-counted as H-bonds.
+            # Requires one donor heavy atom and one acceptor heavy atom.
             if not is_salt and 2.4 <= dist <= hbond_dist:
                 if lelem in _polar_elements and relem in _polar_elements:
-                    l_is_carbonyl_o = (latom_name == "O" and lelem == "O")
-                    r_is_carbonyl_o = (ratom_name == "O" and relem == "O")
-                    if not (l_is_carbonyl_o and r_is_carbonyl_o):
+                    l_don = _is_donor(lres, latom_name, lelem)
+                    l_acc = _is_acceptor(lres, latom_name, lelem)
+                    r_don = _is_donor(rres, ratom_name, relem)
+                    r_acc = _is_acceptor(rres, ratom_name, relem)
+                    if (l_don and r_acc) or (l_acc and r_don):
                         num_hbonds += 1
 
             # ── 4. Hydrophobic Contact (nonpolar C-C pairs: 2.8 A <= d <= 4.5 A) ──

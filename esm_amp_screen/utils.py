@@ -4,9 +4,22 @@ Utility functions for file I/O, sequence parsing, and environment verification.
 
 import sys
 import shutil
+import re
 import logging
 from pathlib import Path
 from typing import Dict, List, Tuple
+
+UNIPROT_REGEX = re.compile(
+    r"^(?:[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9](?:[A-Z][A-Z0-9]{2}[0-9]){1,2})$"
+)
+
+def is_uniprot_accession(identifier: str) -> bool:
+    """Checks if a string matches the standard UniProt accession regex format (e.g. Q9KPW0, P12345)."""
+    val = str(identifier).strip().upper()
+    if val.startswith("AF:"):
+        val = val[3:].strip()
+    return bool(UNIPROT_REGEX.match(val))
+
 
 logging.basicConfig(
     level=logging.INFO,

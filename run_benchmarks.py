@@ -197,13 +197,15 @@ def run_all_benchmarks(benchmarks_dir: Path = Path("benchmarks"), out_csv: Path 
             "exp_delta_g": None
         })
 
-        # 1. Read structure & extract peptide sequence from Chain B
+        # 1. Read structure & extract peptide sequence from Chain B (model 0)
         st = gemmi.read_structure(str(pdb_path))
-        seq = "".join(
-            AA_3TO1.get(res.name.upper(), "X")
-            for m in st for c in m if c.name == "B"
-            for res in c if res.name.upper() in AA_3TO1
-        )
+        seq = ""
+        if len(st) > 0:
+            seq = "".join(
+                AA_3TO1.get(res.name.upper(), "X")
+                for c in st[0] if c.name == "B"
+                for res in c if res.name.upper() in AA_3TO1
+            )
 
         # 2. Compute explicit physics terms
         phys = calculate_haddock_physics_score(pdb_path, receptor_chain="A", peptide_chain="B")

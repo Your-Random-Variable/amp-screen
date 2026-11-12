@@ -1,6 +1,6 @@
 """
-Command-Line Interface (CLI) for ESM-AMP-Screen.
-Ultra-fast, ESM-powered Protein-Peptide & AMP Virtual Screening Pipeline.
+Command-Line Interface (CLI) for AMP-Screen (ESM-AMP-Screen).
+High-throughput Protein-Peptide & AMP Virtual Screening Pipeline with AlphaFold integration.
 """
 
 import sys
@@ -11,10 +11,10 @@ from typing import List, Optional, Dict, Any
 import gemmi
 
 from esm_amp_screen import __version__
-from esm_amp_screen.utils import logger, read_fasta, ensure_dir, which_tool, AA_3TO1
+from esm_amp_screen.utils import logger, read_fasta, ensure_dir, which_tool, AA_3TO1, is_uniprot_accession
 from esm_amp_screen.structure_builder import batch_fold_peptides, fetch_rcsb_pdb, predict_secondary_structure_propensity
 from esm_amp_screen.receptor_prep import clean_receptor_pdb, calculate_grid_box, detect_surface_cavities
-from esm_amp_screen.peptide_prep import batch_prepare_peptides, prepare_native_peptides, create_docked_pristine_pdb
+from esm_amp_screen.peptide_prep import prepare_native_peptides, create_docked_pristine_pdb
 from esm_amp_screen.docking_engine import run_parallel_screening
 from esm_amp_screen.physics_engine import calculate_haddock_physics_score
 from esm_amp_screen.amp_analyzer import (
@@ -260,7 +260,7 @@ def run_pipeline(args: argparse.Namespace) -> None:
     rec_pdb_path = out_dir / "target_receptor.pdb"
     if Path(receptor_arg).exists():
         rec_pdb_path = clean_receptor_pdb(Path(receptor_arg), rec_pdb_path, receptor_chain=rec_chain)
-    elif receptor_arg.upper().startswith("AF:") or (len(receptor_arg) in (6, 10) and receptor_arg.isalnum()):
+    elif is_uniprot_accession(receptor_arg):
         # AlphaFold Database UniProt accession (e.g. Q9KPW0 or AF:Q9KPW0)
         from esm_amp_screen.alphafold import fetch_alphafold_target
         uid = receptor_arg.split(":")[-1].strip().upper()
@@ -295,7 +295,7 @@ def run_pipeline(args: argparse.Namespace) -> None:
     ensure_dir(peptides_pdb_dir)
 
     if library_arg.is_dir():
-        # User already provided a folder of ESM-predicted PDB files
+        # User already provided a folder of pre-generated peptide PDB files
         logger.info(f"Using pre-generated peptide PDBs from directory: {library_arg}")
         peptide_pdbs = list(library_arg.glob("*.pdb"))
         sequences = {}
@@ -317,8 +317,7 @@ def run_pipeline(args: argparse.Namespace) -> None:
         folded = batch_fold_peptides(
             sequences,
             peptides_pdb_dir,
-            conformation=args.conformation,
-            hf_token=args.hf_token
+            conformation=args.conformation
         )
         peptide_pdbs = [p[0] for p in folded.values()]
     else:
@@ -363,7 +362,8 @@ def run_pipeline(args: argparse.Namespace) -> None:
         threads=args.threads,
         max_workers=args.max_workers,
         exhaustiveness=args.exhaustiveness,
-        num_modes=args.num_modes
+        num_modes=args.num_modes,
+        receptor_chain=rec_chain
     )
 
     # 7. Biophysical Profiling & Contact Analysis for Stage 1
@@ -374,22 +374,31 @@ def run_pipeline(args: argparse.Namespace) -> None:
         if not dres["success"]:
             continue
 
-        seq = sequences.get(pep_id, "")
+        parent_id = pep_id.split("__conf_")[0]
+        seq = sequences.get(pep_id) or sequences.get(parent_id, "")
         affinity = dres["best_affinity"]
         top_pose_pdb = dres.get("docked_pdb")
         if not top_pose_pdb or not Path(top_pose_pdb).exists():
             top_pose_pdb = docking_out_dir / f"{pep_id}_pose1.pdb"
 
+        # Resolve secondary structure conformation type
+        if "__conf_" in pep_id:
+            conf_type = pep_id.split("__conf_")[-1]
+        elif args.conformation == "auto":
+            conf_type = predict_secondary_structure_propensity(seq) if seq else "helix"
+        else:
+            conf_type = args.conformation
+
         # Calculate AMP metrics
         z = calculate_net_charge(seq) if seq else 0.0
-        mu_h = calculate_hydrophobic_moment(seq, angle_deg=100.0 if args.conformation == "helix" else 160.0) if seq else 0.0
+        mu_h = calculate_hydrophobic_moment(seq, angle_deg=100.0 if "helix" in conf_type else 160.0) if seq else 0.0
         mean_h = calculate_mean_hydrophobicity(seq) if seq else 0.0
         boman = calculate_boman_index(seq) if seq else 0.0
         heavy_atoms = count_heavy_atoms(seq) if seq else 1
         le = calculate_ligand_efficiency(affinity, heavy_atoms)
         bepr = calculate_per_residue_energy(affinity, len(seq) if seq else 1)
 
-        contacts = analyze_complex_contacts(rec_pdb_path, top_pose_pdb) if top_pose_pdb.exists() else {
+        contacts = analyze_complex_contacts(rec_pdb_path, top_pose_pdb, receptor_chain=rec_chain) if top_pose_pdb.exists() else {
             "salt_bridges": 0, "hbonds": 0, "hydrophobic_contacts": 0, "clashes": 0, "key_contacts": []
         }
 
@@ -406,7 +415,7 @@ def run_pipeline(args: argparse.Namespace) -> None:
         sol_aff = estimate_solution_affinity(
             affinity_kcal_mol=affinity,
             sequence=seq,
-            conformation=args.conformation,
+            conformation=conf_type,
             is_cyclic=args.disulfide_lock
         ) if seq else {"entropy_penalty": 0.0, "solution_delta_g": affinity, "solution_kd": "N/A"}
 
@@ -509,7 +518,8 @@ def run_pipeline(args: argparse.Namespace) -> None:
             max_workers=args.max_workers,
             exhaustiveness=args.refine_exhaustiveness,
             num_modes=args.num_modes,
-            local_only=True
+            local_only=True,
+            receptor_chain=rec_chain
         )
 
         for hit in top_stage1_hits:
@@ -522,7 +532,7 @@ def run_pipeline(args: argparse.Namespace) -> None:
                 if not ref_pose_pdb or not Path(ref_pose_pdb).exists():
                     ref_pose_pdb = stage2_docking_dir / f"{pep_id}_pose1.pdb"
 
-                ref_contacts = analyze_complex_contacts(rec_pdb_path, ref_pose_pdb) if ref_pose_pdb.exists() else {
+                ref_contacts = analyze_complex_contacts(rec_pdb_path, ref_pose_pdb, receptor_chain=rec_chain) if ref_pose_pdb.exists() else {
                     "salt_bridges": hit["salt_bridges"], "hbonds": hit["hbonds"],
                     "hydrophobic_contacts": hit["hydrophobic_contacts"], "clashes": 0, "key_contacts": []
                 }
@@ -541,12 +551,20 @@ def run_pipeline(args: argparse.Namespace) -> None:
                     clashes=ref_contacts["clashes"]
                 )
 
+                hit_seq = hit.get("sequence", "")
+                if "__conf_" in pep_id:
+                    ref_conf = pep_id.split("__conf_")[-1]
+                elif args.conformation == "auto":
+                    ref_conf = predict_secondary_structure_propensity(hit_seq) if hit_seq else "helix"
+                else:
+                    ref_conf = args.conformation
+
                 ref_sol_aff = estimate_solution_affinity(
                     affinity_kcal_mol=ref_affinity,
-                    sequence=hit.get("sequence", ""),
-                    conformation=args.conformation,
+                    sequence=hit_seq,
+                    conformation=ref_conf,
                     is_cyclic=args.disulfide_lock
-                ) if hit.get("sequence") else {"entropy_penalty": 0.0, "solution_delta_g": ref_affinity, "solution_kd": "N/A"}
+                ) if hit_seq else {"entropy_penalty": 0.0, "solution_delta_g": ref_affinity, "solution_kd": "N/A"}
 
                 refined_item = dict(hit)
                 refined_item.update({
@@ -806,7 +824,7 @@ def run_pipeline(args: argparse.Namespace) -> None:
         logger.info(f"Preparing AlphaFold-Multimer / AF3 inputs for top {len(top_cands)} candidates...")
         for cand in top_cands:
             pep_id = cand["pep_id"]
-            p_seq = sequences.get(pep_id, "")
+            p_seq = cand.get("sequence") or sequences.get(pep_id) or sequences.get(pep_id.split("__conf_")[0], "")
             if p_seq and rec_seq:
                 prepare_alphafold_multimer_inputs(
                     target_seq=rec_seq,
@@ -986,7 +1004,7 @@ def run_pockets_cli(args: argparse.Namespace) -> None:
     rec_pdb_path = out_dir / "target_receptor.pdb"
     if Path(receptor_arg).exists():
         rec_pdb_path = clean_receptor_pdb(Path(receptor_arg), rec_pdb_path, receptor_chain=rec_chain)
-    elif receptor_arg.upper().startswith("AF:") or (len(receptor_arg) in (6, 10) and receptor_arg.isalnum()):
+    elif is_uniprot_accession(receptor_arg):
         # AlphaFold Database UniProt accession (e.g. Q9KPW0 or AF:Q9KPW0)
         from esm_amp_screen.alphafold import fetch_alphafold_target
         uid = receptor_arg.split(":")[-1].strip().upper()
@@ -1060,7 +1078,10 @@ def run_pockets_cli(args: argparse.Namespace) -> None:
 
 def run_benchmark_cli(args: argparse.Namespace) -> None:
     if getattr(args, "run_all", False) or (not args.complex and not args.reference):
-        from run_benchmarks import run_all_benchmarks
+        try:
+            from run_benchmarks import run_all_benchmarks
+        except ImportError:
+            from esm_amp_screen.benchmark import run_all_benchmarks
         b_dir = Path(args.benchmarks_dir).resolve()
         o_csv = b_dir / "benchmark_results.csv"
         run_all_benchmarks(b_dir, o_csv)
@@ -1467,7 +1488,7 @@ def run_alphafold_cli(args: argparse.Namespace) -> None:
             fasta = read_fasta(Path(target_input))
             t_name = list(fasta.keys())[0]
             t_seq = list(fasta.values())[0]
-        elif len(target_input) <= 10 and target_input.isalnum() and not all(c in "ACDEFGHIKLMNPQRSTVWY" for c in target_input):
+        elif is_uniprot_accession(target_input):
             # Treat as UniProt ID
             hdr, t_seq = fetch_uniprot_sequence(target_input)
             t_name = target_input

@@ -25,7 +25,8 @@ from esm_amp_screen.amp_analyzer import (
     calculate_net_charge,
     calculate_hydrophobic_moment,
     calculate_mean_hydrophobicity,
-    calculate_boman_index
+    calculate_boman_index,
+    predict_hemolytic_risk_and_selectivity
 )
 from esm_amp_screen.ml_scorer import MLPeptideScorer
 
@@ -58,7 +59,7 @@ def fetch_alphafold_target(
     ensure_dir(out_pdb.parent)
 
     api_url = f"https://alphafold.ebi.ac.uk/api/prediction/{uid}"
-    req = urllib.request.Request(api_url, headers={"User-Agent": "ESM-AMP-Screen/1.5.1"})
+    req = urllib.request.Request(api_url, headers={"User-Agent": "AMP-Screen/1.7.0"})
 
     logger.info(f"Querying AlphaFold Database for UniProt accession: {uid}...")
     try:
@@ -78,7 +79,7 @@ def fetch_alphafold_target(
     global_plddt = float(entry.get("globalMetricValue", 0.0))
     logger.info(f"Downloading AlphaFold structure from {pdb_url} (Global pLDDT: {global_plddt:.1f})...")
 
-    dl_req = urllib.request.Request(pdb_url, headers={"User-Agent": "ESM-AMP-Screen/1.5.1"})
+    dl_req = urllib.request.Request(pdb_url, headers={"User-Agent": "AMP-Screen/1.7.0"})
     try:
         with urllib.request.urlopen(dl_req, timeout=30) as resp:
             raw_pdb = resp.read().decode("utf-8")
@@ -127,7 +128,7 @@ def fetch_uniprot_sequence(uniprot_id: str) -> Tuple[str, str]:
     """
     uid = uniprot_id.strip().upper()
     url = f"https://rest.uniprot.org/uniprotkb/{uid}.fasta"
-    req = urllib.request.Request(url, headers={"User-Agent": "ESM-AMP-Screen/1.5.1"})
+    req = urllib.request.Request(url, headers={"User-Agent": "AMP-Screen/1.7.0"})
     with urllib.request.urlopen(req, timeout=15) as resp:
         text = resp.read().decode("utf-8").strip()
     lines = text.split("\n")
@@ -261,37 +262,42 @@ def score_alphafold_complex(
     pep_seq_parts = []
     rec_coords = []
     pep_coords = []
+    pep_atom_res_idx = []
 
-    for model in st:
-        for chain in model:
+    model = st[0]
+    for chain in model:
+        if chain.name == target_chain:
             for res in chain:
                 ca = res.find_atom("CA", "*")
                 b_val = ca.b_iso if ca else 80.0
-                if chain.name == target_chain:
-                    target_plddts.append(b_val)
-                    for atom in res:
-                        rec_coords.append([atom.pos.x, atom.pos.y, atom.pos.z])
-                elif chain.name == peptide_chain:
-                    pep_plddts.append(b_val)
-                    if res.name.upper() in AA_3TO1:
-                        pep_seq_parts.append(AA_3TO1[res.name.upper()])
-                    for atom in res:
-                        pep_coords.append([atom.pos.x, atom.pos.y, atom.pos.z])
+                target_plddts.append(b_val)
+                for atom in res:
+                    rec_coords.append([atom.pos.x, atom.pos.y, atom.pos.z])
+        elif chain.name == peptide_chain:
+            for res_idx, res in enumerate(chain):
+                ca = res.find_atom("CA", "*")
+                b_val = ca.b_iso if ca else 80.0
+                pep_plddts.append(b_val)
+                if res.name.upper() in AA_3TO1:
+                    pep_seq_parts.append(AA_3TO1[res.name.upper()])
+                for atom in res:
+                    pep_coords.append([atom.pos.x, atom.pos.y, atom.pos.z])
+                    pep_atom_res_idx.append(res_idx)
 
     pep_seq = "".join(pep_seq_parts)
     mean_target_plddt = float(np.mean(target_plddts)) if target_plddts else 0.0
     mean_pep_plddt = float(np.mean(pep_plddts)) if pep_plddts else 0.0
 
-    # 2. Interface pLDDT (residues within 5.0 A of partner chain)
+    # 2. Interface pLDDT (contacting peptide residues within 5.0 A of target chain)
     interface_plddts = []
     if rec_coords and pep_coords:
         from scipy.spatial.distance import cdist
         dists = cdist(np.array(rec_coords), np.array(pep_coords))
-        # Identify interface atoms (< 5.0 A)
-        close_rec_idx = np.where(dists.min(axis=1) <= 5.0)[0]
-        close_pep_idx = np.where(dists.min(axis=0) <= 5.0)[0]
-        # Approximate interface pLDDT from peptide residues
-        interface_plddts = pep_plddts if pep_plddts else [mean_pep_plddt]
+        # Identify interface peptide atoms (< 5.0 A to any receptor atom)
+        close_pep_atom_indices = np.where(dists.min(axis=0) <= 5.0)[0]
+        contacting_res_indices = set(pep_atom_res_idx[i] for i in close_pep_atom_indices)
+        if contacting_res_indices and pep_plddts:
+            interface_plddts = [pep_plddts[i] for i in contacting_res_indices if i < len(pep_plddts)]
 
     interface_plddt = float(np.mean(interface_plddts)) if interface_plddts else mean_pep_plddt
 
@@ -328,22 +334,14 @@ def score_alphafold_complex(
     mean_h = calculate_mean_hydrophobicity(pep_seq) if pep_seq else 0.0
     boman = calculate_boman_index(pep_seq) if pep_seq else 0.0
 
-    # Hemolysis & Toxicity Rules
-    if mean_h > 0.22:
-        hemo_risk = "Moderate (Hydrophobic patch intact)"
-    elif mean_h > 0.10:
-        hemo_risk = "Low"
-    else:
-        hemo_risk = "Very Low (< 1%)"
-
-    if net_chg > 7.0:
-        tox_verdict = "High Cytotoxic Risk (Polycationic > +7.0)"
-    elif net_chg > 5.5:
-        tox_verdict = "Moderate-High (Approaching +6.0)"
-    elif net_chg >= 3.0:
-        tox_verdict = "Safe Therapeutic Window"
-    else:
-        tox_verdict = "Membrane Impermeable (Negative/Low Charge)"
+    # Hemolysis & Toxicity Profile
+    hemo_profile = predict_hemolytic_risk_and_selectivity(
+        net_charge=net_chg,
+        mean_hydrophobicity=mean_h,
+        hydrophobic_moment=u_h
+    )
+    hemo_risk = hemo_profile["hemolytic_risk"]
+    tox_verdict = hemo_profile["therapeutic_selectivity"]
 
     # 7. Executive Decision Verdict
     if contacts["clashes"] > 0:
