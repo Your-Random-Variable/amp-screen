@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "esm_amp_screen"
+name = "amp-screen"
 version = "1.7.1"
 description = "High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer"
 readme = "README.md"
@@ -38,6 +38,6 @@ all = [
 ]
 
 [project.scripts]
-amp-screen = "esm_amp_screen.cli:main"
-af-amp-screen = "esm_amp_screen.cli:main"
-esm-amp-screen = "esm_amp_screen.cli:main"
+amp-screen = "amp_screen.cli:main"
+af-amp-screen = "amp_screen.cli:main"
+esm-amp-screen = "amp_screen.cli:main"

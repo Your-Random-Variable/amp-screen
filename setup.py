@@ -1,12 +1,13 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="esm_amp_screen",
+    name="amp-screen",
     version="1.7.1",
     description="High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     author="Ankur Singh",
+    url="https://github.com/Your-Random-Variable/amp-screen",
     packages=find_packages(),
     python_requires=">=3.9",
     install_requires=[
@@ -37,9 +38,9 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "amp-screen = esm_amp_screen.cli:main",
-            "af-amp-screen = esm_amp_screen.cli:main",
-            "esm-amp-screen = esm_amp_screen.cli:main",
+            "amp-screen = amp_screen.cli:main",
+            "af-amp-screen = amp_screen.cli:main",
+            "esm-amp-screen = amp_screen.cli:main",
         ],
     },
     classifiers=[

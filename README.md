@@ -191,8 +191,8 @@ AMP-Screen is built for high-throughput concurrency, scaling seamlessly from 4-c
 
 ```bash
 # Clone the repository
-git clone https://github.com/Your-Random-Variable/esm-amp-screen.git
-cd esm-amp-screen
+git clone https://github.com/Your-Random-Variable/amp-screen.git
+cd amp-screen
 
 # Create and activate environment
 conda env create -f environment.yml
@@ -542,7 +542,7 @@ If you use **AMP-Screen** in your research, please cite:
 @software{amp_screen_2026,
   author = {Singh, Ankur},
   title = {AMP-Screen: High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer},
-  url = {https://github.com/Your-Random-Variable/esm-amp-screen},
+  url = {https://github.com/Your-Random-Variable/amp-screen},
   version = {1.7.1},
   year = {2026}
 }
