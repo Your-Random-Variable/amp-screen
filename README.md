@@ -77,6 +77,8 @@ Peptide Library (FASTA / PDBs) ──► Target Protein (PDB / RCSB ID, with --r
 
 ### 📊 Standardized 14-Complex Benchmark Suite (Experimental Validation)
 
+> 📖 **Full Comparative Benchmark Report:** See [BENCHMARKS.md](BENCHMARKS.md) for head-to-head comparisons against 7 published docking suites (AutoDock Vina, Vinardo, GNINA CNN, HADDOCK 2.4, HDOCK, Rosetta FlexPepDock, ADCP), empirical CAPRI pose metrics, in silico alanine scanning hotspot validation, and instructions to reproduce all benchmarks.
+
 The physics and solution thermodynamics engines are evaluated on **14 standardized benchmark co-crystal complexes** across 6 protein families (shipped inside `benchmarks/`). This benchmark evaluates physical force-field rescoring and the 56D trained ML ensemble predictions directly against published experimental wet-lab measurements ($K_d$ and $\Delta G^\circ$):
 
 | Benchmark PDB | Target Receptor | Receptor Family | Peptide Sequence (Length) | Experimental $K_d$ | Exp $\Delta G^\circ$ | Physical $\Delta G_{\text{sol}}$ | **Calibrated ML $\Delta G$** | **Calibrated ML $K_d$** | Absolute Error ($\|\Delta\Delta G\|$) | Experimental Assay |
