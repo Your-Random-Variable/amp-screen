@@ -11,7 +11,7 @@
 </p>
 
 **AMP-Screen** (`amp-screen` / `af-amp-screen`) is a high-throughput, physics-grounded computational framework for peptide virtual screening, protein-peptide interaction modeling, and rational lead optimization:
-1. **AlphaFold Suite (`amp-screen alphafold`)**: Full integration with the AlphaFold ecosystem—automatic AlphaFold Database (AFDB) receptor fetching via UniProt IDs, AlphaFold-Multimer / AlphaFold 3 input preparation, and co-complex evaluation (interface pLDDT, HADDOCK force fields, 56D ML calibrated binding affinity, and toxicity triage).
+1. **AlphaFold Suite (`amp-screen alphafold`)**: Full integration with the AlphaFold ecosystem—automatic AlphaFold Database (AFDB) receptor fetching via UniProt IDs, AlphaFold-Multimer / AlphaFold 3 input preparation, and co-complex evaluation (interface pLDDT, HADDOCK force fields, 88D ML calibrated binding affinity, and toxicity triage).
 2. **Membrane Mode (`amp-screen membrane`)**: Ultra-fast sequence-first peptide membrane biophysical profiling leveraging **Wimley-White interfacial thermodynamics** ($\Delta G_{\text{w}\to\text{if}}$, $\Delta G_{\text{w}\to\text{oct}}$, Eisenberg amphipathic moments $\mu_H$, Membrane Permeabilization Index MPI, and in silico therapeutic index)—screening **>100,000 peptides/hour** with pure biophysics (no external model weights required).
 3. **Target Mode (`amp-screen target` / `run`)**: Pure **Native 3D Geometric Surface Docking Engine** operating 100% in Cartesian coordinates ($\text{\AA}$) via Gemmi & NumPy—completely replacing AutoDock Vina, PDBQT files, and Meeko. Integrates longitudinal pocket cleft alignment, continuous soft-core Lennard-Jones, distance-dependent Coulomb electrostatics, downhill simplex interface refinement, and **HADDOCK 2.4 explicit physics**.
 4. **Multi-Pocket Blind Docking & Cavity Discovery (`amp-screen pockets` & `--blind-pockets 5`)**: Automated **7-Ray Protein-Solvent-Protein (PSP / LIGSITE standard)** grid concavity detector discovering the top 5 distinct surface pockets with **0–100 Druggability Scores**, cavity volumes ($\text{\AA}^3$), enclosure depths, and hydrophobic ratios—enabling comprehensive blind docking across all putative binding sites and allosteric clefts.
@@ -63,13 +63,13 @@ Peptide Library (FASTA / PDBs) ──► Target Protein (PDB / RCSB ID, with --r
                                      │ (Top Candidate Modes)
                                      ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│ STAGE 3: Multi-Mode HADDOCK Physics & 56D ML Ensemble Consensus        │
+│ STAGE 3: Multi-Mode HADDOCK Physics & 88D ML Ensemble Consensus        │
 │ • Multi-Mode Pose Rescoring (--rescore-modes 5): evaluates modes M1..M5│
 │ • United-atom charge model (cationic AMPs strictly positive formal Z)  │
 │ • Continuous electrostatics (9–12 Å canonical C2 quintic switch)       │
 │ • Lennard-Jones 12-6 with steep repulsive wall (+500 kcal/mol clash)   │
 │ • Shrake–Rupley buried surface area (BSA) & Eisenberg desolvation      │
-│ • 56D ML physical chemistry ensemble & calibrated solution Kd ranking  │
+│ • 88D ML physical chemistry ensemble & calibrated solution Kd ranking  │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -79,7 +79,7 @@ Peptide Library (FASTA / PDBs) ──► Target Protein (PDB / RCSB ID, with --r
 
 > 📖 **Full Comparative Benchmark Report:** See [BENCHMARKS.md](BENCHMARKS.md) for head-to-head comparisons against 7 published docking suites (AutoDock Vina, Vinardo, GNINA CNN, HADDOCK 2.4, HDOCK, Rosetta FlexPepDock, ADCP), empirical CAPRI pose metrics, in silico alanine scanning hotspot validation, and instructions to reproduce all benchmarks.
 
-The physics and solution thermodynamics engines are evaluated on **14 standardized benchmark co-crystal complexes** across 6 protein families (shipped inside `benchmarks/`). This benchmark evaluates physical force-field rescoring and the 56D trained ML ensemble predictions directly against published experimental wet-lab measurements ($K_d$ and $\Delta G^\circ$):
+The physics and solution thermodynamics engines are evaluated on **14 standardized benchmark co-crystal complexes** across 6 protein families (shipped inside `benchmarks/`). This benchmark evaluates physical force-field rescoring and the 88D trained ML ensemble predictions directly against published experimental wet-lab measurements ($K_d$ and $\Delta G^\circ$):
 
 | Benchmark PDB | Target Receptor | Receptor Family | Peptide Sequence (Length) | Experimental $K_d$ | Exp $\Delta G^\circ$ | Physical $\Delta G_{\text{sol}}$ | **Calibrated ML $\Delta G$** | **Calibrated ML $K_d$** | Absolute Error ($\|\Delta\Delta G\|$) | Experimental Assay |
 | :---: | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
@@ -99,7 +99,7 @@ The physics and solution thermodynamics engines are evaluated on **14 standardiz
 | **1SSH** | Yeast YFR024C-A SH3 | SH3 Domain | `GPPPAMPARPT` (11 aa) | Unreported | *Unmeasured* | $-7.70$ | **$-7.71\text{ kcal/mol}$** | **$2.2\ \mu\text{M}$** | *Physically consistent* | X-ray |
 
 ### Summary Statistics Across 12 Experimentally Quantified Targets:
-- **Calibrated 56D ML Ensemble:**
+- **Calibrated 88D ML Ensemble:**
   - **Mean Absolute Error (MAE):** **`0.12 kcal/mol`**
   - **Root Mean Square Error (RMSE):** **`0.13 kcal/mol`**
   - **Maximum Absolute Error:** **`0.19 kcal/mol`**
@@ -107,10 +107,10 @@ The physics and solution thermodynamics engines are evaluated on **14 standardiz
 - **Physical Force-Field ($\Delta G_{\text{sol}}$):**
   - **MAE:** `2.59 kcal/mol`, **RMSE:** `3.39 kcal/mol`, **Pearson $r$:** `0.465` ($p = 0.1279$), **Spearman $\rho$:** `0.385`
 - **Expanded Complex Dataset Benchmark ($N=381$ across 40 protein families, GroupKFold CV):**
-  - **Cross-Validated Pearson $r$:** **`0.4630`** ($p = 1.21 \times 10^{-21}$)
-  - **Cross-Validated Spearman $\rho$:** **`0.4487`**
-  - **Mean Absolute Error (MAE):** **`0.729 pKd units`** (~$0.99\text{ kcal/mol}$)
-  - **Root Mean Square Error (RMSE):** **`0.881 pKd units`** (~$1.20\text{ kcal/mol}$)
+  - **Cross-Validated Pearson $r$:** **`0.4910`** ($p = 1.63 \times 10^{-24}$)
+  - **Cross-Validated Spearman $\rho$:** **`0.4641`**
+  - **Mean Absolute Error (MAE):** **`0.710 pKd units`** (~$0.97\text{ kcal/mol}$)
+  - **Root Mean Square Error (RMSE):** **`0.865 pKd units`** (~$1.18\text{ kcal/mol}$)
 
 > [!IMPORTANT]
 > **Scientific Rigor & Scope:** The 12 experimentally quantified co-crystals serve as a gold-standard sanity check validating that calibrated predictions closely track wet-lab solution affinities across diverse peptide lengths (5–13 residues) and receptor families (SH3, SH2, PDZ, Chaperone, Apoptosis). The GroupKFold cross-validation across 40 distinct protein families verifies generalization to novel receptor targets.
@@ -123,29 +123,29 @@ The physics and solution thermodynamics engines are evaluated on **14 standardiz
 
 To strictly test **out-of-distribution, blind generalization** on protein-peptide systems with **zero overlap** with the 381 PDBbind training dataset (`data/pdbbind_peptide_affinity_dataset.csv`), we assembled and evaluated an independent test suite of **18 high-resolution co-crystal structures** with published ITC, SPR, and FP solution affinities:
 
-| PDB ID | Target Receptor | Peptide Name | Peptide Sequence ($L$) | Experimental $K_d$ | Exp $\Delta G^\circ$ | Physical $\Delta G$ | **56D ML $\Delta G$** | **56D ML $K_d$** | Absolute Error | Assay & Citation |
+| PDB ID | Target Receptor | Peptide Name | Peptide Sequence ($L$) | Experimental $K_d$ | Exp $\Delta G^\circ$ | Physical $\Delta G$ | **88D ML $\Delta G$** | **88D ML $K_d$** | Absolute Error | Assay & Citation |
 | :---: | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **1X2R** | Keap1 Kelch Domain | Nrf2 ETGE | `LDEETGEFL` (9 aa) | $5.0\text{ nM}$ | $-11.32\text{ kcal/mol}$ | $-8.22$ | **$-10.77\text{ kcal/mol}$** | **$13\text{ nM}$** | **$0.55\text{ kcal/mol}$** | ITC (Tong et al., 2006) |
-| **2FLU** | Keap1 Kelch Domain | Nrf2 Neh2 | `AFFAQLQLDEETGEFL` (16 aa) | $9.0\text{ nM}$ | $-10.97\text{ kcal/mol}$ | $-8.16$ | **$-9.43\text{ kcal/mol}$** | **$123\text{ nM}$** | **$1.54\text{ kcal/mol}$** | ITC (Lo et al., 2006) |
-| **2NL9** | Mcl-1 Oncoprotein | Bim BH3 | `RPEIWIAQELRRIGDEFNAYYAR` (23 aa) | $2.0\text{ nM}$ | $-11.87\text{ kcal/mol}$ | $-10.12$ | **$-9.91\text{ kcal/mol}$** | **$54\text{ nM}$** | **$1.96\text{ kcal/mol}$** | SPR (Lee et al., 2008) |
-| **6QG8** | Bcl-2 Oncoprotein | PUMA BH3 | `EEEQWAREIGAQLRRMADDL` (20 aa) | $2.4\text{ nM}$ | $-11.75\text{ kcal/mol}$ | $-8.97$ | **$-9.69\text{ kcal/mol}$** | **$79\text{ nM}$** | **$2.06\text{ kcal/mol}$** | SPR (Stewart et al., 2019) |
-| **1QZ7** | $\beta$-Catenin | Axin | `EENPESILDEHVQRVMK` (17 aa) | $72\text{ nM}$ | $-9.75\text{ kcal/mol}$ | $-8.21$ | **$-9.31\text{ kcal/mol}$** | **$149\text{ nM}$** | **$0.44\text{ kcal/mol}$** | ITC (Xing et al., 2003) |
-| **1TW6** | cIAP1 BIR3 Domain | Smac tetrapeptide | `AVPI` (4 aa) | $280\text{ nM}$ | $-8.94\text{ kcal/mol}$ | $-7.85$ | **$-8.06\text{ kcal/mol}$** | **$1.2\ \mu\text{M}$** | **$0.88\text{ kcal/mol}$** | FP (Sun et al., 2004) |
-| **1SFI** | Bovine Trypsin | SFTI-1 (cyclic) | `GRCTKSIPPICFPD` (14 aa) | $0.1\text{ nM}$ | $-13.64\text{ kcal/mol}$ | $-8.80$ | **$-8.41\text{ kcal/mol}$** | **$682\text{ nM}$** | **$5.23\text{ kcal/mol}$** | Enzyme $K_i$ (Korsinczky 2001) |
-| **3D9L** | Nrd1 CTD Domain | RNAPII CTD | `PSYPTSP` (7 aa) | $20.0\ \mu\text{M}$ | $-6.41\text{ kcal/mol}$ | $-6.88$ | **$-7.33\text{ kcal/mol}$** | **$4.2\ \mu\text{M}$** | **$0.92\text{ kcal/mol}$** | ITC (Vassal et al., 2008) |
-| **1MFG** | Erbin PDZ Domain | ErbB2 C-tail | `EYLGLDVPV` (9 aa) | $50.0\ \mu\text{M}$ | $-5.87\text{ kcal/mol}$ | $-8.13$ | **$-9.58\text{ kcal/mol}$** | **$95\text{ nM}$** | **$3.71\text{ kcal/mol}$** | Fluorescence (Birrane 2003) |
-| **1UJ0** | STAM2 SH3 Domain | UBPY peptide | `TPMVNRENK` (9 aa) | $27.0\ \mu\text{M}$ | $-6.23\text{ kcal/mol}$ | $-7.89$ | **$-7.50\text{ kcal/mol}$** | **$3.2\ \mu\text{M}$** | **$1.27\text{ kcal/mol}$** | SPR (Kaneko 2003) |
-| **2PUY** | BHC80 PHD Finger | Histone H3 | `ARTKQTARKS` (10 aa) | $30.0\ \mu\text{M}$ | $-6.17\text{ kcal/mol}$ | $-6.83$ | **$-6.27\text{ kcal/mol}$** | **$25.3\ \mu\text{M}$** | **$0.10\text{ kcal/mol}$** | ITC (Lan et al., 2007) |
-| **2AK5** | $\beta$-PIX SH3 Domain | Cbl-b PR | `RPPKPRPR` (8 aa) | $14.0\ \mu\text{M}$ | $-6.62\text{ kcal/mol}$ | $-6.83$ | **$-6.63\text{ kcal/mol}$** | **$13.9\ \mu\text{M}$** | **$0.01\text{ kcal/mol}$** | ITC (Wu et al., 2005) |
-| **1BC5** | CheR Methyltransferase | Receptor NWETF | `NWETF` (5 aa) | $2.0\ \mu\text{M}$ | $-7.78\text{ kcal/mol}$ | $-8.36$ | **$-9.83\text{ kcal/mol}$** | **$63\text{ nM}$** | **$2.05\text{ kcal/mol}$** | Binding assay (Djordjevic 1998) |
-| **1D4T** | SAP SH2 Domain | SLAM peptide | `KSLTIYAQVQK` (11 aa) | $650\text{ nM}$ | $-8.44\text{ kcal/mol}$ | $-9.24$ | **$-10.32\text{ kcal/mol}$** | **$27\text{ nM}$** | **$1.88\text{ kcal/mol}$** | ITC (Poy et al., 1999) |
-| **3DXC** | Fe65-PTB2 Domain | APP AICD | `AVTPEERHLSKMQQNGYENPTYKFFEQM` (28 aa) | $220\text{ nM}$ | $-9.08\text{ kcal/mol}$ | $-10.12$ | **$-10.09\text{ kcal/mol}$** | **$40\text{ nM}$** | **$1.01\text{ kcal/mol}$** | ITC (Radzimanowski 2008) |
-| **1SE0** | DIAP1 BIR1 Domain | Grim IBM | `AIAYFIP` (7 aa) | $120\text{ nM}$ | $-9.44\text{ kcal/mol}$ | $-8.22$ | **$-9.59\text{ kcal/mol}$** | **$93\text{ nM}$** | **$0.15\text{ kcal/mol}$** | ITC (Yan et al., 2004) |
-| **3C3O** | ALIX Bro1 Domain | CHMP4A C-helix | `DEEALKQLAEWVS` (13 aa) | $45\text{ nM}$ | $-10.02\text{ kcal/mol}$ | $-8.18$ | **$-9.08\text{ kcal/mol}$** | **$221\text{ nM}$** | **$0.94\text{ kcal/mol}$** | SPR (McCullough 2008) |
-| **1HC9** | $\alpha$-Bungarotoxin | nAChR Mimotope | `WRYYESSLLPYPD` (13 aa) | $2.0\text{ nM}$ | $-11.87\text{ kcal/mol}$ | $-8.83$ | **$-9.67\text{ kcal/mol}$** | **$82\text{ nM}$** | **$2.20\text{ kcal/mol}$** | Binding assay (Harel 2001) |
+| **1X2R** | Keap1 Kelch Domain | Nrf2 ETGE | `LDEETGEFL` (9 aa) | $5.0\text{ nM}$ | $-11.32\text{ kcal/mol}$ | $-8.22$ | **$-10.45\text{ kcal/mol}$** | **$22\text{ nM}$** | **$0.87\text{ kcal/mol}$** | ITC (Tong et al., 2006) |
+| **2FLU** | Keap1 Kelch Domain | Nrf2 Neh2 | `AFFAQLQLDEETGEFL` (16 aa) | $9.0\text{ nM}$ | $-10.97\text{ kcal/mol}$ | $-8.16$ | **$-9.68\text{ kcal/mol}$** | **$80\text{ nM}$** | **$1.29\text{ kcal/mol}$** | ITC (Lo et al., 2006) |
+| **2NL9** | Mcl-1 Oncoprotein | Bim BH3 | `RPEIWIAQELRRIGDEFNAYYAR` (23 aa) | $2.0\text{ nM}$ | $-11.87\text{ kcal/mol}$ | $-10.12$ | **$-10.66\text{ kcal/mol}$** | **$15\text{ nM}$** | **$1.21\text{ kcal/mol}$** | SPR (Lee et al., 2008) |
+| **6QG8** | Bcl-2 Oncoprotein | PUMA BH3 | `EEEQWAREIGAQLRRMADDL` (20 aa) | $2.4\text{ nM}$ | $-11.75\text{ kcal/mol}$ | $-8.97$ | **$-9.85\text{ kcal/mol}$** | **$60\text{ nM}$** | **$1.90\text{ kcal/mol}$** | SPR (Stewart et al., 2019) |
+| **1QZ7** | $\beta$-Catenin | Axin | `EENPESILDEHVQRVMK` (17 aa) | $72\text{ nM}$ | $-9.75\text{ kcal/mol}$ | $-8.21$ | **$-9.49\text{ kcal/mol}$** | **$111\text{ nM}$** | **$0.26\text{ kcal/mol}$** | ITC (Xing et al., 2003) |
+| **1TW6** | cIAP1 BIR3 Domain | Smac tetrapeptide | `AVPI` (4 aa) | $280\text{ nM}$ | $-8.94\text{ kcal/mol}$ | $-7.85$ | **$-8.59\text{ kcal/mol}$** | **$506\text{ nM}$** | **$0.35\text{ kcal/mol}$** | FP (Sun et al., 2004) |
+| **1SFI** | Bovine Trypsin | SFTI-1 (cyclic) | `GRCTKSIPPICFPD` (14 aa) | $0.1\text{ nM}$ | $-13.64\text{ kcal/mol}$ | $-8.80$ | **$-9.00\text{ kcal/mol}$** | **$254\text{ nM}$** | **$4.64\text{ kcal/mol}$** | Enzyme $K_i$ (Korsinczky 2001) |
+| **3D9L** | Nrd1 CTD Domain | RNAPII CTD | `PSYPTSP` (7 aa) | $20.0\ \mu\text{M}$ | $-6.41\text{ kcal/mol}$ | $-6.88$ | **$-7.18\text{ kcal/mol}$** | **$5.4\ \mu\text{M}$** | **$0.77\text{ kcal/mol}$** | ITC (Vassal et al., 2008) |
+| **1MFG** | Erbin PDZ Domain | ErbB2 C-tail | `EYLGLDVPV` (9 aa) | $50.0\ \mu\text{M}$ | $-5.87\text{ kcal/mol}$ | $-8.13$ | **$-9.53\text{ kcal/mol}$** | **$103\text{ nM}$** | **$3.66\text{ kcal/mol}$** | Fluorescence (Birrane 2003) |
+| **1UJ0** | STAM2 SH3 Domain | UBPY peptide | `TPMVNRENK` (9 aa) | $27.0\ \mu\text{M}$ | $-6.23\text{ kcal/mol}$ | $-7.89$ | **$-8.04\text{ kcal/mol}$** | **$1.3\ \mu\text{M}$** | **$1.81\text{ kcal/mol}$** | SPR (Kaneko 2003) |
+| **2PUY** | BHC80 PHD Finger | Histone H3 | `ARTKQTARKS` (10 aa) | $30.0\ \mu\text{M}$ | $-6.17\text{ kcal/mol}$ | $-6.83$ | **$-7.56\text{ kcal/mol}$** | **$2.9\ \mu\text{M}$** | **$1.39\text{ kcal/mol}$** | ITC (Lan et al., 2007) |
+| **2AK5** | $\beta$-PIX SH3 Domain | Cbl-b PR | `RPPKPRPR` (8 aa) | $14.0\ \mu\text{M}$ | $-6.62\text{ kcal/mol}$ | $-6.83$ | **$-7.26\text{ kcal/mol}$** | **$4.7\ \mu\text{M}$** | **$0.64\text{ kcal/mol}$** | ITC (Wu et al., 2005) |
+| **1BC5** | CheR Methyltransferase | Receptor NWETF | `NWETF` (5 aa) | $2.0\ \mu\text{M}$ | $-7.78\text{ kcal/mol}$ | $-8.36$ | **$-9.17\text{ kcal/mol}$** | **$191\text{ nM}$** | **$1.39\text{ kcal/mol}$** | Binding assay (Djordjevic 1998) |
+| **1D4T** | SAP SH2 Domain | SLAM peptide | `KSLTIYAQVQK` (11 aa) | $650\text{ nM}$ | $-8.44\text{ kcal/mol}$ | $-9.24$ | **$-10.98\text{ kcal/mol}$** | **$< 10\text{ nM}$** | **$2.54\text{ kcal/mol}$** | ITC (Poy et al., 1999) |
+| **3DXC** | Fe65-PTB2 Domain | APP AICD | `AVTPEERHLSKMQQNGYENPTYKFFEQM` (28 aa) | $220\text{ nM}$ | $-9.08\text{ kcal/mol}$ | $-10.12$ | **$-10.41\text{ kcal/mol}$** | **$23\text{ nM}$** | **$1.33\text{ kcal/mol}$** | ITC (Radzimanowski 2008) |
+| **1SE0** | DIAP1 BIR1 Domain | Grim IBM | `AIAYFIP` (7 aa) | $120\text{ nM}$ | $-9.44\text{ kcal/mol}$ | $-8.22$ | **$-9.09\text{ kcal/mol}$** | **$217\text{ nM}$** | **$0.35\text{ kcal/mol}$** | ITC (Yan et al., 2004) |
+| **3C3O** | ALIX Bro1 Domain | CHMP4A C-helix | `DEEALKQLAEWVS` (13 aa) | $45\text{ nM}$ | $-10.02\text{ kcal/mol}$ | $-37.4$ | **$-9.15\text{ kcal/mol}$** | **$196\text{ nM}$** | **$0.87\text{ kcal/mol}$** | SPR (McCullough 2008) |
+| **1HC9** | $\alpha$-Bungarotoxin | nAChR Mimotope | `WRYYESSLLPYPD` (13 aa) | $2.0\text{ nM}$ | $-11.87\text{ kcal/mol}$ | $-8.83$ | **$-10.29\text{ kcal/mol}$** | **$29\text{ nM}$** | **$1.58\text{ kcal/mol}$** | Binding assay (Harel 2001) |
 
 - **Generalization Performance:**
-  - **56D ML Ensemble:** $\text{MAE} = \mathbf{1.27\text{ kcal/mol}}$ on the 17 canonical signaling complexes (**8 of 17 achieve chemical accuracy $< 1.0\text{ kcal/mol}$**, Pearson $r = \mathbf{0.659}$, Spearman $\rho = \mathbf{0.531}$), overall $\text{MAE} = \mathbf{1.49\text{ kcal/mol}}$ ($N=18$).
+  - **88D ML Ensemble:** $\text{MAE} = \mathbf{1.31\text{ kcal/mol}}$ on the 17 canonical signaling complexes (**7 of 17 achieve chemical accuracy $< 1.0\text{ kcal/mol}$**, Pearson $r = \mathbf{0.705}$, Spearman $\rho = \mathbf{0.619}$), overall $\text{MAE} = \mathbf{1.49\text{ kcal/mol}}$, $\text{RMSE} = \mathbf{1.86\text{ kcal/mol}}$, Pearson $r = \mathbf{0.599}$ ($p = 0.0087$, statistically significant), Spearman $\rho = \mathbf{0.504}$ ($N=18$).
   - **Physical Force-Field:** $\text{MAE} = \mathbf{1.76\text{ kcal/mol}}$ ($N=18$), Pearson $r = \mathbf{0.595}$ ($p = 0.0092$, statistically significant), Spearman $\rho = \mathbf{0.640}$.
   - **Reproduction:** Run `amp-screen benchmark --external` or `python run_external_benchmark.py`.
 
@@ -157,9 +157,9 @@ To understand how AMP-Screen compares against the latest published protein-pepti
 
 | Feature / Criterion | AutoDock CrankPep (ADCP) | Rosetta FlexPepDock | AlphaFold-Multimer / AF3 (PepPCBench 2025) | **AMP-Screen (v1.7.1)** |
 | :--- | :--- | :--- | :--- | :--- |
-| **Primary Method** | Rigid-body fragment assembly + Monte Carlo | High-resolution Monte Carlo + all-atom minimization | End-to-end deep learning (Evoformer / Diffusion) | Conformational priors + Native 3D Geometric Docking + HADDOCK Physics + 56D ML Ensemble |
+| **Primary Method** | Rigid-body fragment assembly + Monte Carlo | High-resolution Monte Carlo + all-atom minimization | End-to-end deep learning (Evoformer / Diffusion) | Conformational priors + Native 3D Geometric Docking + HADDOCK Physics + 88D ML Ensemble |
 | **Typical Pose Accuracy ($L$-RMSD)** | $2.0 - 4.5\text{ \AA}$ (blind pocket) | $1.0 - 2.5\text{ \AA}$ (requires initial pose) | **$1.0 - 1.8\text{ \AA}$** (state-of-the-art folding) | $1.5 - 3.2\text{ \AA}$ (with native geometric cleft alignment) |
-| **Binding Affinity Output ($\Delta G$ / $K_d$)** | Empirical contact score only (no solution $\Delta G$) | Rosetta Energy Units (REU, gas/solvent empirical) | **None** (outputs $\text{pLDDT}$ & $\text{ipTM}$ confidence, not $\Delta G$ or $K_d$) | **Calibrated solution $\Delta G$ & $K_d$** (Physical & 56D ML Ensemble) |
+| **Binding Affinity Output ($\Delta G$ / $K_d$)** | Empirical contact score only (no solution $\Delta G$) | Rosetta Energy Units (REU, gas/solvent empirical) | **None** (outputs $\text{pLDDT}$ & $\text{ipTM}$ confidence, not $\Delta G$ or $K_d$) | **Calibrated solution $\Delta G$ & $K_d$** (Physical & 88D ML Ensemble) |
 | **Compute Time per Peptide** | 15–60 minutes | 30–120 minutes | 5–15 minutes (multi-GPU) | **2–5 seconds (Pure CPU)** |
 | **Virtual Screening Throughput** | ~50 peptides / day | ~20 peptides / day | ~100–200 / day (requires GPU cluster) | **~10,000+ / day (CPU workstation)** |
 | **Antimicrobial Membrane Mode** | Not supported | Not supported | Not supported | **>100,000 peptides / hour (Wimley-White + DeepSTAMP)** |
@@ -483,7 +483,7 @@ amp-screen alphafold prep \
 - Creates **AlphaFold 3 JSON** ready for direct upload to [alphafoldserver.com](https://alphafoldserver.com).
 
 #### Step 3: Evaluate & Triage Co-Complex Structures
-Score co-folded AlphaFold-Multimer / AF3 complex PDB models with HADDOCK explicit physics, 56D ML calibrated binding affinity, and peptide safety profiling:
+Score co-folded AlphaFold-Multimer / AF3 complex PDB models with HADDOCK explicit physics, 88D ML calibrated binding affinity, and peptide safety profiling:
 ```bash
 amp-screen alphafold score \
   --complex-pdb complex_Design_B.pdb \
@@ -492,7 +492,7 @@ amp-screen alphafold score \
 ```
 - **Interface pLDDT & Confidence:** Extracts residue pLDDT at the binding interface ($\le 5\ \text{\AA}$).
 - **HADDOCK Force-Field Physics:** $E_{\text{vdw}}$, $E_{\text{elec}}$, $E_{\text{desolv}}$, buried surface area (BSA), and steric clash detection.
-- **56D Calibrated ML Affinity:** Predicts solution $K_d$ and thermodynamic $\Delta G$ using the validated multi-model ensemble.
+- **88D Calibrated ML Affinity:** Predicts solution $K_d$ and thermodynamic $\Delta G$ using the validated multi-model ensemble.
 - **Toxicity & Hemolysis Profiling:** Net charge at physiological pH 7.4, Eisenberg hydrophobic moment ($\mu_H$), mean hydrophobicity, hemolysis risk, and polycationic cytotoxic hazard ($> +7.0$).
 - **Executive Decision Triage:**
   - `🟢 RECOMMENDED LEAD` (High confidence, potent $K_d < 300\ \text{nM}$, 0 clashes, safe charge & low hemolysis)
@@ -528,12 +528,12 @@ AMP-Screen ships with curated, reproducible training and validation datasets in 
 
 ### Protein-Peptide Complex Affinity Dataset (`data/pdbbind_peptide_affinity_dataset.csv`)
 - **Sample Cohort ($N=381$):** Curated protein-peptide complexes from PDBbind and BioLiP across 40 distinct receptor families (SH3, SH2, PDZ, Serine/Cysteine/Aspartic Proteases, Chaperones, Bromodomains, Chromodomains, Apoptosis regulators MDM2/Bcl-2, MHC Class I/II, Nuclear Receptors, and Kinases) with experimentally measured $K_d$/$K_i$/$\text{IC}_{50}$ ($\text{p}K_d$ values).
-- **Features:** 56 leak-free dimensions (20 atomic element pair distance counts $\le 4.0\text{ \AA}$ and $4.0 - 8.0\text{ \AA}$, HADDOCK explicit physics terms, BSA, salt bridges, hydrogen bonds, hydrophobic contacts, net charge, contact density, amino acid composition, sequence length, and isoelectric point).
+- **Features:** 88 leak-free dimensions (20 atomic element pair distance counts $\le 4.0\text{ \AA}$ and $4.0 - 8.0\text{ \AA}$, HADDOCK explicit physics terms, BSA, salt bridges, hydrogen bonds, hydrophobic contacts, net charge, contact density, amino acid composition, sequence length, isoelectric point, hydropathy, secondary structure propensities, energetic partition ratios, detailed amino acid fractions, shell ratios, rotatable bonds, and stereochemical indices).
 - **Zero-Target-Leakage Cross-Validation (GroupKFold across 40 Receptor Families):**
-  - **Cross-Validated Pearson $r$:** **`0.4630`** ($p = 1.21 \times 10^{-21}$)
-  - **Cross-Validated Spearman $\rho$:** **`0.4487`**
-  - **Root Mean Square Error (RMSE):** **`0.881 pKd units`** (~$1.20\text{ kcal/mol}$)
-  - **Mean Absolute Error (MAE):** **`0.729 pKd units`** (~$0.99\text{ kcal/mol}$)
+  - **Cross-Validated Pearson $r$:** **`0.4910`** ($p = 1.63 \times 10^{-24}$)
+  - **Cross-Validated Spearman $\rho$:** **`0.4641`**
+  - **Root Mean Square Error (RMSE):** **`0.865 pKd units`** (~$1.18\text{ kcal/mol}$)
+  - **Mean Absolute Error (MAE):** **`0.710 pKd units`** (~$0.97\text{ kcal/mol}$)
 - **Retrain Command:**
   ```bash
   python train_ml_model.py --data data/pdbbind_peptide_affinity_dataset.csv --output data/trained_complex_ensemble.joblib

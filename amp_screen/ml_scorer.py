@@ -39,29 +39,63 @@ R_GAS_KCAL = 0.001987204   # Gas constant R in kcal / (mol * K)
 TEMP_KELVIN = 298.15       # Standard biochemical temperature (298.15 K, 25 °C)
 RT_LN10 = R_GAS_KCAL * TEMP_KELVIN * np.log(10.0)  # ~ 1.3642 kcal/mol per pKd unit at 298.15 K
 
-# Complete 56-Dimensional Physical Chemistry & Structural Interface Feature Space
+# Biophysical propensity scales
+KYTE_DOOLITTLE = {
+    'A': 1.8, 'R': -4.5, 'N': -3.5, 'D': -3.5, 'C': 2.5,
+    'Q': -3.5, 'E': -3.5, 'G': -0.4, 'H': -3.2, 'I': 4.5,
+    'L': 3.8, 'K': -3.9, 'M': 1.9, 'F': 2.8, 'P': -1.6,
+    'S': -0.8, 'T': -0.7, 'W': -0.9, 'Y': -1.3, 'V': 4.2
+}
+CHOU_FASMAN_HELIX = {
+    'E': 1.51, 'A': 1.42, 'L': 1.21, 'M': 1.45, 'H': 1.00,
+    'K': 1.16, 'Q': 1.11, 'W': 1.08, 'I': 1.08, 'V': 1.06,
+    'D': 1.01, 'F': 1.13, 'R': 0.98, 'C': 0.70, 'N': 0.67,
+    'S': 0.77, 'T': 0.83, 'Y': 0.69, 'P': 0.57, 'G': 0.57
+}
+CHOU_FASMAN_SHEET = {
+    'M': 1.05, 'V': 1.70, 'I': 1.60, 'C': 1.19, 'Y': 1.47,
+    'F': 1.38, 'Q': 1.10, 'L': 1.30, 'T': 1.19, 'W': 1.37,
+    'A': 0.83, 'R': 0.93, 'G': 0.75, 'D': 0.54, 'K': 0.74,
+    'S': 0.75, 'H': 0.87, 'N': 0.89, 'P': 0.55, 'E': 0.37
+}
+
+# Complete 88-Dimensional Physical Chemistry & Structural Interface Feature Space
 FEATURE_NAMES = []
 for e1, e2 in ELEMENT_PAIRS:
     FEATURE_NAMES.append(f"pair_{e1}_{e2}_close")
     FEATURE_NAMES.append(f"pair_{e1}_{e2}_medium")
 
 FEATURE_NAMES.extend([
-    # Explicit HADDOCK & Physics terms
+    # Explicit HADDOCK & Physics terms (6)
     "e_vdw", "e_elec", "e_desolv", "bsa", "haddock_score", "e_air",
-    # Interface Contacts
+    # Interface Contacts (4)
     "salt_bridges", "hbonds", "hydrophobic_contacts", "clashes",
-    # Core Sequence Biophysics
+    # Core Sequence Biophysics (4)
     "net_charge", "hydrophobic_moment", "boman_index", "length",
-    # Size-Normalized Energetics
+    # Size-Normalized Energetics (5)
     "e_vdw_per_res", "e_elec_per_res", "e_desolv_per_res", "bsa_per_res", "haddock_per_res",
-    # Interface Density & Packing Quality
+    # Interface Density & Packing Quality (4)
     "contact_density", "hbond_density", "hydrophobic_density", "clash_ratio",
-    # Electrostatic Architecture & Charge
+    # Electrostatic Architecture & Charge (5)
     "charge_density", "pos_charge_count", "neg_charge_count", "charge_asymmetry", "isoelectric_point",
-    # Chemical Composition & Structural Propensities
+    # Chemical Composition & Structural Propensities (6)
     "aromatic_ratio", "aliphatic_ratio", "proline_ratio", "polar_ratio", "charged_ratio", "glycine_ratio",
-    # Solution Thermodynamics & Efficiency
-    "entropy_penalty", "ligand_efficiency_proxy"
+    # Solution Thermodynamics & Efficiency (2)
+    "entropy_penalty", "ligand_efficiency_proxy",
+    # Hydropathy & Hydrophobicity (2)
+    "gravy_hydropathy", "hydrophobic_ratio",
+    # Secondary Structure & Conformational Propensities (3)
+    "helix_propensity", "sheet_propensity", "ppii_propensity",
+    # Energetic & Force Field Partition Ratios (5)
+    "elec_to_vdw_ratio", "polar_to_hydrophobic_contact_ratio", "desolv_to_bsa_ratio", "elec_to_bsa_ratio", "vdw_to_bsa_ratio",
+    # Detailed Amino Acid Fractions (6)
+    "sulfur_ratio", "basic_ratio", "acidic_ratio", "hydroxyl_ratio", "amide_ratio", "beta_branched_ratio",
+    # Multi-Shell Interface Densities (5)
+    "close_to_medium_shell_ratio", "total_interface_contacts", "specific_contact_density", "close_contact_density", "medium_contact_density",
+    # Thermodynamic Degrees of Freedom & Molecular Weight (5)
+    "rotatable_bonds_est", "conf_entropy_loss_est", "mol_weight_est", "haddock_per_mw", "bsa_per_mw",
+    # Specialized Biophysical & Stereochemical Descriptors (6)
+    "cation_pi_potential", "solvation_free_energy_ratio", "surface_complementarity_proxy", "charge_transfer_index", "aliphatic_index", "flexibility_turn_propensity"
 ])
 
 
@@ -135,10 +169,12 @@ def extract_complex_features(
     seq: str = ""
 ) -> List[float]:
     """
-    Extracts the complete 56-dimensional feature vector:
+    Extracts the complete 88-dimensional feature vector:
     20 element-pair bins, 6 physics terms, 4 contact counts, 4 core biophysics,
     5 size-normalized energetics, 4 interface density metrics, 5 charge architecture terms,
-    6 composition ratios, and 2 solution thermodynamics features.
+    6 composition ratios, 2 solution thermodynamics features, and 32 biophysical descriptors
+    (hydropathy, conformational propensities, partition ratios, detailed AA fractions,
+    shell densities, rotatable bond / entropy estimates, and stereochemical indices).
     """
     L = float(hit_meta.get("length", len(seq) if seq else 12.0))
     L = max(1.0, L)
@@ -224,6 +260,73 @@ def extract_complex_features(
 
     feat_vec.extend([entropy_pen, le_proxy])
 
+    # 10. Hydropathy & Hydrophobicity (2)
+    gravy_hydropathy = float(np.mean([KYTE_DOOLITTLE.get(aa, 0.0) for aa in seq]) if len(seq) > 0 else hit_meta.get("gravy_hydropathy", 0.0))
+    hydrophobic_ratio = float(sum(seq.count(aa) for aa in ('V', 'I', 'L', 'M', 'F', 'W', 'C')) / L if seq else hit_meta.get("hydrophobic_ratio", 0.0))
+    feat_vec.extend([gravy_hydropathy, hydrophobic_ratio])
+
+    # 11. Secondary Structure & Conformational Propensities (3)
+    helix_prop = float(np.mean([CHOU_FASMAN_HELIX.get(aa, 1.0) for aa in seq]) if len(seq) > 0 else hit_meta.get("helix_propensity", 1.0))
+    sheet_prop = float(np.mean([CHOU_FASMAN_SHEET.get(aa, 1.0) for aa in seq]) if len(seq) > 0 else hit_meta.get("sheet_propensity", 1.0))
+    ppii_prop = float((seq.count('P') * 2.0 + seq.count('G') + seq.count('A')) / L if seq else hit_meta.get("ppii_propensity", 0.0))
+    feat_vec.extend([helix_prop, sheet_prop, ppii_prop])
+
+    # 12. Energetic & Force Field Partition Ratios (5)
+    elec_to_vdw = float(abs(eelec) / max(1.0, abs(evdw)))
+    polar_to_hydrophobic = float((hbonds + salt_bridges) / max(1.0, hydrophobic))
+    desolv_to_bsa = float(edesolv / max(1.0, bsa))
+    elec_to_bsa = float(abs(eelec) / max(1.0, bsa))
+    vdw_to_bsa = float(abs(evdw) / max(1.0, bsa))
+    feat_vec.extend([elec_to_vdw, polar_to_hydrophobic, desolv_to_bsa, elec_to_bsa, vdw_to_bsa])
+
+    # 13. Detailed Amino Acid Fractions (6)
+    if seq:
+        sulfur_ratio = float(sum(seq.count(aa) for aa in ('C', 'M')) / L)
+        basic_ratio = float(sum(seq.count(aa) for aa in ('K', 'R', 'H')) / L)
+        acidic_ratio = float(sum(seq.count(aa) for aa in ('D', 'E')) / L)
+        hydroxyl_ratio = float(sum(seq.count(aa) for aa in ('S', 'T', 'Y')) / L)
+        amide_ratio = float(sum(seq.count(aa) for aa in ('N', 'Q')) / L)
+        beta_branched_ratio = float(sum(seq.count(aa) for aa in ('V', 'I', 'T')) / L)
+    else:
+        sulfur_ratio = float(hit_meta.get("sulfur_ratio", 0.0))
+        basic_ratio = float(hit_meta.get("basic_ratio", 0.0))
+        acidic_ratio = float(hit_meta.get("acidic_ratio", 0.0))
+        hydroxyl_ratio = float(hit_meta.get("hydroxyl_ratio", 0.0))
+        amide_ratio = float(hit_meta.get("amide_ratio", 0.0))
+        beta_branched_ratio = float(hit_meta.get("beta_branched_ratio", 0.0))
+    feat_vec.extend([sulfur_ratio, basic_ratio, acidic_ratio, hydroxyl_ratio, amide_ratio, beta_branched_ratio])
+
+    # 14. Multi-Shell Interface Densities (5)
+    close_sum = sum(v for k, v in fp.items() if k.endswith("_close"))
+    med_sum = sum(v for k, v in fp.items() if k.endswith("_medium"))
+    close_to_med_ratio = float(close_sum / max(1e-4, med_sum))
+    total_contacts = float(hbonds + salt_bridges + hydrophobic)
+    specific_contact_density = float(total_contacts / L)
+    close_density = float(close_sum / L)
+    med_density = float(med_sum / L)
+    feat_vec.extend([close_to_med_ratio, total_contacts, specific_contact_density, close_density, med_density])
+
+    # 15. Thermodynamic Degrees of Freedom & Molecular Weight (5)
+    rot_bonds = float(L * 2.8)
+    conf_entropy = float(0.45 * rot_bonds)
+    mw_est = float(L * 110.0)
+    haddock_per_mw = float(haddock / max(100.0, mw_est))
+    bsa_per_mw = float(bsa / max(100.0, mw_est))
+    feat_vec.extend([rot_bonds, conf_entropy, mw_est, haddock_per_mw, bsa_per_mw])
+
+    # 16. Specialized Biophysical & Stereochemical Descriptors (6)
+    cation_pi = float((pos_count * (arom_ratio * L)) / L)
+    solv_ratio = float(edesolv / max(1.0, abs(evdw) + abs(eelec)))
+    sc_proxy = float(bsa / max(100.0, abs(haddock) * 10.0))
+    charge_trans = float((net_charge * boman) / L)
+    if seq:
+        aliphatic_idx = float((seq.count('A') + 2.9 * seq.count('V') + 3.9 * (seq.count('I') + seq.count('L'))) / L)
+        turn_prop = float((seq.count('P') + seq.count('G')) / L)
+    else:
+        aliphatic_idx = float(hit_meta.get("aliphatic_index", 0.0))
+        turn_prop = float(hit_meta.get("flexibility_turn_propensity", 0.0))
+    feat_vec.extend([cation_pi, solv_ratio, sc_proxy, charge_trans, aliphatic_idx, turn_prop])
+
     return feat_vec
 
 
@@ -231,7 +334,7 @@ class MLPeptideScorer:
     """
     Multi-Parametric Consensus & Machine Learning Scorer for Protein-Peptide Affinity.
     Integrates RF-Score structural fingerprints with HADDOCK physics, interface densities,
-    and AMP descriptors across 56 physical parameters.
+    and AMP descriptors across 88 physical parameters.
     When a pre-trained model file (.joblib) is provided, uses the trained regressor ensemble.
     When no pre-trained model is supplied, transparently marks is_calibrated = False and
     computes an uncalibrated heuristic consensus score based on explicit physics and docking terms.
@@ -288,7 +391,7 @@ class MLPeptideScorer:
         logger.info(f"Saved trained ML model to {out_path.name}")
 
     def _setup_features(self):
-        """Sets up feature names for 56D structural and physical interface fingerprints."""
+        """Sets up feature names for 88D structural and physical interface fingerprints."""
         self.feature_names = list(FEATURE_NAMES)
 
     def compute_consensus_score(
@@ -377,24 +480,28 @@ class MLPeptideScorer:
         pep_len = float(hit_meta.get("length", len(seq) if seq else 12.0))
         dock_energy = float(hit_meta.get("affinity", hit_meta.get("docking_energy", physics["haddock_score"] * 0.28)))
 
-        # Assemble Feature Vector (exactly 56 dimensions, pure physical chemistry)
+        # Assemble Feature Vector (exactly 88 dimensions, pure physical chemistry)
         feat_vec = extract_complex_features(fp=fp, physics=physics, hit_meta=hit_meta, seq=seq or "")
         X_input = np.array([feat_vec])
 
         # 5. Ensemble ML / Consensus Predictions
         if self.is_calibrated and self.rf_model is not None and self.gb_model is not None:
-            preds = [
-                float(self.rf_model.predict(X_input)[0]),
-                float(self.gb_model.predict(X_input)[0])
-            ]
-            raw_pkd = float(np.mean(preds))
+            rf_pred = float(self.rf_model.predict(X_input)[0])
+            gb_pred = float(self.gb_model.predict(X_input)[0])
+            preds = [gb_pred, rf_pred]
+            if self.et_model is not None:
+                et_pred = float(self.et_model.predict(X_input)[0])
+                preds.append(et_pred)
+                raw_pkd = float(0.40 * gb_pred + 0.30 * rf_pred + 0.30 * et_pred)
+            else:
+                raw_pkd = float(np.mean(preds))
             # Tail variance-expansion calibration:
             # Decision tree ensembles suffer from regression-to-the-mean shrinkage at extreme tails
             # (cross-validation prediction std is 0.58 vs true target std of 0.98 in the 381 PDBbind dataset).
-            # Expanding around the dataset mean (6.21) by the standard deviation ratio (1.693)
+            # Expanding around the dataset mean (6.21) by the standard deviation ratio (1.70)
             # counteracts tree shrinkage and restores true physical dynamic range.
             mean_pkd = 6.21
-            var_scale = 1.693
+            var_scale = 1.70
             ml_pkd = float(np.clip(mean_pkd + (raw_pkd - mean_pkd) * var_scale, 3.5, 12.0))
             variance_penalty = (max(preds) - min(preds)) * 10.0
             clash_penalty = hit_meta.get("clashes", 0) * 15.0

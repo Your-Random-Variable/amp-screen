@@ -1,9 +1,9 @@
 """
 Model Training & Cluster-Stratified Cross-Validation Utility for AMP-Screen.
-Extracts 56D structural, physical, and sequence feature vectors from a dataset of
+Extracts 88D structural, physical, and sequence feature vectors from a dataset of
 381 protein-peptide co-complexes across 40 distinct receptor families with known
 experimental affinities (pKd, Kd, DeltaG).
-Trains the tri-model ensemble (Random Forest + Gradient Boosting + Extra Trees)
+Trains the tri-model ensemble (Gradient Boosting + Random Forest + Extra Trees)
 and saves the trained model to data/trained_complex_ensemble.joblib.
 
 Key Scientific Safeguards:
@@ -35,7 +35,7 @@ from amp_screen.utils import logger, ensure_dir
 
 
 def featurize_complex(complex_pdb: Path, meta_row: dict) -> list:
-    """Extracts 56D feature vector from a single complex PDB (without label leakage)."""
+    """Extracts 88D feature vector from a single complex PDB (without label leakage)."""
     fp = extract_structural_fingerprint(complex_pdb)
     physics = calculate_haddock_physics_score(complex_pdb)
     seq = meta_row.get("sequence", meta_row.get("peptide_sequence", ""))
@@ -54,7 +54,7 @@ def train_and_evaluate(
     Uses GroupKFold by receptor family if groups are provided to prevent target leakage.
     """
     print("\n" + "=" * 105)
-    print("      PROTEIN-PEPTIDE COMPLEX AFFINITY ENSEMBLE TRAINING & EVALUATION (56 PARAMETERS)")
+    print("      PROTEIN-PEPTIDE COMPLEX AFFINITY ENSEMBLE TRAINING & EVALUATION (88 PARAMETERS)")
     print("=" * 105)
 
     y_pred_cv = np.zeros_like(y)
@@ -72,15 +72,15 @@ def train_and_evaluate(
         X_tr, y_tr = X[train_idx], y[train_idx]
         X_va, y_va = X[val_idx], y[val_idx]
 
-        rf = RandomForestRegressor(n_estimators=250, max_depth=12, min_samples_split=3, random_state=42, n_jobs=-1)
-        gb = GradientBoostingRegressor(n_estimators=200, max_depth=4, learning_rate=0.04, subsample=0.85, random_state=42)
-        et = ExtraTreesRegressor(n_estimators=250, max_depth=12, min_samples_split=3, random_state=42, n_jobs=-1)
+        rf = RandomForestRegressor(n_estimators=400, max_depth=12, min_samples_split=3, max_features=0.6, random_state=42, n_jobs=-1)
+        gb = GradientBoostingRegressor(n_estimators=250, max_depth=3, learning_rate=0.03, subsample=0.75, max_features=0.7, random_state=42)
+        et = ExtraTreesRegressor(n_estimators=400, max_depth=12, min_samples_split=3, max_features=0.6, random_state=42, n_jobs=-1)
 
         rf.fit(X_tr, y_tr)
         gb.fit(X_tr, y_tr)
         et.fit(X_tr, y_tr)
 
-        y_pred_cv[val_idx] = (rf.predict(X_va) + gb.predict(X_va) + et.predict(X_va)) / 3.0
+        y_pred_cv[val_idx] = 0.40 * gb.predict(X_va) + 0.30 * rf.predict(X_va) + 0.30 * et.predict(X_va)
         fold_r, _ = pearsonr(y_va, y_pred_cv[val_idx]) if len(y_va) > 2 else (0.0, 1.0)
         print(f"  Fold {fold_idx}/{n_splits}: {len(val_idx)} validation complexes | Pearson r: {fold_r:.3f}")
 
@@ -99,10 +99,10 @@ def train_and_evaluate(
     print("=" * 105)
 
     # Fit final models on 100% of available data
-    print("\nFitting final tri-model ensemble (RF + GB + ET) on all 381 complexes...")
-    final_rf = RandomForestRegressor(n_estimators=300, max_depth=14, min_samples_split=3, random_state=42, n_jobs=-1)
-    final_gb = GradientBoostingRegressor(n_estimators=250, max_depth=4, learning_rate=0.04, subsample=0.85, random_state=42)
-    final_et = ExtraTreesRegressor(n_estimators=300, max_depth=14, min_samples_split=3, random_state=42, n_jobs=-1)
+    print("\nFitting final tri-model ensemble (GB + RF + ET) on all 381 complexes with 88 parameters...")
+    final_rf = RandomForestRegressor(n_estimators=400, max_depth=12, min_samples_split=3, max_features=0.6, random_state=42, n_jobs=-1)
+    final_gb = GradientBoostingRegressor(n_estimators=250, max_depth=3, learning_rate=0.03, subsample=0.75, max_features=0.7, random_state=42)
+    final_et = ExtraTreesRegressor(n_estimators=400, max_depth=12, min_samples_split=3, max_features=0.6, random_state=42, n_jobs=-1)
 
     final_rf.fit(X, y)
     final_gb.fit(X, y)
@@ -115,6 +115,7 @@ def train_and_evaluate(
         "gb": final_gb,
         "et": final_et,
         "features": list(FEATURE_NAMES),
+        "ensemble_weights": {"gb": 0.40, "rf": 0.30, "et": 0.30},
         "cv_pearson_r": round(float(r_val), 4),
         "cv_spearman_rho": round(float(rho_val), 4),
         "cv_rmse": round(float(rmse_val), 4),
@@ -123,7 +124,7 @@ def train_and_evaluate(
         "n_features": len(FEATURE_NAMES)
     }
     joblib.dump(payload, str(out_model_path), compress=3)
-    print(f"✔ Successfully saved trained 56D ML ensemble to: {out_model_path}")
+    print(f"✔ Successfully saved trained 88D ML ensemble to: {out_model_path}")
 
     return payload
 

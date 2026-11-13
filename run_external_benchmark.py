@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 AMP-Screen External Benchmark Evaluation Suite.
-Strictly evaluates the physics engine and 56D ML ensemble on an expanded external,
+Strictly evaluates the physics engine and 88D ML ensemble on an expanded external,
 prospective test set of 18 high-resolution protein-peptide co-crystal structures
 that have ZERO overlap with the 381 PDBbind training dataset.
 """
@@ -296,7 +296,7 @@ def run_external_benchmark(
 
     print(f"\nDescriptive Performance on Completely Unseen External Test Set (N={len(df)}):")
     print(f"  • Physical Force-Field (All N={len(df)}): MAE = {mae_phys:.2f} kcal/mol, RMSE = {rmse_phys:.2f} kcal/mol, r = {r_phys:.3f} (p = {p_phys:.4f}), ρ = {rho_phys:.3f}")
-    print(f"  • 56D ML Ensemble      (All N={len(df)}): MAE = {mae_ml:.2f} kcal/mol, RMSE = {rmse_ml:.2f} kcal/mol, r = {r_ml:.3f} (p = {p_ml:.4f}), ρ = {rho_ml:.3f}")
+    print(f"  • 88D ML Ensemble      (All N={len(df)}): MAE = {mae_ml:.2f} kcal/mol, RMSE = {rmse_ml:.2f} kcal/mol, r = {r_ml:.3f} (p = {p_ml:.4f}), ρ = {rho_ml:.3f}")
 
     # Signaling subset excluding bicyclic ceiling outlier 1SFI
     df_signaling = df[df["pdb_id"] != "1SFI"]
@@ -306,7 +306,7 @@ def run_external_benchmark(
         r_ml_sig, _ = pearsonr(df_signaling["ml_delta_g"], df_signaling["exp_delta_g"])
         rho_ml_sig, _ = spearmanr(df_signaling["ml_delta_g"], df_signaling["exp_delta_g"])
         print(f"\nStandard Physiological Signaling Complexes (N={len(df_signaling)}, excl. bicyclic 1SFI):")
-        print(f"  • 56D ML Ensemble:      MAE = {mae_ml_sig:.2f} kcal/mol, RMSE = {rmse_ml_sig:.2f} kcal/mol, r = {r_ml_sig:.3f}, ρ = {rho_ml_sig:.3f}")
+        print(f"  • 88D ML Ensemble:      MAE = {mae_ml_sig:.2f} kcal/mol, RMSE = {rmse_ml_sig:.2f} kcal/mol, r = {r_ml_sig:.3f}, ρ = {rho_ml_sig:.3f}")
         chem_acc = int(np.sum(df_signaling["err_ml"] < 1.0))
         print(f"  • Chemical Accuracy (< 1.0 kcal/mol): {chem_acc}/{len(df_signaling)} complexes ({chem_acc/len(df_signaling)*100:.1f}%)")
     print("=" * 115 + "\n")
