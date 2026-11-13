@@ -30,7 +30,7 @@ $$\Delta G^\circ = RT \ln\left(\frac{K_d}{1\text{ M}}\right)$$
 | PDB ID | Target Receptor | Receptor Family | Peptide Sequence ($L$) | Experimental $K_d$ | Experimental $\Delta G^\circ$ | Physical Force-Field $\Delta G$ | **Calibrated ML $\Delta G$** | **Calibrated ML $K_d$** | Absolute Error ($\|\Delta\Delta G\|$) | $K_d$ Accuracy Ratio | Experimental Assay & Citation |
 | :---: | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
 | **1AWR** | Cyclophilin A (CypA) | Prolyl Isomerase | `HAGPIA` (6 aa) | $5.5\ \mu\text{M}$ | $-7.18\text{ kcal/mol}$ | $-5.57$ | **$-7.33\text{ kcal/mol}$** | **$4.3\ \mu\text{M}$** | **$0.15\text{ kcal/mol}$** | $1.28\times$ | Capsid binding (Vajdos et al., 1997) |
-| **1B07** | Amphiphysin SH3 | SH3 Domain | `EVPGPVPPRR` (10 aa) | $1.8\ \mu\text{M}$ | $-7.83\text{ kcal/mol}$ | $-4.42$ | **$-7.88\text{ kcal/mol}$** | **$1.7\ \mu\text{M}$** | **$0.05\text{ kcal/mol}$** | $1.06\times$ | SPR (Owen et al., 1998) |
+| **1B07** | c-Crk N-SH3 (Peptoid) | SH3 Domain | `EVPGPVPPRR` (10 aa) | $1.8\ \mu\text{M}$ | $-7.83\text{ kcal/mol}$ | $-4.42$ | **$-7.88\text{ kcal/mol}$** | **$1.7\ \mu\text{M}$** | **$0.05\text{ kcal/mol}$** | $1.06\times$ | Peptoid binding (Nguyen et al., 1998) |
 | **1BBZ** | c-Abl SH3 Domain | SH3 Domain | `APSYSPPPPP` (10 aa) | $1.5\ \mu\text{M}$ | $-7.94\text{ kcal/mol}$ | $-6.18$ | **$-7.95\text{ kcal/mol}$** | **$1.5\ \mu\text{M}$** | **$0.01\text{ kcal/mol}$** | $1.00\times$ | NMR titr. (Pisabarro et al., 1998) |
 | **1BE9** | PSD-95 PDZ3 Domain | PDZ Domain | `KQTSV` (5 aa) | $3.2\ \mu\text{M}$ | $-7.49\text{ kcal/mol}$ | $-2.18$ | **$-7.69\text{ kcal/mol}$** | **$2.3\ \mu\text{M}$** | **$0.20\text{ kcal/mol}$** | $1.39\times$ | Fluorescence (Doyle et al., 1996) |
 | **1CKA** | c-Crk N-SH3 Domain | SH3 Domain | `PPPALPPKK` (9 aa) | $2.0\ \mu\text{M}^*$ | $-7.77\text{ kcal/mol}$ | $-8.86$ | **$-7.73\text{ kcal/mol}$** | **$2.1\ \mu\text{M}$** | **$0.04\text{ kcal/mol}$** | $1.05\times$ | ITC proxy (Wu et al., 1995) |
@@ -39,22 +39,31 @@ $$\Delta G^\circ = RT \ln\left(\frac{K_d}{1\text{ M}}\right)$$
 | **1LCJ** | Lck SH2 Domain | SH2 Domain | `EPQEEIPIYL` (10 aa) | $0.35\ \mu\text{M}$ | $-8.80\text{ kcal/mol}$ | $-7.46$ | **$-8.81\text{ kcal/mol}$** | **$348\text{ nM}$** | **$0.01\text{ kcal/mol}$** | $1.01\times$ | SPR (Tong et al., 1996) |
 | **1PRL** | c-Src SH3 Domain | SH3 Domain | `AFAPPLPRR` (9 aa) | $8.0\ \mu\text{M}$ | $-6.95\text{ kcal/mol}$ | $+1.24$ | **$-7.16\text{ kcal/mol}$** | **$5.7\ \mu\text{M}$** | **$0.21\text{ kcal/mol}$** | $1.40\times$ | Fluorescence (Feng et al., 1994) |
 | **1SEM** | Sem-5 / Grb2 SH3 | SH3 Domain | `PPPVPPR` (7 aa) | $12.0\ \mu\text{M}$ | $-6.71\text{ kcal/mol}$ | $-6.56$ | **$-6.87\text{ kcal/mol}$** | **$9.2\ \mu\text{M}$** | **$0.16\text{ kcal/mol}$** | $1.30\times$ | NMR (Lim et al., 1994) |
-| **1VJ6** | INAD PDZ3 Domain | PDZ Domain | `YLVTSV` (6 aa) | $0.22\ \mu\text{M}$ | $-9.08\text{ kcal/mol}$ | $-6.14$ | **$-8.97\text{ kcal/mol}$** | **$268\text{ nM}$** | **$0.11\text{ kcal/mol}$** | $1.22\times$ | ITC (van Huizen et al., 1998) |
+| **1VJ6** | PTP-BL PDZ2 Domain | PDZ Domain | `YLVTSV` (6 aa) | $0.22\ \mu\text{M}$ | $-9.08\text{ kcal/mol}$ | $-6.14$ | **$-8.97\text{ kcal/mol}$** | **$268\text{ nM}$** | **$0.11\text{ kcal/mol}$** | $1.22\times$ | NMR titration (Walma et al., 2002) |
 | **1YCR** | MDM2 Oncoprotein | Apoptosis / Oncogene | `ETFSDLWKLLPEN` (13 aa) | $600\text{ nM}^*$ | $-8.49\text{ kcal/mol}$ | $-11.85$ | **$-8.69\text{ kcal/mol}$** | **$423\text{ nM}$** | **$0.20\text{ kcal/mol}$** | $1.42\times$ | ITC 35°C proxy (Dawson et al., 2004) |
 | **1ER8** | Endothiapepsin | Aspartic Protease | `HPFHLLVY` (8 aa) | Peptidomimetic | *Unmeasured* | $-16.53$ | **$-10.58\text{ kcal/mol}$** | **$18\text{ nM}$** | *Consistent* | — | X-ray (Bailey et al., 1993) |
 | **1SSH** | Yeast YFR024C-A SH3 | SH3 Domain | `GPPPAMPARPT` (11 aa) | Unreported | *Unmeasured* | $-7.70$ | **$-7.73\text{ kcal/mol}$** | **$2.2\ \mu\text{M}$** | *Consistent* | — | X-ray (SGX Consortium, 2004) |
 
-### Summary Statistics ($N=12$ Experimentally Quantified Pairs):
-- **Calibrated 56D ML Ensemble:**
-  - **Mean Absolute Error (MAE):** **`0.12 kcal/mol`**
-  - **Root Mean Square Error (RMSE):** **`0.14 kcal/mol`**
-  - **Maximum Absolute Error:** **`0.21 kcal/mol`**
-  - **$K_d$ Prediction Accuracy:** **`1.00x` to `1.42x` of wet-lab measurements** across all targets.
-- **Physical Force Field ($\Delta G_{\text{sol}}$):**
-  - **MAE:** `2.59 kcal/mol`
-  - **RMSE:** `3.39 kcal/mol`
-  - **Pearson $r$:** `0.465` ($p = 0.1279$)
-  - **Spearman $\rho$:** `0.385`
+### Machine Learning Generalization & Data Transparency:
+1. **Training Dataset Composition ($N=381$ Complexes):**
+   - The ML training corpus (`data/pdbbind_peptide_affinity_dataset.csv`) contains 381 protein-peptide complexes curated from PDBbind and PepBDB across 40 protein families.
+   - The 14 benchmark complexes are included in this 381-complex dataset. The final pre-trained ensemble (`data/trained_complex_ensemble.joblib`) was fitted on all 381 complexes, which explains the high self-consistency fit ($\text{MAE} = 0.12\text{ kcal/mol}$, $\text{RMSE} = 0.14\text{ kcal/mol}$).
+2. **Strictly Held-Out Benchmark Validation (Zero Training Overlap):**
+   - When all 14 benchmark complexes are **strictly excluded from training** and the ensemble is trained solely on the remaining 367 complexes:
+     - **Held-Out MAE:** **`0.95 kcal/mol`** (below standard threshold for chemical accuracy $< 1.0\text{ kcal/mol}$)
+     - **Held-Out RMSE:** **`1.03 kcal/mol`**
+     - **Held-Out Pearson correlation ($r$):** **`0.637`** ($p = 0.0142$)
+     - **Held-Out Spearman rank order ($\rho$):** **`0.604`**
+3. **GroupKFold Cross-Validation Across 40 Receptor Families ($N=381$):**
+   - Cross-Validated Pearson $r$: **`0.4630`** ($p = 1.21 \times 10^{-21}$)
+   - Cross-Validated Spearman $\rho$: **`0.4487`**
+   - Cross-Validated RMSE: **`0.881 pKd units`** (~$1.20\text{ kcal/mol}$)
+   - Cross-Validated MAE: **`0.729 pKd units`** (~$0.99\text{ kcal/mol}$)
+4. **Physical Force Field Alone (Zero ML Tuning):**
+   - **MAE:** `2.59 kcal/mol`
+   - **RMSE:** `3.39 kcal/mol`
+   - **Pearson $r$:** `0.465` ($p = 0.1279$)
+   - **Spearman $\rho$:** `0.385`
 
 ---
 

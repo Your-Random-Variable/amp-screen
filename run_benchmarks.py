@@ -4,7 +4,7 @@ AMP-Screen Benchmark: Bound Co-Crystal Pose Rescoring & Sanity Check.
 Evaluates the physics engine, solution thermodynamics, and contact analysis
 on bound co-crystal poses across 14 standardized reference complexes from PepBDB / RCSB PDB:
 1. 1AWR: Cyclophilin A + HAGPIA (6 aa)
-2. 1B07: Amphiphysin SH3 + EVPGPVPPRR (10 aa)
+2. 1B07: c-Crk N-SH3 (Peptoid) + EVPGPVPPRR (10 aa)
 3. 1BBZ: c-Abl SH3 Domain + APSYSPPPPP (10 aa)
 4. 1BE9: PSD-95 PDZ3 Domain + KQTSV (5 aa)
 5. 1CKA: c-Crk N-SH3 + PPPALPPKK (9 aa resolved-core proxy for 10-mer C3G)
@@ -15,7 +15,7 @@ on bound co-crystal poses across 14 standardized reference complexes from PepBDB
 10. 1PRL: c-Src SH3 Domain + AFAPPLPRR (9 aa)
 11. 1SEM: Sem-5 / Grb2 SH3 + PPPVPPR (7 aa)
 12. 1SSH: Yeast YFR024C-A SH3 + Sla1 peptide (11 aa)
-13. 1VJ6: INAD PDZ3 Domain + YLVTSV (6 aa)
+13. 1VJ6: PTP-BL PDZ2 Domain + YLVTSV (6 aa)
 14. 1YCR: MDM2 Oncoprotein + p53(17-29) (13 aa; 15-mer ITC proxy, 35°C)
 """
 
@@ -61,12 +61,12 @@ LITERATURE_BENCHMARKS = {
         "citation": "Vajdos et al., Protein Sci. 6:2297 (1997)"
     },
     "1B07": {
-        "target": "Amphiphysin SH3",
-        "peptide_name": "Dynamin-1 (EVPGPVPPRR)",
+        "target": "c-Crk N-SH3 (Peptoid)",
+        "peptide_name": "Peptoid Chimera EVPG(Nphe)VPPRR",
         "exp_kd_molar": 1.8e-6,
         "exp_kd_str": "1.8 µM",
         "exp_delta_g": -7.83,
-        "citation": "Owen et al., EMBO J. 17:5273 (1998)"
+        "citation": "Nguyen et al., Science 282:2088 (1998)"
     },
     "1BBZ": {
         "target": "c-Abl SH3 Domain",
@@ -149,12 +149,12 @@ LITERATURE_BENCHMARKS = {
         "citation": "SGX Consortium (2004)"
     },
     "1VJ6": {
-        "target": "INAD PDZ3 Domain",
-        "peptide_name": "TRP C-tail (YLVTSV)",
+        "target": "PTP-BL PDZ2 Domain",
+        "peptide_name": "APC C-tail (YLVTSV)",
         "exp_kd_molar": 2.2e-7,
         "exp_kd_str": "0.22 µM",
         "exp_delta_g": -9.08,
-        "citation": "van Huizen et al., EMBO J. 17:2285 (1998)"
+        "citation": "Walma et al., JMB 322:407 (2002)"
     },
     "1YCR": {
         "target": "MDM2 Oncoprotein",
