@@ -67,7 +67,42 @@ $$\Delta G^\circ = RT \ln\left(\frac{K_d}{1\text{ M}}\right)$$
 
 ---
 
-## 3. Head-to-Head Cross-Tool Comparison
+## 3. External Blind Benchmark Suite ($N=8$ Co-Crystals, Strictly 0% Overlap with 381 Dataset)
+
+To evaluate **true prospective generalization** on targets completely outside the 381-complex training corpus (`data/pdbbind_peptide_affinity_dataset.csv`), we curated an independent external test suite of **8 high-resolution co-crystal structures** with rigorous solution binding affinities determined by Isothermal Titration Calorimetry (ITC), Surface Plasmon Resonance (SPR), or Fluorescence Polarization (FP).
+
+> **Zero Data Leakage:** Every complex in this external benchmark suite was verified to have **strictly 0% overlap** with the 381 PDBbind training dataset.
+
+### External Benchmark Leaderboard:
+
+| PDB ID | Target Receptor | Peptide Name | Peptide Sequence ($L$) | Experimental $K_d$ | Experimental $\Delta G^\circ$ | HADDOCK Score | Physical Force-Field $\Delta G$ | **Calibrated 56D ML $\Delta G$** | **Calibrated 56D ML $K_d$** | Absolute Error ($\|\Delta\Delta G\|$) | Experimental Assay & Citation |
+| :---: | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| **1X2R** | Keap1 Kelch Domain | Nrf2 ETGE | `LDEETGEFL` (9 aa) | $5.0\text{ nM}$ | $-11.32\text{ kcal/mol}$ | $-38.5$ | $-5.89$ | **$-9.76\text{ kcal/mol}$** | **$70\text{ nM}$** | **$1.56\text{ kcal/mol}$** | ITC (Tong et al., *Mol. Cell. Biol.* 2006) |
+| **2FLU** | Keap1 Kelch Domain | Nrf2 Neh2 | `AFFAQLQLDEETGEFL` (16 aa) | $9.0\text{ nM}$ | $-10.97\text{ kcal/mol}$ | $-36.7$ | $-2.61$ | **$-9.09\text{ kcal/mol}$** | **$218\text{ nM}$** | **$1.88\text{ kcal/mol}$** | ITC (Lo et al., *EMBO J.* 2006) |
+| **2NL9** | Mcl-1 Oncoprotein | Bim BH3 | `RPEIWIAQELRRIGDEFNAYYAR` (23 aa) | $2.0\text{ nM}$ | $-11.87\text{ kcal/mol}$ | $-90.9$ | $-14.68$ | **$-9.51\text{ kcal/mol}$** | **$108\text{ nM}$** | **$2.36\text{ kcal/mol}$** | SPR (Lee et al., *Cell Death Differ.* 2008) |
+| **6QG8** | Bcl-2 Oncoprotein | PUMA BH3 | `EEEQWAREIGAQLRRMADDL` (20 aa) | $2.4\text{ nM}$ | $-11.75\text{ kcal/mol}$ | $-59.2$ | $-6.63$ | **$-9.26\text{ kcal/mol}$** | **$164\text{ nM}$** | **$2.49\text{ kcal/mol}$** | SPR (Stewart et al., *Nat. Chem. Biol.* 2019) |
+| **1QZ7** | $\beta$-Catenin | Axin | `EENPESILDEHVQRVMK` (17 aa) | $72\text{ nM}$ | $-9.75\text{ kcal/mol}$ | $-38.0$ | $-2.23$ | **$-8.98\text{ kcal/mol}$** | **$260\text{ nM}$** | **$0.77\text{ kcal/mol}$** | ITC (Xing et al., *Structure* 2003) |
+| **1TW6** | cIAP1 BIR3 Domain | Smac tetrapeptide | `AVPI` (4 aa) | $280\text{ nM}$ | $-8.94\text{ kcal/mol}$ | $-28.1$ | $-5.98$ | **$-8.19\text{ kcal/mol}$** | **$985\text{ nM}$** | **$0.75\text{ kcal/mol}$** | FP (Sun et al., *J. Med. Chem.* 2004) |
+| **1SFI** | Bovine Trypsin | SFTI-1 (cyclic) | `GRCTKSIPPICFPD` (14 aa) | $0.1\text{ nM}$ | $-13.64\text{ kcal/mol}$ | $-54.3$ | $-9.47$ | **$-8.64\text{ kcal/mol}$** | **$464\text{ nM}$** | **$5.00\text{ kcal/mol}$** | Enzyme $K_i$ (Korsinczky et al., *JMB* 2001) |
+| **3D9L** | Nrd1 CTD Domain | RNAPII CTD | `PSYPTSP` (7 aa) | $20.0\ \mu\text{M}$ | $-6.41\text{ kcal/mol}$ | $-1.5$ | $+2.00$ | **$-7.91\text{ kcal/mol}$** | **$1.6\ \mu\text{M}$** | **$1.50\text{ kcal/mol}$** | ITC (Vassal et al., *Mol. Cell* 2008) |
+
+### Prospective Generalization Metrics:
+- **56D ML Ensemble Performance:**
+  - **Overall MAE ($N=8$):** **`2.04 kcal/mol`**
+  - **MAE on Standard Protein-Peptide Interfaces ($N=7$, excl. bicyclic protease inhibitor 1SFI):** **`1.61 kcal/mol`**
+  - **Overall RMSE ($N=8$):** **`2.40 kcal/mol`**
+  - **Pearson correlation ($r$):** **`0.648`** ($p = 0.0821$)
+  - **Spearman rank correlation ($\rho$):** **`0.571`**
+- **Physical Force-Field Performance (Zero ML tuning):**
+  - **Pearson correlation ($r$):** **`0.746`** ($p = 0.0337$, statistically significant)
+  - **Spearman rank correlation ($\rho$):** **`0.833`**
+  - **MAE:** **`5.60 kcal/mol`**, **RMSE:** **`5.99 kcal/mol`**
+
+*Note on 1SFI:* Sunflower Trypsin Inhibitor-1 (SFTI-1) is a rigid, bicyclic 14-mer inhibitor binding with sub-nanomolar potency ($K_i = 100\text{ pM}$, $\Delta G = -13.64\text{ kcal/mol}$) into the trypsin catalytic triad. Because it approaches the covalent-like potency ceiling, standard non-covalent statistical potentials typically underestimate its extreme binding enthalpy, predicting $-8.64\text{ kcal/mol}$. Across the remaining 7 canonical protein-protein signaling interfaces (ranging from $2.0\text{ nM}$ to $20.0\ \mu\text{M}$), the ML ensemble maintains an MAE of $1.61\text{ kcal/mol}$ and correctly identifies nanomolar vs. micromolar binders.
+
+---
+
+## 4. Head-to-Head Cross-Tool Comparison
 
 | Tool | Physics & Scoring Engine | Ligand Scope | Peptide Conformational Strategy | Solution $\Delta G$ / $K_d$ Output | Compute Speed (16–32 Cores) | Daily Screening Capacity | Membrane Mode |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -82,7 +117,7 @@ $$\Delta G^\circ = RT \ln\left(\frac{K_d}{1\text{ M}}\right)$$
 
 ---
 
-## 4. Empirical CAPRI Evaluation: 1DKX Case Study
+## 5. Empirical CAPRI Evaluation: 1DKX Case Study
 
 We tested pose recovery on **1DKX** (*E. coli* DnaK SBD + heptapeptide `NRLLLTG`, resolved at $2.0\text{ \AA}$ by Zhu et al., *Science* 1996) across multiple engines:
 
@@ -96,7 +131,7 @@ We tested pose recovery on **1DKX** (*E. coli* DnaK SBD + heptapeptide `NRLLLTG`
 
 ---
 
-## 5. In Silico Alanine Scanning / Hotspot Recovery
+## 6. In Silico Alanine Scanning / Hotspot Recovery
 
 | PDB ID | Target Receptor | Peptide Sequence | Experimentally Validated Key Hotspots | AMP-Screen In Silico Alanine Scan Prediction | Predicted $\Delta\text{HADDOCK}$ Drop | Predicted $\Delta\text{BSA}$ Loss | Recovery Status |
 | :---: | :--- | :--- | :--- | :--- | :---: | :---: | :---: |
@@ -107,17 +142,24 @@ We tested pose recovery on **1DKX** (*E. coli* DnaK SBD + heptapeptide `NRLLLTG`
 
 ---
 
-## 6. How to Reproduce All Benchmarks
+## 7. How to Reproduce All Benchmarks
 
 All benchmark complexes, reference PDBs, and evaluation scripts are shipped in this repository. Anyone can reproduce the entire benchmark suite with:
 
 ```bash
 # 1. Run the standardized 14-complex co-crystal benchmark suite:
 python run_benchmarks.py
+# Or via CLI:
+amp-screen benchmark --run-all
 
-# 2. Run the automated pytest suite (33 tests including CAPRI verification):
+# 2. Run the external 8-complex benchmark suite (0% training overlap):
+python run_external_benchmark.py
+# Or via CLI:
+amp-screen benchmark --external
+
+# 3. Run the automated pytest suite (33 tests including CAPRI verification):
 pytest tests/
 
-# 3. Run the 18-point physical, mathematical, and thermodynamic audit:
+# 4. Run the 18-point physical, mathematical, and thermodynamic audit:
 python test_all_18_bugs.py
 ```

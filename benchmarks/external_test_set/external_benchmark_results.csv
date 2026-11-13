@@ -1,0 +1,9 @@
+pdb_id,target,peptide_name,sequence,length,haddock_score,bsa_angstrom2,hbonds,salt_bridges,hydrophobic_contacts,phys_delta_g,phys_kd,ml_delta_g,ml_kd,ml_pkd,exp_delta_g,exp_kd,citation,err_phys,err_ml
+1X2R,Keap1 Kelch Domain,Nrf2 ETGE (9-mer),LDEETGEFL,9,-38.5,1088.0,9,3,0,-5.89,48.0 µM,-9.76,70 nM,7.15,-11.32,5.0 nM,"Tong et al., Mol. Cell. Biol. 26:2887 (2006)",5.430000000000001,1.5600000000000005
+2FLU,Keap1 Kelch Domain,Nrf2 Neh2 (16-mer),AFFAQLQLDEETGEFL,16,-36.7,1020.4,9,3,0,-2.61,12.1 mM,-9.09,218 nM,6.66,-10.97,9.0 nM,"Lo et al., EMBO J. 25:3605 (2006)",8.360000000000001,1.8800000000000008
+2NL9,Mcl-1 Oncoprotein,Bim BH3 (23-mer),RPEIWIAQELRRIGDEFNAYYAR,23,-90.9,2064.2,8,3,61,-14.68,17.4 pM,-9.51,108 nM,6.97,-11.87,2.0 nM,"Lee et al., Cell Death Differ. 15:888 (2008)",2.8100000000000005,2.3599999999999994
+6QG8,Bcl-2 Oncoprotein,PUMA BH3 (20-mer),EEEQWAREIGAQLRRMADDL,20,-59.2,1573.6,2,3,48,-6.63,13.7 µM,-9.26,164 nM,6.78,-11.75,2.4 nM,"Stewart et al., Nat. Chem. Biol. 15:1020 (2019)",5.12,2.49
+1QZ7,Beta-Catenin,Axin (17-mer),EENPESILDEHVQRVMK,17,-38.0,1272.2,1,1,37,-2.23,23.0 mM,-8.98,260 nM,6.59,-9.75,72 nM,"Xing et al., Structure 11:1391 (2003)",7.52,0.7699999999999996
+1TW6,cIAP1 BIR3 Domain,Smac (4-mer AVPI),AVPI,4,-28.1,642.1,6,0,35,-5.98,41.4 µM,-8.19,985 nM,6.01,-8.94,280 nM,"Sun et al., J. Med. Chem. 47:4149 (2004)",2.959999999999999,0.75
+1SFI,Bovine Trypsin,SFTI-1 (14-mer Cyclic),GRCTKSIPPICFPD,14,-54.3,1347.6,15,1,6,-9.47,113.6 nM,-8.64,464 nM,6.33,-13.64,0.1 nM,"Korsinczky et al., JMB 311:579 (2001)",4.17,5.0
+3D9L,Nrd1 CTD Domain,RNAPII CTD (7-mer),PSYPTSP,7,-1.5,917.5,7,0,5,2.0,> 1.0 mM,-7.91,1.6 µM,5.8,-6.41,20.0 µM,"Vassal et al., Mol. Cell 31:479 (2008)",8.41,1.5

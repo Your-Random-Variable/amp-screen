@@ -943,6 +943,7 @@ def main():
     p_bench.add_argument("--complex", "-c", help="Predicted complex PDB (target + peptide)")
     p_bench.add_argument("--reference", "-r", help="Reference co-crystal PDB")
     p_bench.add_argument("--run-all", action="store_true", default=False, help="Run standardized validation suite across all 14 benchmark co-crystals")
+    p_bench.add_argument("--external", action="store_true", default=False, help="Run external prospective benchmark suite across 8 unseen co-crystals (0% training overlap)")
     p_bench.add_argument("--benchmarks-dir", default="./benchmarks", help="Directory of benchmark PDB files (default: ./benchmarks)")
     p_bench.add_argument("--rec-chain", default="A", help="Receptor chain in predicted complex (default: A)")
     p_bench.add_argument("--pep-chain", default="B", help="Peptide chain in predicted complex (default: B)")
@@ -1077,6 +1078,17 @@ def run_pockets_cli(args: argparse.Namespace) -> None:
 
 
 def run_benchmark_cli(args: argparse.Namespace) -> None:
+    if getattr(args, "external", False):
+        try:
+            from run_external_benchmark import run_external_benchmark
+            b_dir = Path(args.benchmarks_dir) if args.benchmarks_dir != "./benchmarks" else Path("benchmarks/external_test_set")
+            run_external_benchmark(benchmarks_dir=b_dir)
+            return
+        except ImportError:
+            from amp_screen.benchmark import run_all_external_benchmarks
+            run_all_external_benchmarks()
+            return
+
     if getattr(args, "run_all", False) or (not args.complex and not args.reference):
         try:
             from run_benchmarks import run_all_benchmarks

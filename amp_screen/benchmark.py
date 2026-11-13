@@ -298,3 +298,17 @@ def run_all_benchmarks(benchmarks_dir: Path = Path("benchmarks"), out_csv: Optio
     from run_benchmarks import run_all_benchmarks as _run_all
     return _run_all(benchmarks_dir=benchmarks_dir, out_csv=out_csv or (benchmarks_dir / "benchmark_results.csv"))
 
+
+def run_all_external_benchmarks(benchmarks_dir: Path = Path("benchmarks/external_test_set"), out_csv: Optional[Path] = None):
+    """
+    Evaluates the prospective external benchmark suite (8 complexes, 0% training overlap).
+    """
+    import sys
+    benchmarks_dir = Path(benchmarks_dir).resolve()
+    repo_root = benchmarks_dir.parent.parent if benchmarks_dir.name == "external_test_set" else benchmarks_dir.parent
+    if str(repo_root) not in sys.path:
+        sys.path.insert(0, str(repo_root))
+    from run_external_benchmark import run_external_benchmark as _run_ext
+    return _run_ext(benchmarks_dir=benchmarks_dir, out_csv=out_csv or (benchmarks_dir / "external_benchmark_results.csv"))
+
+
