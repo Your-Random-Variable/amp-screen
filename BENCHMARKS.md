@@ -67,13 +67,13 @@ $$\Delta G^\circ = RT \ln\left(\frac{K_d}{1\text{ M}}\right)$$
 
 ---
 
-## 3. External Blind Benchmark Suite ($N=8$ Co-Crystals, Strictly 0% Overlap with 381 Dataset)
+## 3. External Blind Benchmark Suite ($N=18$ Co-Crystals, Strictly 0% Overlap with 381 Dataset)
 
-To evaluate **true prospective generalization** on targets completely outside the 381-complex training corpus (`data/pdbbind_peptide_affinity_dataset.csv`), we curated an independent external test suite of **8 high-resolution co-crystal structures** with rigorous solution binding affinities determined by Isothermal Titration Calorimetry (ITC), Surface Plasmon Resonance (SPR), or Fluorescence Polarization (FP).
+To evaluate **true prospective generalization** on targets completely outside the 381-complex training corpus (`data/pdbbind_peptide_affinity_dataset.csv`), we curated an independent external test suite of **18 high-resolution co-crystal structures** with rigorous solution binding affinities determined by Isothermal Titration Calorimetry (ITC), Surface Plasmon Resonance (SPR), or Fluorescence Polarization (FP).
 
-> **Zero Data Leakage:** Every complex in this external benchmark suite was verified to have **strictly 0% overlap** with the 381 PDBbind training dataset.
+> **Zero Data Leakage:** Every complex in this expanded external benchmark suite was verified to have **strictly 0% overlap** with the 381 PDBbind training dataset and the 14 retrospective complexes.
 
-### External Benchmark Leaderboard:
+### External Benchmark Leaderboard ($N=18$ Independent Co-Crystals):
 
 | PDB ID | Target Receptor | Peptide Name | Peptide Sequence ($L$) | Experimental $K_d$ | Experimental $\Delta G^\circ$ | HADDOCK Score | Physical Force-Field $\Delta G$ | **Calibrated 56D ML $\Delta G$** | **Calibrated 56D ML $K_d$** | Absolute Error ($\|\Delta\Delta G\|$) | Experimental Assay & Citation |
 | :---: | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
@@ -85,21 +85,33 @@ To evaluate **true prospective generalization** on targets completely outside th
 | **1TW6** | cIAP1 BIR3 Domain | Smac tetrapeptide | `AVPI` (4 aa) | $280\text{ nM}$ | $-8.94\text{ kcal/mol}$ | $-28.1$ | $-7.85$ | **$-8.06\text{ kcal/mol}$** | **$1.2\ \mu\text{M}$** | **$0.88\text{ kcal/mol}$** | FP (Sun et al., *J. Med. Chem.* 2004) |
 | **1SFI** | Bovine Trypsin | SFTI-1 (cyclic) | `GRCTKSIPPICFPD` (14 aa) | $0.1\text{ nM}$ | $-13.64\text{ kcal/mol}$ | $-54.3$ | $-8.80$ | **$-8.41\text{ kcal/mol}$** | **$682\text{ nM}$** | **$5.23\text{ kcal/mol}$** | Enzyme $K_i$ (Korsinczky et al., *JMB* 2001) |
 | **3D9L** | Nrd1 CTD Domain | RNAPII CTD | `PSYPTSP` (7 aa) | $20.0\ \mu\text{M}$ | $-6.41\text{ kcal/mol}$ | $-1.5$ | $-6.88$ | **$-7.33\text{ kcal/mol}$** | **$4.2\ \mu\text{M}$** | **$0.92\text{ kcal/mol}$** | ITC (Vassal et al., *Mol. Cell* 2008) |
+| **1MFG** | Erbin PDZ Domain | ErbB2 C-tail | `EYLGLDVPV` (9 aa) | $50.0\ \mu\text{M}$ | $-5.87\text{ kcal/mol}$ | $-36.0$ | $-8.13$ | **$-9.58\text{ kcal/mol}$** | **$95\text{ nM}$** | **$3.71\text{ kcal/mol}$** | Fluorescence (Birrane et al., *JBC* 2003) |
+| **1UJ0** | STAM2 SH3 Domain | UBPY peptide | `TPMVNRENK` (9 aa) | $27.0\ \mu\text{M}$ | $-6.23\text{ kcal/mol}$ | $-29.2$ | $-7.89$ | **$-7.50\text{ kcal/mol}$** | **$3.2\ \mu\text{M}$** | **$1.27\text{ kcal/mol}$** | SPR (Kaneko et al., *JBC* 2003) |
+| **2PUY** | BHC80 PHD Finger | Histone H3 | `ARTKQTARKS` (10 aa) | $30.0\ \mu\text{M}$ | $-6.17\text{ kcal/mol}$ | $-0.1$ | $-6.83$ | **$-6.27\text{ kcal/mol}$** | **$25.3\ \mu\text{M}$** | **$0.10\text{ kcal/mol}$** | ITC (Lan et al., *Nature* 2007) |
+| **2AK5** | $\beta$-PIX SH3 Domain | Cbl-b PR | `RPPKPRPR` (8 aa) | $14.0\ \mu\text{M}$ | $-6.62\text{ kcal/mol}$ | $-0.0$ | $-6.83$ | **$-6.63\text{ kcal/mol}$** | **$13.9\ \mu\text{M}$** | **$0.01\text{ kcal/mol}$** | ITC (Wu et al., *Mol. Cell* 2005) |
+| **1BC5** | CheR Methyltransferase | Receptor NWETF | `NWETF` (5 aa) | $2.0\ \mu\text{M}$ | $-7.78\text{ kcal/mol}$ | $-42.2$ | $-8.36$ | **$-9.83\text{ kcal/mol}$** | **$63\text{ nM}$** | **$2.05\text{ kcal/mol}$** | Binding assay (Djordjevic & Stock, *PNAS* 1998) |
+| **1D4T** | SAP SH2 Domain | SLAM peptide | `KSLTIYAQVQK` (11 aa) | $650\text{ nM}$ | $-8.44\text{ kcal/mol}$ | $-66.7$ | $-9.24$ | **$-10.32\text{ kcal/mol}$** | **$27\text{ nM}$** | **$1.88\text{ kcal/mol}$** | ITC (Poy et al., *Mol. Cell* 1999) |
+| **3DXC** | Fe65-PTB2 Domain | APP AICD | `AVTPEERHLSKMQQNGYENPTYKFFEQM` (28 aa) | $220\text{ nM}$ | $-9.08\text{ kcal/mol}$ | $-91.0$ | $-10.12$ | **$-10.09\text{ kcal/mol}$** | **$40\text{ nM}$** | **$1.01\text{ kcal/mol}$** | ITC (Radzimanowski et al., *EMBO Rep.* 2008) |
+| **1SE0** | DIAP1 BIR1 Domain | Grim IBM | `AIAYFIP` (7 aa) | $120\text{ nM}$ | $-9.44\text{ kcal/mol}$ | $-38.3$ | $-8.22$ | **$-9.59\text{ kcal/mol}$** | **$93\text{ nM}$** | **$0.15\text{ kcal/mol}$** | ITC (Yan et al., *Nat. Struct. Mol. Biol.* 2004) |
+| **3C3O** | ALIX Bro1 Domain | CHMP4A C-helix | `DEEALKQLAEWVS` (13 aa) | $45\text{ nM}$ | $-10.02\text{ kcal/mol}$ | $-37.4$ | $-8.18$ | **$-9.08\text{ kcal/mol}$** | **$221\text{ nM}$** | **$0.94\text{ kcal/mol}$** | SPR (McCullough et al., *Science* 2008) |
+| **1HC9** | $\alpha$-Bungarotoxin | nAChR Mimotope | `WRYYESSLLPYPD` (13 aa) | $2.0\text{ nM}$ | $-11.87\text{ kcal/mol}$ | $-55.3$ | $-8.83$ | **$-9.67\text{ kcal/mol}$** | **$82\text{ nM}$** | **$2.20\text{ kcal/mol}$** | Binding assay (Harel et al., *Neuron* 2001) |
 
 ### Prospective Generalization Metrics:
 - **56D ML Ensemble Performance:**
-  - **MAE on Standard Protein-Peptide Signaling Interfaces ($N=7$, excl. bicyclic protease inhibitor 1SFI):** **`1.19 kcal/mol`** (4 out of 7 achieve chemical accuracy $< 1.0\text{ kcal/mol}$)
-  - **Overall MAE ($N=8$):** **`1.70 kcal/mol`** (reduced from $2.04\text{ kcal/mol}$ via tail variance calibration)
-  - **Overall RMSE ($N=8$):** **`2.23 kcal/mol`**
-  - **Pearson correlation ($r$):** **`0.579`**
-  - **Spearman rank correlation ($\rho$):** **`0.571`**
+  - **MAE on Standard Protein-Peptide Signaling Interfaces ($N=17$, excl. bicyclic protease inhibitor 1SFI):** **`1.27 kcal/mol`**
+  - **Chemical Accuracy ($< 1.0\text{ kcal/mol}$):** **`8 out of 17 complexes (47.1%)`**
+  - **Pearson correlation on Signaling Complexes ($r$):** **`0.659`**
+  - **Spearman rank correlation on Signaling Complexes ($\rho$):** **`0.531`**
+  - **Overall MAE ($N=18$):** **`1.49 kcal/mol`**
+  - **Overall RMSE ($N=18$):** **`1.97 kcal/mol`**
+  - **Overall Pearson correlation ($r$):** **`0.530`** ($p = 0.0237$, statistically significant)
 - **Physical Force-Field Performance (HADDOCK 2.4 Calibrated Linear Mapping):**
-  - **MAE:** **`2.30 kcal/mol`** (substantially improved from $5.60\text{ kcal/mol}$ without calibration)
-  - **RMSE:** **`2.63 kcal/mol`**
-  - **Pearson correlation ($r$):** **`0.780`** ($p = 0.0225$, **statistically significant**)
-  - **Spearman rank correlation ($\rho$):** **`0.905`** (**exceptional ranking concordance**)
+  - **MAE across all 18 complexes:** **`1.76 kcal/mol`**
+  - **RMSE across all 18 complexes:** **`2.11 kcal/mol`**
+  - **Pearson correlation ($r$):** **`0.595`** ($p = 0.0092$, **statistically significant**)
+  - **Spearman rank correlation ($\rho$):** **`0.640`**
 
-*Note on 1SFI:* Sunflower Trypsin Inhibitor-1 (SFTI-1) is a rigid, bicyclic 14-mer inhibitor binding with sub-nanomolar potency ($K_i = 100\text{ pM}$, $\Delta G = -13.64\text{ kcal/mol}$) into the trypsin catalytic triad with 15 hydrogen bonds. Because the entire 381-complex PDBbind training corpus only spans down to $\Delta G = -11.85\text{ kcal/mol}$, 1SFI exceeds the training boundary. Across the 7 canonical signaling interfaces ($2.0\text{ nM}$ to $20.0\ \mu\text{M}$), the ML ensemble maintains an MAE of **$1.19\text{ kcal/mol}$**.
+*Note on 1SFI:* Sunflower Trypsin Inhibitor-1 (SFTI-1) is a rigid, bicyclic 14-mer inhibitor binding with sub-nanomolar potency ($K_i = 100\text{ pM}$, $\Delta G = -13.64\text{ kcal/mol}$) into the trypsin catalytic triad with 15 hydrogen bonds. Because the entire 381-complex PDBbind training corpus only spans down to $\Delta G = -11.85\text{ kcal/mol}$, 1SFI exceeds the training boundary. Across all 17 canonical signaling interfaces ($2.0\text{ nM}$ to $50.0\ \mu\text{M}$), the ML ensemble maintains an MAE of **$1.27\text{ kcal/mol}$** with nearly half (47.1%) within chemical accuracy ($< 1.0\text{ kcal/mol}$).
 
 ---
 

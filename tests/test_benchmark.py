@@ -34,5 +34,17 @@ class TestBenchmark(unittest.TestCase):
             self.assertIn("pdb_id", df.columns)
             self.assertIn("haddock_score", df.columns)
 
+    def test_run_all_external_benchmarks(self):
+        from run_external_benchmark import run_external_benchmark
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            out_csv = Path(tmp_dir) / "external_benchmark_results.csv"
+            df = run_external_benchmark(benchmarks_dir=Path("benchmarks/external_test_set"), out_csv=out_csv)
+            self.assertEqual(len(df), 18)
+            self.assertTrue(out_csv.exists())
+            self.assertIn("pdb_id", df.columns)
+            self.assertIn("ml_delta_g", df.columns)
+            self.assertIn("phys_delta_g", df.columns)
+            self.assertIn("exp_delta_g", df.columns)
+
 if __name__ == "__main__":
     unittest.main()

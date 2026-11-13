@@ -943,7 +943,7 @@ def main():
     p_bench.add_argument("--complex", "-c", help="Predicted complex PDB (target + peptide)")
     p_bench.add_argument("--reference", "-r", help="Reference co-crystal PDB")
     p_bench.add_argument("--run-all", action="store_true", default=False, help="Run standardized validation suite across all 14 benchmark co-crystals")
-    p_bench.add_argument("--external", action="store_true", default=False, help="Run external prospective benchmark suite across 8 unseen co-crystals (0% training overlap)")
+    p_bench.add_argument("--external", action="store_true", default=False, help="Run external prospective benchmark suite across 18 unseen co-crystals (0% training overlap)")
     p_bench.add_argument("--benchmarks-dir", default="./benchmarks", help="Directory of benchmark PDB files (default: ./benchmarks)")
     p_bench.add_argument("--rec-chain", default="A", help="Receptor chain in predicted complex (default: A)")
     p_bench.add_argument("--pep-chain", default="B", help="Peptide chain in predicted complex (default: B)")

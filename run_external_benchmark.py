@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 AMP-Screen External Benchmark Evaluation Suite.
-Strictly evaluates the physics engine and 56D ML ensemble on an external,
-prospective test set of 8 high-resolution protein-peptide co-crystal structures
+Strictly evaluates the physics engine and 56D ML ensemble on an expanded external,
+prospective test set of 18 high-resolution protein-peptide co-crystal structures
 that have ZERO overlap with the 381 PDBbind training dataset.
 """
 
@@ -87,6 +87,86 @@ EXTERNAL_BENCHMARKS = {
         "exp_kd_str": "20.0 µM",
         "exp_delta_g": -6.41,
         "citation": "Vassal et al., Mol. Cell 31:479 (2008)"
+    },
+    "1MFG": {
+        "target": "Erbin PDZ Domain",
+        "pep_name": "ErbB2 C-tail (9-mer)",
+        "exp_kd_molar": 5.0e-5,
+        "exp_kd_str": "50.0 µM",
+        "exp_delta_g": -5.87,
+        "citation": "Birrane et al., J. Biol. Chem. 278:1399 (2003)"
+    },
+    "1UJ0": {
+        "target": "STAM2 SH3 Domain",
+        "pep_name": "UBPY peptide (9-mer)",
+        "exp_kd_molar": 2.7e-5,
+        "exp_kd_str": "27.0 µM",
+        "exp_delta_g": -6.23,
+        "citation": "Kaneko et al., J. Biol. Chem. 278:45484 (2003)"
+    },
+    "2PUY": {
+        "target": "BHC80 PHD Finger",
+        "pep_name": "Histone H3 (10-mer)",
+        "exp_kd_molar": 3.0e-5,
+        "exp_kd_str": "30.0 µM",
+        "exp_delta_g": -6.17,
+        "citation": "Lan et al., Nature 448:718 (2007)"
+    },
+    "2AK5": {
+        "target": "beta-PIX SH3 Domain",
+        "pep_name": "Cbl-b PR (8-mer)",
+        "exp_kd_molar": 1.4e-5,
+        "exp_kd_str": "14.0 µM",
+        "exp_delta_g": -6.62,
+        "citation": "Wu et al., Mol. Cell 20:397 (2005)"
+    },
+    "1BC5": {
+        "target": "CheR Methyltransferase",
+        "pep_name": "Chemoreceptor NWETF (5-mer)",
+        "exp_kd_molar": 2.0e-6,
+        "exp_kd_str": "2.0 µM",
+        "exp_delta_g": -7.78,
+        "citation": "Djordjevic & Stock, PNAS 95:1381 (1998)"
+    },
+    "1D4T": {
+        "target": "SAP SH2 Domain",
+        "pep_name": "SLAM peptide (11-mer)",
+        "exp_kd_molar": 6.5e-7,
+        "exp_kd_str": "650 nM",
+        "exp_delta_g": -8.44,
+        "citation": "Poy et al., Mol. Cell 4:555 (1999)"
+    },
+    "3DXC": {
+        "target": "Fe65-PTB2 Domain",
+        "pep_name": "APP AICD (28-mer)",
+        "exp_kd_molar": 2.2e-7,
+        "exp_kd_str": "220 nM",
+        "exp_delta_g": -9.08,
+        "citation": "Radzimanowski et al., EMBO Rep. 9:1134 (2008)"
+    },
+    "1SE0": {
+        "target": "DIAP1 BIR1 Domain",
+        "pep_name": "Grim IBM (7-mer)",
+        "exp_kd_molar": 1.2e-7,
+        "exp_kd_str": "120 nM",
+        "exp_delta_g": -9.44,
+        "citation": "Yan et al., Nat. Struct. Mol. Biol. 11:420 (2004)"
+    },
+    "3C3O": {
+        "target": "ALIX Bro1 Domain",
+        "pep_name": "CHMP4A C-helix (13-mer)",
+        "exp_kd_molar": 4.5e-8,
+        "exp_kd_str": "45 nM",
+        "exp_delta_g": -10.02,
+        "citation": "McCullough et al., Science 320:1088 (2008)"
+    },
+    "1HC9": {
+        "target": "alpha-Bungarotoxin",
+        "pep_name": "nAChR Mimotope (13-mer)",
+        "exp_kd_molar": 2.0e-9,
+        "exp_kd_str": "2.0 nM",
+        "exp_delta_g": -11.87,
+        "citation": "Harel et al., Neuron 32:265 (2001)"
     }
 }
 
@@ -214,9 +294,21 @@ def run_external_benchmark(
     r_ml, p_ml = pearsonr(df["ml_delta_g"], df["exp_delta_g"])
     rho_ml, _ = spearmanr(df["ml_delta_g"], df["exp_delta_g"])
 
-    print("\nDescriptive Performance on Completely Unseen External Test Set (N=8):")
-    print(f"  • Physical Force-Field: MAE = {mae_phys:.2f} kcal/mol, RMSE = {rmse_phys:.2f} kcal/mol, r = {r_phys:.3f} (p = {p_phys:.4f}), ρ = {rho_phys:.3f}")
-    print(f"  • 56D ML Ensemble:      MAE = {mae_ml:.2f} kcal/mol, RMSE = {rmse_ml:.2f} kcal/mol, r = {r_ml:.3f} (p = {p_ml:.4f}), ρ = {rho_ml:.3f}")
+    print(f"\nDescriptive Performance on Completely Unseen External Test Set (N={len(df)}):")
+    print(f"  • Physical Force-Field (All N={len(df)}): MAE = {mae_phys:.2f} kcal/mol, RMSE = {rmse_phys:.2f} kcal/mol, r = {r_phys:.3f} (p = {p_phys:.4f}), ρ = {rho_phys:.3f}")
+    print(f"  • 56D ML Ensemble      (All N={len(df)}): MAE = {mae_ml:.2f} kcal/mol, RMSE = {rmse_ml:.2f} kcal/mol, r = {r_ml:.3f} (p = {p_ml:.4f}), ρ = {rho_ml:.3f}")
+
+    # Signaling subset excluding bicyclic ceiling outlier 1SFI
+    df_signaling = df[df["pdb_id"] != "1SFI"]
+    if len(df_signaling) < len(df):
+        mae_ml_sig = float(np.mean(df_signaling["err_ml"]))
+        rmse_ml_sig = float(np.sqrt(np.mean(df_signaling["err_ml"] ** 2)))
+        r_ml_sig, _ = pearsonr(df_signaling["ml_delta_g"], df_signaling["exp_delta_g"])
+        rho_ml_sig, _ = spearmanr(df_signaling["ml_delta_g"], df_signaling["exp_delta_g"])
+        print(f"\nStandard Physiological Signaling Complexes (N={len(df_signaling)}, excl. bicyclic 1SFI):")
+        print(f"  • 56D ML Ensemble:      MAE = {mae_ml_sig:.2f} kcal/mol, RMSE = {rmse_ml_sig:.2f} kcal/mol, r = {r_ml_sig:.3f}, ρ = {rho_ml_sig:.3f}")
+        chem_acc = int(np.sum(df_signaling["err_ml"] < 1.0))
+        print(f"  • Chemical Accuracy (< 1.0 kcal/mol): {chem_acc}/{len(df_signaling)} complexes ({chem_acc/len(df_signaling)*100:.1f}%)")
     print("=" * 115 + "\n")
 
     out_csv.parent.mkdir(parents=True, exist_ok=True)
