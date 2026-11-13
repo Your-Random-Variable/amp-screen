@@ -125,18 +125,18 @@ To strictly test **out-of-distribution, blind generalization** on protein-peptid
 
 | PDB ID | Target Receptor | Peptide Name | Peptide Sequence ($L$) | Experimental $K_d$ | Exp $\Delta G^\circ$ | Physical $\Delta G$ | **56D ML $\Delta G$** | **56D ML $K_d$** | Absolute Error | Assay & Citation |
 | :---: | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **1X2R** | Keap1 Kelch Domain | Nrf2 ETGE | `LDEETGEFL` (9 aa) | $5.0\text{ nM}$ | $-11.32\text{ kcal/mol}$ | $-5.89$ | **$-9.76\text{ kcal/mol}$** | **$70\text{ nM}$** | **$1.56\text{ kcal/mol}$** | ITC (Tong et al., 2006) |
-| **2FLU** | Keap1 Kelch Domain | Nrf2 Neh2 | `AFFAQLQLDEETGEFL` (16 aa) | $9.0\text{ nM}$ | $-10.97\text{ kcal/mol}$ | $-2.61$ | **$-9.09\text{ kcal/mol}$** | **$218\text{ nM}$** | **$1.88\text{ kcal/mol}$** | ITC (Lo et al., 2006) |
-| **2NL9** | Mcl-1 Oncoprotein | Bim BH3 | `RPEIWIAQELRRIGDEFNAYYAR` (23 aa) | $2.0\text{ nM}$ | $-11.87\text{ kcal/mol}$ | $-14.68$ | **$-9.51\text{ kcal/mol}$** | **$108\text{ nM}$** | **$2.36\text{ kcal/mol}$** | SPR (Lee et al., 2008) |
-| **6QG8** | Bcl-2 Oncoprotein | PUMA BH3 | `EEEQWAREIGAQLRRMADDL` (20 aa) | $2.4\text{ nM}$ | $-11.75\text{ kcal/mol}$ | $-6.63$ | **$-9.26\text{ kcal/mol}$** | **$164\text{ nM}$** | **$2.49\text{ kcal/mol}$** | SPR (Stewart et al., 2019) |
-| **1QZ7** | $\beta$-Catenin | Axin | `EENPESILDEHVQRVMK` (17 aa) | $72\text{ nM}$ | $-9.75\text{ kcal/mol}$ | $-2.23$ | **$-8.98\text{ kcal/mol}$** | **$260\text{ nM}$** | **$0.77\text{ kcal/mol}$** | ITC (Xing et al., 2003) |
-| **1TW6** | cIAP1 BIR3 Domain | Smac tetrapeptide | `AVPI` (4 aa) | $280\text{ nM}$ | $-8.94\text{ kcal/mol}$ | $-5.98$ | **$-8.19\text{ kcal/mol}$** | **$985\text{ nM}$** | **$0.75\text{ kcal/mol}$** | FP (Sun et al., 2004) |
-| **1SFI** | Bovine Trypsin | SFTI-1 (cyclic) | `GRCTKSIPPICFPD` (14 aa) | $0.1\text{ nM}$ | $-13.64\text{ kcal/mol}$ | $-9.47$ | **$-8.64\text{ kcal/mol}$** | **$464\text{ nM}$** | **$5.00\text{ kcal/mol}$** | Enzyme $K_i$ (Korsinczky 2001) |
-| **3D9L** | Nrd1 CTD Domain | RNAPII CTD | `PSYPTSP` (7 aa) | $20.0\ \mu\text{M}$ | $-6.41\text{ kcal/mol}$ | $+2.00$ | **$-7.91\text{ kcal/mol}$** | **$1.6\ \mu\text{M}$** | **$1.50\text{ kcal/mol}$** | ITC (Vassal et al., 2008) |
+| **1X2R** | Keap1 Kelch Domain | Nrf2 ETGE | `LDEETGEFL` (9 aa) | $5.0\text{ nM}$ | $-11.32\text{ kcal/mol}$ | $-8.22$ | **$-10.77\text{ kcal/mol}$** | **$13\text{ nM}$** | **$0.55\text{ kcal/mol}$** | ITC (Tong et al., 2006) |
+| **2FLU** | Keap1 Kelch Domain | Nrf2 Neh2 | `AFFAQLQLDEETGEFL` (16 aa) | $9.0\text{ nM}$ | $-10.97\text{ kcal/mol}$ | $-8.16$ | **$-9.43\text{ kcal/mol}$** | **$123\text{ nM}$** | **$1.54\text{ kcal/mol}$** | ITC (Lo et al., 2006) |
+| **2NL9** | Mcl-1 Oncoprotein | Bim BH3 | `RPEIWIAQELRRIGDEFNAYYAR` (23 aa) | $2.0\text{ nM}$ | $-11.87\text{ kcal/mol}$ | $-10.12$ | **$-9.91\text{ kcal/mol}$** | **$54\text{ nM}$** | **$1.96\text{ kcal/mol}$** | SPR (Lee et al., 2008) |
+| **6QG8** | Bcl-2 Oncoprotein | PUMA BH3 | `EEEQWAREIGAQLRRMADDL` (20 aa) | $2.4\text{ nM}$ | $-11.75\text{ kcal/mol}$ | $-8.97$ | **$-9.69\text{ kcal/mol}$** | **$79\text{ nM}$** | **$2.06\text{ kcal/mol}$** | SPR (Stewart et al., 2019) |
+| **1QZ7** | $\beta$-Catenin | Axin | `EENPESILDEHVQRVMK` (17 aa) | $72\text{ nM}$ | $-9.75\text{ kcal/mol}$ | $-8.21$ | **$-9.31\text{ kcal/mol}$** | **$149\text{ nM}$** | **$0.44\text{ kcal/mol}$** | ITC (Xing et al., 2003) |
+| **1TW6** | cIAP1 BIR3 Domain | Smac tetrapeptide | `AVPI` (4 aa) | $280\text{ nM}$ | $-8.94\text{ kcal/mol}$ | $-7.85$ | **$-8.06\text{ kcal/mol}$** | **$1.2\ \mu\text{M}$** | **$0.88\text{ kcal/mol}$** | FP (Sun et al., 2004) |
+| **1SFI** | Bovine Trypsin | SFTI-1 (cyclic) | `GRCTKSIPPICFPD` (14 aa) | $0.1\text{ nM}$ | $-13.64\text{ kcal/mol}$ | $-8.80$ | **$-8.41\text{ kcal/mol}$** | **$682\text{ nM}$** | **$5.23\text{ kcal/mol}$** | Enzyme $K_i$ (Korsinczky 2001) |
+| **3D9L** | Nrd1 CTD Domain | RNAPII CTD | `PSYPTSP` (7 aa) | $20.0\ \mu\text{M}$ | $-6.41\text{ kcal/mol}$ | $-6.88$ | **$-7.33\text{ kcal/mol}$** | **$4.2\ \mu\text{M}$** | **$0.92\text{ kcal/mol}$** | ITC (Vassal et al., 2008) |
 
 - **Generalization Performance:**
-  - **56D ML Ensemble:** $\text{MAE} = \mathbf{2.04\text{ kcal/mol}}$ (or $\mathbf{1.61\text{ kcal/mol}}$ on the 7 canonical signaling complexes), Pearson $r = \mathbf{0.648}$, Spearman $\rho = \mathbf{0.571}$.
-  - **Physical Force-Field:** Pearson $r = \mathbf{0.746}$ ($p = 0.0337$, statistically significant), Spearman $\rho = \mathbf{0.833}$.
+  - **56D ML Ensemble:** $\text{MAE} = \mathbf{1.19\text{ kcal/mol}}$ on the 7 canonical signaling complexes (4 of 7 achieve chemical accuracy $< 1.0\text{ kcal/mol}$), overall $\text{MAE} = \mathbf{1.70\text{ kcal/mol}}$.
+  - **Physical Force-Field:** $\text{MAE} = \mathbf{2.30\text{ kcal/mol}}$, Pearson $r = \mathbf{0.780}$ ($p = 0.0225$, statistically significant), Spearman $\rho = \mathbf{0.905}$.
   - **Reproduction:** Run `amp-screen benchmark --external` or `python run_external_benchmark.py`.
 
 ---

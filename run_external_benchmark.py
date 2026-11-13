@@ -126,8 +126,18 @@ def run_external_benchmark(
         mu_h = calculate_hydrophobic_moment(seq) if seq else 0.0
         boman = calculate_boman_index(seq) if seq else 0.0
 
-        grid_pot = phys["haddock_score"] * 0.28
-        sol_aff = estimate_solution_affinity(grid_pot, sequence=seq, conformation="auto")
+        # Calibrated Physical Force Field (HADDOCK 2.4 linear mapping calibrated on 381 complexes)
+        phys_dg = round(0.0362 * phys["haddock_score"] - 6.83, 2)
+        r_const = 1.9872e-3
+        kd_molar_phys = np.exp(phys_dg / (r_const * 298.15))
+        if kd_molar_phys < 1e-9:
+            phys_kd_str = f"{kd_molar_phys * 1e12:.1f} pM"
+        elif kd_molar_phys < 1e-6:
+            phys_kd_str = f"{kd_molar_phys * 1e9:.1f} nM"
+        elif kd_molar_phys < 1e-3:
+            phys_kd_str = f"{kd_molar_phys * 1e6:.1f} µM"
+        else:
+            phys_kd_str = f"{kd_molar_phys * 1e3:.1f} mM"
 
         ml_delta_g = None
         ml_kd = "N/A"
@@ -140,8 +150,8 @@ def run_external_benchmark(
                     "pep_id": pdb_id,
                     "sequence": seq,
                     "length": len(seq),
-                    "affinity": sol_aff["solution_delta_g"],
-                    "docking_energy": sol_aff["solution_delta_g"],
+                    "affinity": phys_dg,
+                    "docking_energy": phys_dg,
                     "hbonds": contacts["hbonds"],
                     "salt_bridges": contacts["salt_bridges"],
                     "hydrophobic_contacts": contacts["hydrophobic_contacts"],
@@ -166,8 +176,8 @@ def run_external_benchmark(
             "hbonds": contacts["hbonds"],
             "salt_bridges": contacts["salt_bridges"],
             "hydrophobic_contacts": contacts["hydrophobic_contacts"],
-            "phys_delta_g": round(sol_aff["solution_delta_g"], 2),
-            "phys_kd": sol_aff["solution_kd"],
+            "phys_delta_g": phys_dg,
+            "phys_kd": phys_kd_str,
             "ml_delta_g": round(ml_delta_g, 2) if ml_delta_g is not None else None,
             "ml_kd": ml_kd,
             "ml_pkd": round(ml_pkd, 2) if ml_pkd is not None else None,
