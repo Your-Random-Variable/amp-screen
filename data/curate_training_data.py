@@ -4,7 +4,7 @@ Curates:
 1. data/amp_training_dataset.csv (180 diverse, validated active AMPs)
 2. data/decoy_training_dataset.csv (180 negative controls: 90 composition-matched scrambled + 90 natural non-AMPs)
 3. data/full_training_set_sequence.csv (360 sequences with 5-fold stratified CV assignment)
-4. data/pdbbind_peptide_affinity_dataset.csv (120 curated protein-peptide complexes with experimental binding affinities)
+4. data/pdbbind_peptide_affinity_dataset.csv (539 curated protein-peptide complexes across 46 families with 96 biophysical features)
 """
 
 import sys
@@ -605,7 +605,7 @@ full_seq_csv = OUT_DIR / "full_training_set_sequence.csv"
 df_full_seq.to_csv(full_seq_csv, index=False)
 print(f"Saved {len(df_full_seq)} combined training sequences to {full_seq_csv}")
 
-# D. Protein-Peptide Complex Affinity Dataset (381 complexes with 56 physical parameters)
+# D. Protein-Peptide Complex Affinity Dataset (539 complexes with 96 physical parameters)
 try:
     from data.generate_expanded_dataset import generate_dataset
 except ImportError:

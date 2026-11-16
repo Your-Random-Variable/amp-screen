@@ -1,7 +1,7 @@
 """
 Model Training & Cluster-Stratified Cross-Validation Utility for AMP-Screen.
 Extracts 96D structural, physical, and sequence feature vectors from a dataset of
-381 protein-peptide co-complexes across 40 distinct receptor families with known
+539 protein-peptide co-complexes across 46 distinct receptor families with known
 experimental affinities (pKd, Kd, DeltaG).
 Trains the tri-model ensemble (Gradient Boosting + Random Forest + Extra Trees)
 and saves the trained model to data/trained_complex_ensemble.joblib.
@@ -99,7 +99,7 @@ def train_and_evaluate(
     print("=" * 105)
 
     # Fit final models on 100% of available data
-    print("\nFitting final tri-model ensemble (GB + RF + ET) on all 381 complexes with 96 parameters...")
+    print(f"\nFitting final tri-model ensemble (GB + RF + ET) on all {len(y)} complexes with {len(FEATURE_NAMES)} parameters...")
     final_rf = RandomForestRegressor(n_estimators=400, max_depth=12, min_samples_split=3, max_features=0.6, random_state=42, n_jobs=-1)
     final_gb = GradientBoostingRegressor(n_estimators=250, max_depth=3, learning_rate=0.03, subsample=0.75, max_features=0.7, random_state=42)
     final_et = ExtraTreesRegressor(n_estimators=400, max_depth=12, min_samples_split=3, max_features=0.6, random_state=42, n_jobs=-1)
