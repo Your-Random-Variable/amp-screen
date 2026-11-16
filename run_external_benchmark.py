@@ -3,7 +3,7 @@
 AMP-Screen External Benchmark Evaluation Suite.
 Strictly evaluates the physics engine and 96D ML ensemble on an expanded external,
 prospective test set of 18 high-resolution protein-peptide co-crystal structures
-that have ZERO overlap with the 539 PDBbind training dataset.
+that have ZERO overlap with the 1,054 PDBbind training dataset.
 """
 
 from pathlib import Path
@@ -182,7 +182,7 @@ def run_external_benchmark(
     results = []
 
     print("\n" + "=" * 115)
-    print("      AMP-SCREEN: FULLY EXTERNAL BENCHMARK EVALUATION (0% OVERLAP WITH 539 TRAINING SET)")
+    print("      AMP-SCREEN: FULLY EXTERNAL BENCHMARK EVALUATION (0% OVERLAP WITH 1,054 TRAINING SET)")
     print("=" * 115)
     print(f"Benchmarking directory: {benchmarks_dir} ({len(EXTERNAL_BENCHMARKS)} external complexes)\n")
 
@@ -226,6 +226,8 @@ def run_external_benchmark(
         if ml_scorer and ml_scorer.is_calibrated:
             ml_res = ml_scorer.score_complex(
                 pdb_path,
+                receptor_chain="A",
+                peptide_chain="B",
                 hit_meta={
                     "pep_id": pdb_id,
                     "sequence": seq,

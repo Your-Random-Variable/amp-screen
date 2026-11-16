@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="amp-screen",
-    version="1.8.0",
+    version="1.9.0",
     description="High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
@@ -18,6 +18,7 @@ setup(
         "rdkit>=2023.09.1",
         "scikit-learn>=1.3.0",
         "biopython>=1.81",
+        "torch>=2.0.0",
         "PeptideBuilder>=0.1.1",
         "tqdm>=4.65.0",
         "joblib>=1.3.0"
