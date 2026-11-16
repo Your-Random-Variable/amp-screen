@@ -4,8 +4,8 @@ authors:
   - family-names: "Singh"
     given-names: "Ankur"
 title: "AMP-Screen: High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer"
-version: 1.7.1
-date-released: 2026-11-12
+version: 1.11.0
+date-released: 2026-11-16
 url: "https://github.com/Your-Random-Variable/amp-screen"
 keywords:
   - computational biology

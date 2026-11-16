@@ -59,7 +59,7 @@ def fetch_alphafold_target(
     ensure_dir(out_pdb.parent)
 
     api_url = f"https://alphafold.ebi.ac.uk/api/prediction/{uid}"
-    req = urllib.request.Request(api_url, headers={"User-Agent": "AMP-Screen/1.7.0"})
+    req = urllib.request.Request(api_url, headers={"User-Agent": "AMP-Screen/1.11.0"})
 
     logger.info(f"Querying AlphaFold Database for UniProt accession: {uid}...")
     try:
@@ -79,7 +79,7 @@ def fetch_alphafold_target(
     global_plddt = float(entry.get("globalMetricValue", 0.0))
     logger.info(f"Downloading AlphaFold structure from {pdb_url} (Global pLDDT: {global_plddt:.1f})...")
 
-    dl_req = urllib.request.Request(pdb_url, headers={"User-Agent": "AMP-Screen/1.7.0"})
+    dl_req = urllib.request.Request(pdb_url, headers={"User-Agent": "AMP-Screen/1.11.0"})
     try:
         with urllib.request.urlopen(dl_req, timeout=30) as resp:
             raw_pdb = resp.read().decode("utf-8")
@@ -128,7 +128,7 @@ def fetch_uniprot_sequence(uniprot_id: str) -> Tuple[str, str]:
     """
     uid = uniprot_id.strip().upper()
     url = f"https://rest.uniprot.org/uniprotkb/{uid}.fasta"
-    req = urllib.request.Request(url, headers={"User-Agent": "AMP-Screen/1.7.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "AMP-Screen/1.11.0"})
     with urllib.request.urlopen(req, timeout=15) as resp:
         text = resp.read().decode("utf-8").strip()
     lines = text.split("\n")

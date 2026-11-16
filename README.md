@@ -596,6 +596,15 @@ python -m pytest -q
 
 ---
 
+## 📝 Manuscript & Publications
+
+A complete, submission-ready manuscript formatted for ***Bioinformatics* (Oxford Academic)** is available in the repository:
+- **Application Note (Markdown):** [`manuscript/Bioinformatics_Application_Note.md`](manuscript/Bioinformatics_Application_Note.md)
+- **Application Note (LaTeX Source):** [`manuscript/Bioinformatics_Application_Note.tex`](manuscript/Bioinformatics_Application_Note.tex)
+- **Supplementary Information:** [`manuscript/Supplementary_Information.md`](manuscript/Supplementary_Information.md)
+
+---
+
 ## 📚 Citation
 
 If you use **AMP-Screen** in your research, please cite:
@@ -605,7 +614,7 @@ If you use **AMP-Screen** in your research, please cite:
   author = {Singh, Ankur},
   title = {AMP-Screen: High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer},
   url = {https://github.com/Your-Random-Variable/amp-screen},
-  version = {1.7.1},
+  version = {1.11.0},
   year = {2026}
 }
 ```
