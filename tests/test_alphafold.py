@@ -31,7 +31,7 @@ class TestAlphaFoldModule(unittest.TestCase):
             self.assertIn("proteinChain", json_txt)
 
     def test_score_alphafold_complex(self):
-        cpx_path = Path("delivery_bama_docking/DesignB_BamA_docked_complex.pdb")
+        cpx_path = Path("benchmarks/1dkx.pdb")
         if cpx_path.exists():
             res = score_alphafold_complex(
                 complex_pdb=cpx_path,
@@ -41,7 +41,7 @@ class TestAlphaFoldModule(unittest.TestCase):
             self.assertIn("interface_plddt", res)
             self.assertIn("ml_delta_g", res)
             self.assertIn("decision", res)
-            self.assertEqual(res["peptide_length"], 31)
+            self.assertEqual(res["peptide_length"], 7)
             self.assertEqual(res["clashes"], 0)
 
 if __name__ == "__main__":

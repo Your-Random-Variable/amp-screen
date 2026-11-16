@@ -27,7 +27,7 @@
 | **Target Docking Speed** | 15–120 minutes / peptide | 1–5 minutes | **2–5 seconds / peptide (100% Native Cartesian PDB)** |
 | **Coordinate Representation** | Complex internal coordinates | Artificial PDBQT united-atoms & empirical grid | **100% Native 3D Cartesian coordinates ($\text{\AA}$)** |
 | **External Binary Calls** | Many external wrappers | Subprocess calls to `vina`, Meeko, OpenBabel | **Zero external binary calls (Pure Python/Gemmi/NumPy)** |
-| **Unknown Target Discovery** | Requires manual AlphaFold download | Requires PDB search | **Automated AFDB resolution via UniProt ID (e.g. Q9KPW0)** |
+| **Unknown Target Discovery** | Requires manual AlphaFold download | Requires PDB search | **Automated AFDB resolution via UniProt ID (e.g. P04637)** |
 | **Blind Docking / Cavities** | Days of global random sampling | Requires manual search box coordinates | **Automated 7-Ray PSP 5-Pocket Discovery & 0–100 Druggability** |
 | **Experimental Accuracy** | Gas-phase or uncalibrated ($\pm 3-5\text{ kcal/mol}$) | Empirical score with weak solution $K_d$ correlation | **Prospective blind $\text{MAE} = 1.29\text{ kcal/mol}$, $r = 0.529$ ($N=49$ signaling; $0\%$ training overlap, $<35\%$ homology); $0.12\text{ kcal/mol}$ on 14-complex calibration suite** |
 | **Membrane Biophysics** | No membrane modeling | None | **Wimley-White interfacial scale, $\mu_H$, & Hemolysis Risk** |
@@ -503,19 +503,19 @@ amp-screen pockets \
 End-to-end AlphaFold workflow for uncharacterized targets and de novo designed peptides:
 
 #### Step 1: Fetch Unknown Target from AlphaFold Database (AFDB)
-Directly query the AlphaFold Database by UniProt accession ID (e.g. `Q9KPW0`), extract structural confidence (pLDDT), and clean the coordinates:
+Directly query the AlphaFold Database by UniProt accession ID (e.g. `P04637`), extract structural confidence (pLDDT), and clean the coordinates:
 ```bash
-amp-screen alphafold fetch --uniprot Q9KPW0 --output ./target_receptors/
+amp-screen alphafold fetch --uniprot P04637 --output ./target_receptors/
 ```
-*Tip:* You can also pass a UniProt ID directly to `--receptor` in `amp-screen run` or `amp-screen target` (e.g. `--receptor Q9KPW0`), and the pipeline will automatically resolve and download the AlphaFold structure from AFDB.
+*Tip:* You can also pass a UniProt ID directly to `--receptor` in `amp-screen run` or `amp-screen target` (e.g. `--receptor P04637`), and the pipeline will automatically resolve and download the AlphaFold structure from AFDB.
 
 #### Step 2: Prepare AlphaFold-Multimer & AlphaFold 3 Co-Folding Inputs
 Generate co-folding job inputs for candidate peptides against the target receptor:
 ```bash
 amp-screen alphafold prep \
   --target-seq "<TARGET_SEQUENCE>" \
-  --peptide-seq "KIFCGETCKFIPCITKVPGTCKCKSKVCYFN" \
-  --job-name Vcholerae_BamA_DesignB \
+  --peptide-seq "ETFSDLWKLLPEN" \
+  --job-name Target_Peptide_Lead \
   --output ./af_multimer_inputs/
 ```
 - Creates ColabFold FASTA (`<target>:<peptide>`) and automated runner script (`run_colabfold_*.sh`).
