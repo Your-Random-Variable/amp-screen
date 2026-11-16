@@ -1,6 +1,9 @@
+import sys
 import unittest
 import tempfile
 from pathlib import Path
+if str(Path(__file__).parent.parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).parent.parent))
 from amp_screen.benchmark import evaluate_docked_complex
 try:
     from run_benchmarks import run_all_benchmarks
@@ -39,7 +42,7 @@ class TestBenchmark(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp_dir:
             out_csv = Path(tmp_dir) / "external_benchmark_results.csv"
             df = run_external_benchmark(benchmarks_dir=Path("benchmarks/external_test_set"), out_csv=out_csv)
-            self.assertEqual(len(df), 18)
+            self.assertEqual(len(df), 52)
             self.assertTrue(out_csv.exists())
             self.assertIn("pdb_id", df.columns)
             self.assertIn("ml_delta_g", df.columns)

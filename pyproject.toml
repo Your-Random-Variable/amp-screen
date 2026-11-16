@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "amp-screen"
-version = "1.9.0"
+version = "1.10.0"
 description = "High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer"
 readme = "README.md"
 authors = [{ name = "Ankur Singh" }]

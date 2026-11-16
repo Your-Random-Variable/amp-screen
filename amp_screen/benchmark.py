@@ -301,7 +301,7 @@ def run_all_benchmarks(benchmarks_dir: Path = Path("benchmarks"), out_csv: Optio
 
 def run_all_external_benchmarks(benchmarks_dir: Path = Path("benchmarks/external_test_set"), out_csv: Optional[Path] = None):
     """
-    Evaluates the prospective external benchmark suite (18 complexes, 0% training overlap).
+    Evaluates the prospective external benchmark suite (52 complexes, 0% training overlap).
     """
     import sys
     benchmarks_dir = Path(benchmarks_dir).resolve()
