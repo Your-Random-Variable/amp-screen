@@ -55,10 +55,10 @@ $$\Delta G^\circ = RT \ln\left(\frac{K_d}{1\text{ M}}\right)$$
      - **Held-Out Pearson correlation ($r$):** **`0.637`** ($p = 0.0142$)
      - **Held-Out Spearman rank order ($\rho$):** **`0.604`**
 3. **GroupKFold Cross-Validation Across 40 Receptor Families ($N=381$):**
-   - Cross-Validated Pearson $r$: **`0.4910`** ($p = 1.63 \times 10^{-24}$)
-   - Cross-Validated Spearman $\rho$: **`0.4641`**
-   - Cross-Validated RMSE: **`0.865 pKd units`** (~$1.18\text{ kcal/mol}$)
-   - Cross-Validated MAE: **`0.710 pKd units`** (~$0.97\text{ kcal/mol}$)
+   - Cross-Validated Pearson $r$: **`0.4957`** ($p = 5.09 \times 10^{-25}$)
+   - Cross-Validated Spearman $\rho$: **`0.4740`** (improved from 0.4641)
+   - Cross-Validated RMSE: **`0.862 pKd units`** (~$1.18\text{ kcal/mol}$)
+   - Cross-Validated MAE: **`0.709 pKd units`** (~$0.97\text{ kcal/mol}$)
 4. **Physical Force Field Alone (Zero ML Tuning):**
    - **MAE:** `2.59 kcal/mol`
    - **RMSE:** `3.39 kcal/mol`
@@ -75,44 +75,44 @@ To evaluate **true prospective generalization** on targets completely outside th
 
 ### External Benchmark Leaderboard ($N=18$ Independent Co-Crystals):
 
-| PDB ID | Target Receptor | Peptide Name | Peptide Sequence ($L$) | Experimental $K_d$ | Experimental $\Delta G^\circ$ | HADDOCK Score | Physical Force-Field $\Delta G$ | **Calibrated 88D ML $\Delta G$** | **Calibrated 88D ML $K_d$** | Absolute Error ($\|\Delta\Delta G\|$) | Experimental Assay & Citation |
+| PDB ID | Target Receptor | Peptide Name | Peptide Sequence ($L$) | Experimental $K_d$ | Experimental $\Delta G^\circ$ | HADDOCK Score | Physical Force-Field $\Delta G$ | **Calibrated 96D ML $\Delta G$** | **Calibrated 96D ML $K_d$** | Absolute Error ($\|\Delta\Delta G\|$) | Experimental Assay & Citation |
 | :---: | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **1X2R** | Keap1 Kelch Domain | Nrf2 ETGE | `LDEETGEFL` (9 aa) | $5.0\text{ nM}$ | $-11.32\text{ kcal/mol}$ | $-38.5$ | $-8.22$ | **$-10.45\text{ kcal/mol}$** | **$22\text{ nM}$** | **$0.87\text{ kcal/mol}$** | ITC (Tong et al., *Mol. Cell. Biol.* 2006) |
-| **2FLU** | Keap1 Kelch Domain | Nrf2 Neh2 | `AFFAQLQLDEETGEFL` (16 aa) | $9.0\text{ nM}$ | $-10.97\text{ kcal/mol}$ | $-36.7$ | $-8.16$ | **$-9.68\text{ kcal/mol}$** | **$80\text{ nM}$** | **$1.29\text{ kcal/mol}$** | ITC (Lo et al., *EMBO J.* 2006) |
-| **2NL9** | Mcl-1 Oncoprotein | Bim BH3 | `RPEIWIAQELRRIGDEFNAYYAR` (23 aa) | $2.0\text{ nM}$ | $-11.87\text{ kcal/mol}$ | $-90.9$ | $-10.12$ | **$-10.66\text{ kcal/mol}$** | **$15\text{ nM}$** | **$1.21\text{ kcal/mol}$** | SPR (Lee et al., *Cell Death Differ.* 2008) |
-| **6QG8** | Bcl-2 Oncoprotein | PUMA BH3 | `EEEQWAREIGAQLRRMADDL` (20 aa) | $2.4\text{ nM}$ | $-11.75\text{ kcal/mol}$ | $-59.2$ | $-8.97$ | **$-9.85\text{ kcal/mol}$** | **$60\text{ nM}$** | **$1.90\text{ kcal/mol}$** | SPR (Stewart et al., *Nat. Chem. Biol.* 2019) |
-| **1QZ7** | $\beta$-Catenin | Axin | `EENPESILDEHVQRVMK` (17 aa) | $72\text{ nM}$ | $-9.75\text{ kcal/mol}$ | $-38.0$ | $-8.21$ | **$-9.49\text{ kcal/mol}$** | **$111\text{ nM}$** | **$0.26\text{ kcal/mol}$** | ITC (Xing et al., *Structure* 2003) |
-| **1TW6** | cIAP1 BIR3 Domain | Smac tetrapeptide | `AVPI` (4 aa) | $280\text{ nM}$ | $-8.94\text{ kcal/mol}$ | $-28.1$ | $-7.85$ | **$-8.59\text{ kcal/mol}$** | **$506\text{ nM}$** | **$0.35\text{ kcal/mol}$** | FP (Sun et al., *J. Med. Chem.* 2004) |
-| **1SFI** | Bovine Trypsin | SFTI-1 (cyclic) | `GRCTKSIPPICFPD` (14 aa) | $0.1\text{ nM}$ | $-13.64\text{ kcal/mol}$ | $-54.3$ | $-8.80$ | **$-9.00\text{ kcal/mol}$** | **$254\text{ nM}$** | **$4.64\text{ kcal/mol}$** | Enzyme $K_i$ (Korsinczky et al., *JMB* 2001) |
-| **3D9L** | Nrd1 CTD Domain | RNAPII CTD | `PSYPTSP` (7 aa) | $20.0\ \mu\text{M}$ | $-6.41\text{ kcal/mol}$ | $-1.5$ | $-6.88$ | **$-7.18\text{ kcal/mol}$** | **$5.4\ \mu\text{M}$** | **$0.77\text{ kcal/mol}$** | ITC (Vassal et al., *Mol. Cell* 2008) |
-| **1MFG** | Erbin PDZ Domain | ErbB2 C-tail | `EYLGLDVPV` (9 aa) | $50.0\ \mu\text{M}$ | $-5.87\text{ kcal/mol}$ | $-36.0$ | $-8.13$ | **$-9.53\text{ kcal/mol}$** | **$103\text{ nM}$** | **$3.66\text{ kcal/mol}$** | Fluorescence (Birrane et al., *JBC* 2003) |
-| **1UJ0** | STAM2 SH3 Domain | UBPY peptide | `TPMVNRENK` (9 aa) | $27.0\ \mu\text{M}$ | $-6.23\text{ kcal/mol}$ | $-29.2$ | $-7.89$ | **$-8.04\text{ kcal/mol}$** | **$1.3\ \mu\text{M}$** | **$1.81\text{ kcal/mol}$** | SPR (Kaneko et al., *JBC* 2003) |
-| **2PUY** | BHC80 PHD Finger | Histone H3 | `ARTKQTARKS` (10 aa) | $30.0\ \mu\text{M}$ | $-6.17\text{ kcal/mol}$ | $-0.1$ | $-6.83$ | **$-7.56\text{ kcal/mol}$** | **$2.9\ \mu\text{M}$** | **$1.39\text{ kcal/mol}$** | ITC (Lan et al., *Nature* 2007) |
-| **2AK5** | $\beta$-PIX SH3 Domain | Cbl-b PR | `RPPKPRPR` (8 aa) | $14.0\ \mu\text{M}$ | $-6.62\text{ kcal/mol}$ | $-0.0$ | $-6.83$ | **$-7.26\text{ kcal/mol}$** | **$4.7\ \mu\text{M}$** | **$0.64\text{ kcal/mol}$** | ITC (Wu et al., *Mol. Cell* 2005) |
-| **1BC5** | CheR Methyltransferase | Receptor NWETF | `NWETF` (5 aa) | $2.0\ \mu\text{M}$ | $-7.78\text{ kcal/mol}$ | $-42.2$ | $-8.36$ | **$-9.17\text{ kcal/mol}$** | **$191\text{ nM}$** | **$1.39\text{ kcal/mol}$** | Binding assay (Djordjevic & Stock, *PNAS* 1998) |
-| **1D4T** | SAP SH2 Domain | SLAM peptide | `KSLTIYAQVQK` (11 aa) | $650\text{ nM}$ | $-8.44\text{ kcal/mol}$ | $-66.7$ | $-9.24$ | **$-10.98\text{ kcal/mol}$** | **$< 10\text{ nM}$** | **$2.54\text{ kcal/mol}$** | ITC (Poy et al., *Mol. Cell* 1999) |
-| **3DXC** | Fe65-PTB2 Domain | APP AICD | `AVTPEERHLSKMQQNGYENPTYKFFEQM` (28 aa) | $220\text{ nM}$ | $-9.08\text{ kcal/mol}$ | $-91.0$ | $-10.12$ | **$-10.41\text{ kcal/mol}$** | **$23\text{ nM}$** | **$1.33\text{ kcal/mol}$** | ITC (Radzimanowski et al., *EMBO Rep.* 2008) |
-| **1SE0** | DIAP1 BIR1 Domain | Grim IBM | `AIAYFIP` (7 aa) | $120\text{ nM}$ | $-9.44\text{ kcal/mol}$ | $-38.3$ | $-8.22$ | **$-9.09\text{ kcal/mol}$** | **$217\text{ nM}$** | **$0.35\text{ kcal/mol}$** | ITC (Yan et al., *Nat. Struct. Mol. Biol.* 2004) |
-| **3C3O** | ALIX Bro1 Domain | CHMP4A C-helix | `DEEALKQLAEWVS` (13 aa) | $45\text{ nM}$ | $-10.02\text{ kcal/mol}$ | $-37.4$ | $-8.18$ | **$-9.15\text{ kcal/mol}$** | **$196\text{ nM}$** | **$0.87\text{ kcal/mol}$** | SPR (McCullough et al., *Science* 2008) |
-| **1HC9** | $\alpha$-Bungarotoxin | nAChR Mimotope | `WRYYESSLLPYPD` (13 aa) | $2.0\text{ nM}$ | $-11.87\text{ kcal/mol}$ | $-55.3$ | $-8.83$ | **$-10.29\text{ kcal/mol}$** | **$29\text{ nM}$** | **$1.58\text{ kcal/mol}$** | Binding assay (Harel et al., *Neuron* 2001) |
+| **1X2R** | Keap1 Kelch Domain | Nrf2 ETGE | `LDEETGEFL` (9 aa) | $5.0\text{ nM}$ | $-11.32\text{ kcal/mol}$ | $-38.5$ | $-8.22$ | **$-10.49\text{ kcal/mol}$** | **$20\text{ nM}$** | **$0.83\text{ kcal/mol}$** | ITC (Tong et al., *Mol. Cell. Biol.* 2006) |
+| **2FLU** | Keap1 Kelch Domain | Nrf2 Neh2 | `AFFAQLQLDEETGEFL` (16 aa) | $9.0\text{ nM}$ | $-10.97\text{ kcal/mol}$ | $-36.7$ | $-8.16$ | **$-9.53\text{ kcal/mol}$** | **$104\text{ nM}$** | **$1.44\text{ kcal/mol}$** | ITC (Lo et al., *EMBO J.* 2006) |
+| **2NL9** | Mcl-1 Oncoprotein | Bim BH3 | `RPEIWIAQELRRIGDEFNAYYAR` (23 aa) | $2.0\text{ nM}$ | $-11.87\text{ kcal/mol}$ | $-90.9$ | $-10.12$ | **$-10.51\text{ kcal/mol}$** | **$20\text{ nM}$** | **$1.36\text{ kcal/mol}$** | SPR (Lee et al., *Cell Death Differ.* 2008) |
+| **6QG8** | Bcl-2 Oncoprotein | PUMA BH3 | `EEEQWAREIGAQLRRMADDL` (20 aa) | $2.4\text{ nM}$ | $-11.75\text{ kcal/mol}$ | $-59.2$ | $-8.97$ | **$-9.82\text{ kcal/mol}$** | **$63\text{ nM}$** | **$1.93\text{ kcal/mol}$** | SPR (Stewart et al., *Nat. Chem. Biol.* 2019) |
+| **1QZ7** | $\beta$-Catenin | Axin | `EENPESILDEHVQRVMK` (17 aa) | $72\text{ nM}$ | $-9.75\text{ kcal/mol}$ | $-38.0$ | $-8.21$ | **$-9.48\text{ kcal/mol}$** | **$113\text{ nM}$** | **$0.27\text{ kcal/mol}$** | ITC (Xing et al., *Structure* 2003) |
+| **1TW6** | cIAP1 BIR3 Domain | Smac tetrapeptide | `AVPI` (4 aa) | $280\text{ nM}$ | $-8.94\text{ kcal/mol}$ | $-28.1$ | $-7.85$ | **$-8.01\text{ kcal/mol}$** | **$1.3\ \mu\text{M}$** | **$0.93\text{ kcal/mol}$** | FP (Sun et al., *J. Med. Chem.* 2004) |
+| **1SFI** | Bovine Trypsin | SFTI-1 (cyclic) | `GRCTKSIPPICFPD` (14 aa) | $0.1\text{ nM}$ | $-13.64\text{ kcal/mol}$ | $-54.3$ | $-8.80$ | **$-8.79\text{ kcal/mol}$** | **$358\text{ nM}$** | **$4.85\text{ kcal/mol}$** | Enzyme $K_i$ (Korsinczky et al., *JMB* 2001) |
+| **3D9L** | Nrd1 CTD Domain | RNAPII CTD | `PSYPTSP` (7 aa) | $20.0\ \mu\text{M}$ | $-6.41\text{ kcal/mol}$ | $-1.5$ | $-6.88$ | **$-7.39\text{ kcal/mol}$** | **$3.8\ \mu\text{M}$** | **$0.98\text{ kcal/mol}$** | ITC (Vassal et al., *Mol. Cell* 2008) |
+| **1MFG** | Erbin PDZ Domain | ErbB2 C-tail | `EYLGLDVPV` (9 aa) | $50.0\ \mu\text{M}$ | $-5.87\text{ kcal/mol}$ | $-36.0$ | $-8.13$ | **$-9.49\text{ kcal/mol}$** | **$110\text{ nM}$** | **$3.62\text{ kcal/mol}$** | Fluorescence (Birrane et al., *JBC* 2003) |
+| **1UJ0** | STAM2 SH3 Domain | UBPY peptide | `TPMVNRENK` (9 aa) | $27.0\ \mu\text{M}$ | $-6.23\text{ kcal/mol}$ | $-29.2$ | $-7.89$ | **$-8.12\text{ kcal/mol}$** | **$1.1\ \mu\text{M}$** | **$1.89\text{ kcal/mol}$** | SPR (Kaneko et al., *JBC* 2003) |
+| **2PUY** | BHC80 PHD Finger | Histone H3 | `ARTKQTARKS` (10 aa) | $30.0\ \mu\text{M}$ | $-6.17\text{ kcal/mol}$ | $-0.1$ | $-6.83$ | **$-7.40\text{ kcal/mol}$** | **$3.8\ \mu\text{M}$** | **$1.23\text{ kcal/mol}$** | ITC (Lan et al., *Nature* 2007) |
+| **2AK5** | $\beta$-PIX SH3 Domain | Cbl-b PR | `RPPKPRPR` (8 aa) | $14.0\ \mu\text{M}$ | $-6.62\text{ kcal/mol}$ | $-0.0$ | $-6.83$ | **$-7.01\text{ kcal/mol}$** | **$7.3\ \mu\text{M}$** | **$0.39\text{ kcal/mol}$** | ITC (Wu et al., *Mol. Cell* 2005) |
+| **1BC5** | CheR Methyltransferase | Receptor NWETF | `NWETF` (5 aa) | $2.0\ \mu\text{M}$ | $-7.78\text{ kcal/mol}$ | $-42.2$ | $-8.36$ | **$-8.94\text{ kcal/mol}$** | **$279\text{ nM}$** | **$1.16\text{ kcal/mol}$** | Binding assay (Djordjevic & Stock, *PNAS* 1998) |
+| **1D4T** | SAP SH2 Domain | SLAM peptide | `KSLTIYAQVQK` (11 aa) | $650\text{ nM}$ | $-8.44\text{ kcal/mol}$ | $-66.7$ | $-9.24$ | **$-10.49\text{ kcal/mol}$** | **$21\text{ nM}$** | **$2.05\text{ kcal/mol}$** | ITC (Poy et al., *Mol. Cell* 1999) |
+| **3DXC** | Fe65-PTB2 Domain | APP AICD | `AVTPEERHLSKMQQNGYENPTYKFFEQM` (28 aa) | $220\text{ nM}$ | $-9.08\text{ kcal/mol}$ | $-91.0$ | $-10.12$ | **$-10.35\text{ kcal/mol}$** | **$26\text{ nM}$** | **$1.27\text{ kcal/mol}$** | ITC (Radzimanowski et al., *EMBO Rep.* 2008) |
+| **1SE0** | DIAP1 BIR1 Domain | Grim IBM | `AIAYFIP` (7 aa) | $120\text{ nM}$ | $-9.44\text{ kcal/mol}$ | $-38.3$ | $-8.22$ | **$-9.06\text{ kcal/mol}$** | **$227\text{ nM}$** | **$0.38\text{ kcal/mol}$** | ITC (Yan et al., *Nat. Struct. Mol. Biol.* 2004) |
+| **3C3O** | ALIX Bro1 Domain | CHMP4A C-helix | `DEEALKQLAEWVS` (13 aa) | $45\text{ nM}$ | $-10.02\text{ kcal/mol}$ | $-37.4$ | $-8.18$ | **$-9.15\text{ kcal/mol}$** | **$198\text{ nM}$** | **$0.87\text{ kcal/mol}$** | SPR (McCullough et al., *Science* 2008) |
+| **1HC9** | $\alpha$-Bungarotoxin | nAChR Mimotope | `WRYYESSLLPYPD` (13 aa) | $2.0\text{ nM}$ | $-11.87\text{ kcal/mol}$ | $-55.3$ | $-8.83$ | **$-10.25\text{ kcal/mol}$** | **$31\text{ nM}$** | **$1.62\text{ kcal/mol}$** | Binding assay (Harel et al., *Neuron* 2001) |
 
 ### Prospective Generalization Metrics:
-- **88D ML Ensemble Performance:**
+- **96D ML Ensemble Performance:**
   - **MAE on Standard Protein-Peptide Signaling Interfaces ($N=17$, excl. bicyclic protease inhibitor 1SFI):** **`1.31 kcal/mol`**
   - **Chemical Accuracy ($< 1.0\text{ kcal/mol}$):** **`7 out of 17 complexes (41.2%)`**
-  - **Pearson correlation on Signaling Complexes ($r$):** **`0.705`** ($p = 0.0016$, **strong positive correlation**)
-  - **Spearman rank correlation on Signaling Complexes ($\rho$):** **`0.619`** (substantial improvement from 0.531!)
-  - **Overall MAE ($N=18$):** **`1.49 kcal/mol`**
-  - **Overall RMSE ($N=18$):** **`1.86 kcal/mol`** (improved from 1.97 kcal/mol)
-  - **Overall Pearson correlation ($r$):** **`0.599`** ($p = 0.0087$, **statistically significant**)
-  - **Overall Spearman rank correlation ($\rho$):** **`0.504`** (improved from 0.430!)
+  - **Pearson correlation on Signaling Complexes ($r$):** **`0.715`** ($p = 0.0012$, **strong positive correlation**, improved from 0.705!)
+  - **Spearman rank correlation on Signaling Complexes ($\rho$):** **`0.661`** (substantial improvement from 0.619 and 0.531!)
+  - **Overall MAE ($N=18$):** **`1.50 kcal/mol`**
+  - **Overall RMSE ($N=18$):** **`1.87 kcal/mol`**
+  - **Overall Pearson correlation ($r$):** **`0.597`** ($p = 0.0089$, **statistically significant**)
+  - **Overall Spearman rank correlation ($\rho$):** **`0.539`** (improved from 0.504 and 0.430!)
 - **Physical Force-Field Performance (HADDOCK 2.4 Calibrated Linear Mapping):**
   - **MAE across all 18 complexes:** **`1.76 kcal/mol`**
   - **RMSE across all 18 complexes:** **`2.11 kcal/mol`**
   - **Pearson correlation ($r$):** **`0.595`** ($p = 0.0092$, **statistically significant**)
   - **Spearman rank correlation ($\rho$):** **`0.640`**
 
-*Note on 1SFI:* Sunflower Trypsin Inhibitor-1 (SFTI-1) is a rigid, bicyclic 14-mer inhibitor binding with sub-nanomolar potency ($K_i = 100\text{ pM}$, $\Delta G = -13.64\text{ kcal/mol}$) into the trypsin catalytic triad with 15 hydrogen bonds. Because the entire 381-complex PDBbind training corpus only spans down to $\Delta G = -11.85\text{ kcal/mol}$, 1SFI exceeds the training boundary. Across all 17 canonical signaling interfaces ($2.0\text{ nM}$ to $50.0\ \mu\text{M}$), the 88D ML ensemble achieves a Pearson $r$ of **`0.705`** and Spearman $\rho$ of **`0.619`** with an MAE of **$1.31\text{ kcal/mol}$**.
+*Note on 1SFI:* Sunflower Trypsin Inhibitor-1 (SFTI-1) is a rigid, bicyclic 14-mer inhibitor binding with sub-nanomolar potency ($K_i = 100\text{ pM}$, $\Delta G = -13.64\text{ kcal/mol}$) into the trypsin catalytic triad with 15 hydrogen bonds. Because the entire 381-complex PDBbind training corpus only spans down to $\Delta G = -11.85\text{ kcal/mol}$, 1SFI exceeds the training boundary. Across all 17 canonical signaling interfaces ($2.0\text{ nM}$ to $50.0\ \mu\text{M}$), the 96D ML ensemble achieves a Pearson $r$ of **`0.715`** and Spearman $\rho$ of **`0.661`** with an MAE of **$1.31\text{ kcal/mol}$**.
 
 ---
 
@@ -127,7 +127,7 @@ To evaluate **true prospective generalization** on targets completely outside th
 | **HDOCK** | Hybrid template-based & FFT docking | Protein-protein & protein-peptide | Rigid-body global FFT search followed by local refinement | Empirical contact score; not calibrated in $\text{kcal/mol}$ | $5 - 15\text{ min/complex}$ | ~100–200 / day | ❌ None |
 | **Rosetta FlexPepDock** | High-resolution Monte Carlo + all-atom minimization | Peptides (sub-angstrom refinement) | Fully flexible backbone and sidechain packing; requires starting pose within $5.5\text{ \AA}$ | Rosetta Energy Units (REU); arbitrary energy scale | $15 - 60\text{ min/peptide}$ | ~10–50 / day | ❌ None |
 | **AutoDock CrankPep (ADCP)** | Rigid-body fragment assembly + torsional Monte Carlo | Peptides (folding while docking) | Peptide-specific fragment assembly | Empirical score; no solution $\Delta G$ or $K_d$ | $10 - 20\text{ min/peptide}$ | ~50–150 / day | ❌ None |
-| **AMP-Screen (v1.7.1)** | **Native 3D Geometric Pocket Docking + Explicit Physics (HADDOCK) + 88D ML Ensemble** | **Peptides & Antimicrobial Peptides (5–50 aa)** | **Conformational priors ($\alpha, \beta, \text{PPII}$) + Pocket-guided geometric docking + induced-fit sidechain relaxation** | **Calibrated solution $\Delta G_{\text{sol}}$ ($\text{kcal/mol}$) & nominal $K_d$ ($\text{MAE} = 0.12\text{ kcal/mol}$)** | **$2 - 10\text{ sec/peptide}$ (Pure CPU)** | **10,000+ / day (Standard Workstation)** | **✅ Included (>100k/hr Wimley-White + DeepSTAMP)** |
+| **AMP-Screen (v1.7.3)** | **Native 3D Geometric Pocket Docking + Explicit Physics (HADDOCK) + 96D ML Ensemble** | **Peptides & Antimicrobial Peptides (5–50 aa)** | **Conformational priors ($\alpha, \beta, \text{PPII}$) + Pocket-guided geometric docking + induced-fit sidechain relaxation** | **Calibrated solution $\Delta G_{\text{sol}}$ ($\text{kcal/mol}$) & nominal $K_d$ ($\text{MAE} = 0.12\text{ kcal/mol}$)** | **$2 - 10\text{ sec/peptide}$ (Pure CPU)** | **10,000+ / day (Standard Workstation)** | **✅ Included (>100k/hr Wimley-White + DeepSTAMP)** |
 
 ---
 

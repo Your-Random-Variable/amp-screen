@@ -4,7 +4,7 @@ Enables end-to-end AlphaFold workflows for unknown peptides and targets:
 1. Fetch AlphaFold predicted receptor structures from AlphaFold Database (AFDB / EBI).
 2. Generate AlphaFold-Multimer & AlphaFold 3 input files (paired FASTA, AF3 JSON, ColabFold runners).
 3. Evaluate & score co-folded AlphaFold complex structures (interface pLDDT, HADDOCK physics,
-   88D ML affinity, and toxicity assessment).
+   96D ML affinity, and toxicity assessment).
 """
 
 import os
@@ -246,7 +246,7 @@ def score_alphafold_complex(
     Evaluates an AlphaFold-Multimer or AF3 predicted co-complex structure:
     1. Extracts target, peptide, and interface pLDDT confidence scores.
     2. Calculates HADDOCK explicit physics terms (Evdw, Eelec, Edesolv, BSA).
-    3. Runs the calibrated 88D ML ensemble for binding free energy and Kd.
+    3. Runs the calibrated 96D ML ensemble for binding free energy and Kd.
     4. Evaluates peptide safety, net charge, and hemolytic risk.
     5. Returns an intuitive executive Decision Verdict.
     """
@@ -312,7 +312,7 @@ def score_alphafold_complex(
         peptide_chain=peptide_chain
     )
 
-    # 5. Calibrated 88D ML Affinity
+    # 5. Calibrated 96D ML Affinity
     if ml_scorer is None:
         model_file = Path(__file__).resolve().parent.parent / "data" / "trained_complex_ensemble.joblib"
         ml_scorer = MLPeptideScorer(model_path=model_file if model_file.exists() else None)

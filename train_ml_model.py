@@ -1,6 +1,6 @@
 """
 Model Training & Cluster-Stratified Cross-Validation Utility for AMP-Screen.
-Extracts 88D structural, physical, and sequence feature vectors from a dataset of
+Extracts 96D structural, physical, and sequence feature vectors from a dataset of
 381 protein-peptide co-complexes across 40 distinct receptor families with known
 experimental affinities (pKd, Kd, DeltaG).
 Trains the tri-model ensemble (Gradient Boosting + Random Forest + Extra Trees)
@@ -35,7 +35,7 @@ from amp_screen.utils import logger, ensure_dir
 
 
 def featurize_complex(complex_pdb: Path, meta_row: dict) -> list:
-    """Extracts 88D feature vector from a single complex PDB (without label leakage)."""
+    """Extracts 96D feature vector from a single complex PDB (without label leakage)."""
     fp = extract_structural_fingerprint(complex_pdb)
     physics = calculate_haddock_physics_score(complex_pdb)
     seq = meta_row.get("sequence", meta_row.get("peptide_sequence", ""))
@@ -54,7 +54,7 @@ def train_and_evaluate(
     Uses GroupKFold by receptor family if groups are provided to prevent target leakage.
     """
     print("\n" + "=" * 105)
-    print("      PROTEIN-PEPTIDE COMPLEX AFFINITY ENSEMBLE TRAINING & EVALUATION (88 PARAMETERS)")
+    print("      PROTEIN-PEPTIDE COMPLEX AFFINITY ENSEMBLE TRAINING & EVALUATION (96 PARAMETERS)")
     print("=" * 105)
 
     y_pred_cv = np.zeros_like(y)
@@ -99,7 +99,7 @@ def train_and_evaluate(
     print("=" * 105)
 
     # Fit final models on 100% of available data
-    print("\nFitting final tri-model ensemble (GB + RF + ET) on all 381 complexes with 88 parameters...")
+    print("\nFitting final tri-model ensemble (GB + RF + ET) on all 381 complexes with 96 parameters...")
     final_rf = RandomForestRegressor(n_estimators=400, max_depth=12, min_samples_split=3, max_features=0.6, random_state=42, n_jobs=-1)
     final_gb = GradientBoostingRegressor(n_estimators=250, max_depth=3, learning_rate=0.03, subsample=0.75, max_features=0.7, random_state=42)
     final_et = ExtraTreesRegressor(n_estimators=400, max_depth=12, min_samples_split=3, max_features=0.6, random_state=42, n_jobs=-1)
@@ -124,13 +124,13 @@ def train_and_evaluate(
         "n_features": len(FEATURE_NAMES)
     }
     joblib.dump(payload, str(out_model_path), compress=3)
-    print(f"✔ Successfully saved trained 88D ML ensemble to: {out_model_path}")
+    print(f"✔ Successfully saved trained 96D ML ensemble to: {out_model_path}")
 
     return payload
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Train custom 56-parameter ML affinity model for AMP-Screen")
+    parser = argparse.ArgumentParser(description="Train custom 96-parameter ML affinity model for AMP-Screen")
     parser.add_argument("--data", default="data/pdbbind_peptide_affinity_dataset.csv", help="Dataset CSV with experimental affinities and features")
     parser.add_argument("--output", default="data/trained_complex_ensemble.joblib", help="Output model path")
     args = parser.parse_args()
@@ -142,7 +142,7 @@ def main():
     df = pd.read_csv(data_path)
     print(f"Loaded {len(df)} protein-peptide complexes from {data_path.name}.")
 
-    # Verify all 56 features exist in dataframe
+    # Verify all 96 features exist in dataframe
     missing_feats = [f for f in FEATURE_NAMES if f not in df.columns]
     if missing_feats:
         raise ValueError(f"Dataset is missing required features: {missing_feats}")

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="amp-screen",
-    version="1.7.1",
+    version="1.7.3",
     description="High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",

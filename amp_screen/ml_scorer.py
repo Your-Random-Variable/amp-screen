@@ -58,8 +58,26 @@ CHOU_FASMAN_SHEET = {
     'A': 0.83, 'R': 0.93, 'G': 0.75, 'D': 0.54, 'K': 0.74,
     'S': 0.75, 'H': 0.87, 'N': 0.89, 'P': 0.55, 'E': 0.37
 }
+WIMLEY_WHITE_OCTANOL = {
+    'A': 0.50, 'R': 1.81, 'N': 0.85, 'D': 3.64, 'C': -0.02,
+    'Q': 0.77, 'E': 3.63, 'G': 1.15, 'H': 0.11, 'I': -1.12,
+    'L': -1.25, 'K': 2.80, 'M': -0.67, 'F': -1.71, 'P': 0.14,
+    'S': 0.46, 'T': 0.25, 'W': -2.09, 'Y': -0.71, 'V': -0.46
+}
+WIMLEY_WHITE_INTERFACE = {
+    'A': 0.17, 'R': 0.81, 'N': 0.42, 'D': 1.23, 'C': -0.24,
+    'Q': 0.58, 'E': 2.02, 'G': 0.01, 'H': 0.17, 'I': -0.31,
+    'L': -0.56, 'K': 0.99, 'M': -0.23, 'F': -1.13, 'P': 0.45,
+    'S': 0.13, 'T': 0.14, 'W': -1.85, 'Y': -0.94, 'V': 0.07
+}
+EISENBERG_CONSENSUS = {
+    'A': 0.25, 'R': -1.76, 'N': -0.64, 'D': -0.72, 'C': 0.04,
+    'Q': -0.69, 'E': -0.62, 'G': 0.16, 'H': -0.40, 'I': 0.73,
+    'L': 0.53, 'K': -1.10, 'M': 0.26, 'F': 0.61, 'P': -0.07,
+    'S': -0.26, 'T': -0.18, 'W': 0.37, 'Y': 0.02, 'V': 0.54
+}
 
-# Complete 88-Dimensional Physical Chemistry & Structural Interface Feature Space
+# Complete 96-Dimensional Physical Chemistry & Structural Interface Feature Space
 FEATURE_NAMES = []
 for e1, e2 in ELEMENT_PAIRS:
     FEATURE_NAMES.append(f"pair_{e1}_{e2}_close")
@@ -95,7 +113,11 @@ FEATURE_NAMES.extend([
     # Thermodynamic Degrees of Freedom & Molecular Weight (5)
     "rotatable_bonds_est", "conf_entropy_loss_est", "mol_weight_est", "haddock_per_mw", "bsa_per_mw",
     # Specialized Biophysical & Stereochemical Descriptors (6)
-    "cation_pi_potential", "solvation_free_energy_ratio", "surface_complementarity_proxy", "charge_transfer_index", "aliphatic_index", "flexibility_turn_propensity"
+    "cation_pi_potential", "solvation_free_energy_ratio", "surface_complementarity_proxy", "charge_transfer_index", "aliphatic_index", "flexibility_turn_propensity",
+    # Membrane & Interfacial Partitioning Free Energies (Wimley-White & Eisenberg) (4)
+    "wimley_white_interface", "wimley_white_octanol", "octanol_interface_diff", "eisenberg_consensus_hydrophobicity",
+    # Interface Contact Chemistry & Burial Packing Architecture (4)
+    "c_c_close_fraction", "close_contacts_per_bsa", "burial_fraction", "total_atomic_contacts_per_bsa"
 ])
 
 
@@ -169,12 +191,14 @@ def extract_complex_features(
     seq: str = ""
 ) -> List[float]:
     """
-    Extracts the complete 88-dimensional feature vector:
+    Extracts the complete 96-dimensional feature vector:
     20 element-pair bins, 6 physics terms, 4 contact counts, 4 core biophysics,
     5 size-normalized energetics, 4 interface density metrics, 5 charge architecture terms,
-    6 composition ratios, 2 solution thermodynamics features, and 32 biophysical descriptors
+    6 composition ratios, 2 solution thermodynamics features, 32 biophysical descriptors
     (hydropathy, conformational propensities, partition ratios, detailed AA fractions,
-    shell densities, rotatable bond / entropy estimates, and stereochemical indices).
+    shell densities, rotatable bond / entropy estimates, and stereochemical indices),
+    4 membrane/interfacial partitioning free energies (Wimley-White & Eisenberg), and
+    4 interface contact chemistry & burial packing architecture metrics.
     """
     L = float(hit_meta.get("length", len(seq) if seq else 12.0))
     L = max(1.0, L)
@@ -327,6 +351,26 @@ def extract_complex_features(
         turn_prop = float(hit_meta.get("flexibility_turn_propensity", 0.0))
     feat_vec.extend([cation_pi, solv_ratio, sc_proxy, charge_trans, aliphatic_idx, turn_prop])
 
+    # 17. Membrane & Interfacial Partitioning Free Energies (4)
+    if seq:
+        ww_if = float(np.mean([WIMLEY_WHITE_INTERFACE.get(aa, 0.0) for aa in seq]))
+        ww_oct = float(np.mean([WIMLEY_WHITE_OCTANOL.get(aa, 0.0) for aa in seq]))
+        eis_hyd = float(np.mean([EISENBERG_CONSENSUS.get(aa, 0.0) for aa in seq]))
+    else:
+        ww_if = float(hit_meta.get("wimley_white_interface", 0.0))
+        ww_oct = float(hit_meta.get("wimley_white_octanol", 0.0))
+        eis_hyd = float(hit_meta.get("eisenberg_consensus_hydrophobicity", 0.0))
+    oct_if_diff = float(ww_oct - ww_if)
+    feat_vec.extend([ww_if, ww_oct, oct_if_diff, eis_hyd])
+
+    # 18. Interface Contact Chemistry & Burial Packing Architecture (4)
+    c_c_close = fp.get("pair_C_C_close", 0.0)
+    c_c_close_fraction = float(c_c_close / max(1e-4, close_sum))
+    close_contacts_per_bsa = float(close_sum / max(1.0, bsa / 100.0))
+    burial_fraction = float(min(1.0, bsa / (150.0 * L)))
+    total_atomic_contacts_per_bsa = float((close_sum + med_sum) / max(1.0, bsa / 100.0))
+    feat_vec.extend([c_c_close_fraction, close_contacts_per_bsa, burial_fraction, total_atomic_contacts_per_bsa])
+
     return feat_vec
 
 
@@ -334,7 +378,7 @@ class MLPeptideScorer:
     """
     Multi-Parametric Consensus & Machine Learning Scorer for Protein-Peptide Affinity.
     Integrates RF-Score structural fingerprints with HADDOCK physics, interface densities,
-    and AMP descriptors across 88 physical parameters.
+    and AMP descriptors across 96 physical parameters.
     When a pre-trained model file (.joblib) is provided, uses the trained regressor ensemble.
     When no pre-trained model is supplied, transparently marks is_calibrated = False and
     computes an uncalibrated heuristic consensus score based on explicit physics and docking terms.
@@ -391,7 +435,7 @@ class MLPeptideScorer:
         logger.info(f"Saved trained ML model to {out_path.name}")
 
     def _setup_features(self):
-        """Sets up feature names for 88D structural and physical interface fingerprints."""
+        """Sets up feature names for 96D structural and physical interface fingerprints."""
         self.feature_names = list(FEATURE_NAMES)
 
     def compute_consensus_score(
@@ -480,7 +524,7 @@ class MLPeptideScorer:
         pep_len = float(hit_meta.get("length", len(seq) if seq else 12.0))
         dock_energy = float(hit_meta.get("affinity", hit_meta.get("docking_energy", physics["haddock_score"] * 0.28)))
 
-        # Assemble Feature Vector (exactly 88 dimensions, pure physical chemistry)
+        # Assemble Feature Vector (exactly 96 dimensions, pure physical chemistry)
         feat_vec = extract_complex_features(fp=fp, physics=physics, hit_meta=hit_meta, seq=seq or "")
         X_input = np.array([feat_vec])
 
