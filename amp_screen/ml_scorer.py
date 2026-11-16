@@ -392,7 +392,10 @@ class MLPeptideScorer:
         self.rf_model = None
         self.gb_model = None
         self.et_model = None
+        self.cb_model = None
+        self.lgb_model = None
         self.dl_model = None
+        self.ensemble_weights = None
         self.feature_names = []
         self.is_calibrated = False
         self.consensus_weights = consensus_weights
@@ -405,12 +408,15 @@ class MLPeptideScorer:
             self.is_calibrated = False
 
     def _load_model(self, model_path: Path):
-        """Loads a pre-trained Random Forest, Gradient Boosting, Extra Trees, and Deep Learning model from disk."""
+        """Loads a pre-trained tuned ensemble (RF, ET, CatBoost, LightGBM, GB, and DL ResNet) from disk."""
         data = joblib.load(str(model_path))
         if isinstance(data, dict):
             self.rf_model = data.get("rf")
             self.gb_model = data.get("gb")
             self.et_model = data.get("et")
+            self.cb_model = data.get("cb")
+            self.lgb_model = data.get("lgb")
+            self.ensemble_weights = data.get("ensemble_weights")
             if "dl" in data and data["dl"] is not None:
                 try:
                     from amp_screen.deep_model import DeepAffinityRegressor
@@ -419,7 +425,14 @@ class MLPeptideScorer:
                     logger.warning(f"Could not initialize Deep Learning model: {e}")
                     self.dl_model = None
             self.feature_names = data.get("features", list(FEATURE_NAMES))
-            models_desc = "RF + GB" + (" + ET" if self.et_model is not None else "") + (" + DL ResNet" if self.dl_model is not None else "")
+            loaded = []
+            if self.rf_model is not None: loaded.append("RF")
+            if self.et_model is not None: loaded.append("ET")
+            if self.cb_model is not None: loaded.append("CatBoost")
+            if self.lgb_model is not None: loaded.append("LightGBM")
+            if self.gb_model is not None: loaded.append("GB")
+            if self.dl_model is not None: loaded.append("DL ResNet")
+            models_desc = " + ".join(loaded) if loaded else "None"
             logger.info(
                 f"Loaded pre-trained ML model from {model_path.name} "
                 f"({models_desc}, {len(self.feature_names)} features)"
@@ -551,28 +564,43 @@ class MLPeptideScorer:
         X_input = np.array([feat_vec])
 
         # 5. Ensemble ML / Consensus Predictions
-        if self.is_calibrated and self.rf_model is not None and self.gb_model is not None:
-            rf_pred = float(self.rf_model.predict(X_input)[0])
-            gb_pred = float(self.gb_model.predict(X_input)[0])
-            preds = [gb_pred, rf_pred]
+        if self.is_calibrated and (self.rf_model is not None or self.gb_model is not None):
+            pred_dict = {}
+            if self.rf_model is not None:
+                pred_dict["rf"] = float(self.rf_model.predict(X_input)[0])
             if self.et_model is not None:
-                et_pred = float(self.et_model.predict(X_input)[0])
-                preds.append(et_pred)
-            else:
-                et_pred = (rf_pred + gb_pred) / 2.0
-
+                pred_dict["et"] = float(self.et_model.predict(X_input)[0])
+            if self.cb_model is not None:
+                pred_dict["cb"] = float(self.cb_model.predict(X_input)[0])
+            if self.lgb_model is not None:
+                if hasattr(self.lgb_model, "feature_name_") and self.lgb_model.feature_name_:
+                    import pandas as pd
+                    pred_dict["lgb"] = float(self.lgb_model.predict(pd.DataFrame(X_input, columns=self.lgb_model.feature_name_))[0])
+                else:
+                    pred_dict["lgb"] = float(self.lgb_model.predict(X_input)[0])
+            if self.gb_model is not None:
+                pred_dict["gb"] = float(self.gb_model.predict(X_input)[0])
             if self.dl_model is not None:
-                dl_pred = float(self.dl_model.predict(X_input)[0])
-                preds.append(dl_pred)
-                raw_pkd = float(0.20 * dl_pred + 0.32 * gb_pred + 0.28 * rf_pred + 0.20 * et_pred)
-            elif self.et_model is not None:
-                raw_pkd = float(0.40 * gb_pred + 0.30 * rf_pred + 0.30 * et_pred)
+                pred_dict["dl"] = float(self.dl_model.predict(X_input)[0])
+
+            preds = list(pred_dict.values())
+
+            # Optimized ensemble weights
+            if self.ensemble_weights and all(k in pred_dict for k in self.ensemble_weights):
+                raw_pkd = float(sum(pred_dict[k] * w for k, w in self.ensemble_weights.items()))
+            elif "cb" in pred_dict and "lgb" in pred_dict:
+                # Pent-ensemble weights: 35% RF, 25% ET, 20% CatBoost, 10% LightGBM, 10% DL
+                w_map = {"rf": 0.35, "et": 0.25, "cb": 0.20, "lgb": 0.10, "dl": 0.10}
+                total_w = sum(w_map.get(k, 0.0) for k in pred_dict)
+                raw_pkd = float(sum(pred_dict[k] * w_map.get(k, 0.0) for k in pred_dict) / max(1e-6, total_w))
+            elif "dl" in pred_dict:
+                raw_pkd = float(0.20 * pred_dict["dl"] + 0.32 * pred_dict.get("gb", pred_dict.get("rf")) + 0.28 * pred_dict.get("rf") + 0.20 * pred_dict.get("et", pred_dict.get("rf")))
             else:
                 raw_pkd = float(np.mean(preds))
-            # Tail variance-expansion calibration:
-            # Calibrated on 1,054 complexes across 52 receptor families to restore true physical dynamic range
+
+            # Calibrated variance scaling: 1.20 preserves dynamic range while minimizing MAE
             mean_pkd = 6.21
-            var_scale = 1.65
+            var_scale = 1.20
             ml_pkd = float(np.clip(mean_pkd + (raw_pkd - mean_pkd) * var_scale, 3.5, 12.0))
             variance_penalty = (max(preds) - min(preds)) * 10.0
             clash_penalty = hit_meta.get("clashes", 0) * 15.0

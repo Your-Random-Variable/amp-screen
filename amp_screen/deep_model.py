@@ -98,12 +98,12 @@ class DeepAffinityRegressor:
     def __init__(
         self,
         in_features: int = 96,
-        hidden_dim: int = 256,
-        n_blocks: int = 2,
-        dropout: float = 0.15,
+        hidden_dim: int = 64,
+        n_blocks: int = 1,
+        dropout: float = 0.35,
         lr: float = 1e-3,
-        weight_decay: float = 1e-4,
-        epochs: int = 120,
+        weight_decay: float = 5e-3,
+        epochs: int = 60,
         batch_size: int = 32,
         device: Optional[str] = None,
         random_state: int = 42
