@@ -19,6 +19,9 @@ setup(
         "scikit-learn>=1.3.0",
         "biopython>=1.81",
         "torch>=2.0.0",
+        "catboost>=1.2.0",
+        "lightgbm>=4.0.0",
+        "xgboost>=2.0.0",
         "PeptideBuilder>=0.1.1",
         "tqdm>=4.65.0",
         "joblib>=1.3.0"
@@ -27,8 +30,12 @@ setup(
         "relaxation": [
             "openbabel-wheel>=3.1.1.20"
         ],
+        "legacy": [
+            "meeko>=0.5.0"
+        ],
         "all": [
-            "openbabel-wheel>=3.1.1.20"
+            "openbabel-wheel>=3.1.1.20",
+            "meeko>=0.5.0"
         ]
     },
     entry_points={
@@ -37,6 +44,7 @@ setup(
             "af-amp-screen = amp_screen.cli:main",
         ],
     },
+    license="MIT",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Science/Research",
@@ -45,8 +53,8 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
-        "License :: OSI Approved :: MIT License",
         "Operating System :: POSIX :: Linux",
         "Operating System :: MacOS :: MacOS X",
+        "Operating System :: Microsoft :: Windows",
     ],
 )

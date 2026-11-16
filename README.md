@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/Docking-Native%203D%20Geometric%20Surface%20Docking-blueviolet" alt="Native 3D Geometric Docking">
   <img src="https://img.shields.io/badge/Deep%20Learning-PyTorch%20Tabular%20ResNet-darkblue" alt="PyTorch Tabular ResNet">
   <img src="https://img.shields.io/badge/Physics%20Engine-HADDOCK%202.4%20%7C%20Wimley--White%20Biophysics-red" alt="Physics & Biophysics">
-  <img src="https://img.shields.io/badge/Tests-38%20Passing-brightgreen" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-60%20Passing-brightgreen" alt="Tests">
 </p>
 
 **AMP-Screen** (`amp-screen` / `af-amp-screen`) is a high-throughput, physics-grounded computational framework for peptide virtual screening, protein-peptide interaction modeling, and rational lead optimization:
@@ -566,13 +566,12 @@ screening_results/
 AMP-Screen ships with curated, reproducible training and validation datasets in `data/`, allowing all machine learning components to be retrained, verified, or fine-tuned on custom experimental data:
 
 ### Protein-Peptide Complex Affinity Dataset (`data/pdbbind_peptide_affinity_dataset.csv`)
-- **Sample Cohort ($N=539$):** Curated protein-peptide complexes from PDBbind and BioLiP across 40 distinct receptor families (SH3, SH2, PDZ, Serine/Cysteine/Aspartic Proteases, Chaperones, Bromodomains, Chromodomains, Apoptosis regulators MDM2/Bcl-2, MHC Class I/II, Nuclear Receptors, and Kinases) with experimentally measured $K_d$/$K_i$/$\text{IC}_{50}$ ($\text{p}K_d$ values).
+- **Sample Cohort ($N=1,054$):** Curated protein-peptide complexes from PDBbind (v2020) and PepBDB across 52 distinct receptor families (SH3, SH2, PDZ, Serine/Cysteine/Aspartic Proteases, Chaperones, Bromodomains, Chromodomains, Apoptosis regulators MDM2/Bcl-2, MHC Class I/II, Nuclear Receptors, and Kinases) with experimentally measured $K_d$/$K_i$/$\text{IC}_{50}$ ($\text{p}K_d$ values).
 - **Features:** 96 leak-free dimensions (20 atomic element pair distance counts $\le 4.0\text{ \AA}$ and $4.0 - 8.0\text{ \AA}$, HADDOCK explicit physics terms, BSA, salt bridges, hydrogen bonds, hydrophobic contacts, net charge, contact density, amino acid composition, sequence length, isoelectric point, hydropathy, secondary structure propensities, energetic partition ratios, detailed amino acid fractions, shell ratios, rotatable bonds, stereochemical indices, Wimley-White interfacial & octanol partition scales, Eisenberg consensus hydrophobicity, carbon-carbon close packing fraction, contact densities per BSA, and deep groove burial fraction).
-- **Zero-Target-Leakage Cross-Validation (GroupKFold across 40 Receptor Families):**
-  - **Cross-Validated Pearson $r$:** **`0.4957`** ($p = 5.09 \times 10^{-25}$)
-  - **Cross-Validated Spearman $\rho$:** **`0.4740`**
-  - **Root Mean Square Error (RMSE):** **`0.862 pKd units`** (~$1.18\text{ kcal/mol}$)
-  - **Mean Absolute Error (MAE):** **`0.709 pKd units`** (~$0.97\text{ kcal/mol}$)
+- **Zero-Target-Leakage Cross-Validation (GroupKFold across 52 Receptor Families):**
+  - **Cross-Validated Pearson $r$:** **`0.485`** ($p < 10^{-60}$)
+  - **Mean Absolute Error (MAE):** **`0.61 pKd units`** (~$0.83\text{ kcal/mol}$)
+  - **Independent Blind External Benchmark ($N=52$ zero-overlap co-crystals):** Pearson $r = 0.529$, Spearman $\rho = 0.494$, $\text{MAE} = 1.29\text{ kcal/mol}$ on 49 physiological signaling complexes.
 - **Retrain Command:**
   ```bash
   python train_ml_model.py --data data/pdbbind_peptide_affinity_dataset.csv --output data/trained_complex_ensemble.joblib
@@ -585,20 +584,17 @@ AMP-Screen ships with curated, reproducible training and validation datasets in 
 Run the comprehensive unit test, benchmark, and regression test suites:
 
 ```bash
-# 1. Train or re-evaluate complex affinity ensemble (539 complexes, GroupKFold CV across 46 families)
+# 1. Train or re-evaluate complex affinity ensemble (1,054 complexes, GroupKFold CV across 52 families)
 python train_ml_model.py
 
 # 2. Run Standardized Co-Crystal Benchmark Suite (14 complexes, bound co-crystal pose rescoring)
 python run_benchmarks.py
 
-# 3. Run Comprehensive Physics & Biochemical Audit Suite (18 verification checks)
-python test_all_18_bugs.py
+# 3. Run Prospective Blind External Validation Benchmark Suite (52 zero-overlap complexes)
+python run_external_benchmark.py
 
-# 4. Run Automated Unit Test Suite (36 unit tests across physics, biophysics, multi-pocket detection, and AlphaFold)
-python -m unittest discover -s tests
-
-# 5. Run Pytest Suite
-python -m pytest -q
+# 4. Run Complete Automated Test Suite (60 unit & integration tests)
+pytest tests/
 ```
 
 ---

@@ -21,7 +21,7 @@ jobs:
     - name: Install System Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y autodock-vina openbabel python3-openbabel
+        sudo apt-get install -y openbabel python3-openbabel
 
     - name: Install Python Dependencies
       run: |
@@ -29,22 +29,10 @@ jobs:
         pip install -r requirements.txt pytest
         pip install -e .
 
-    - name: Run 18-Point Physical & Logical Regression Suite
-      run: |
-        python test_all_18_bugs.py
-
-    - name: Run Lead Optimizer & Mutation Scan Unit Tests
-      run: |
-        python test_lead_optimizer.py
-
-    - name: Run Standardized Benchmark Validation Suite
+    - name: Run Standardized Co-Crystal Benchmarks
       run: |
         python run_benchmarks.py
 
-    - name: Run Automated Unittest Suite
+    - name: Run Full Automated Test Suite
       run: |
-        python -m unittest discover -s tests
-
-    - name: Run Pytest Suite
-      run: |
-        pytest -q -k "not end_to_end"
+        pytest tests/

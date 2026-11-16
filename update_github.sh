@@ -9,8 +9,12 @@ echo "==========================================="
 echo "   AMP-Screen GitHub Update Script"
 echo "==========================================="
 
-# Ensure SSH over port 443 is configured for amp-screen
-git remote set-url origin ssh://git@ssh.github.com:443/Your-Random-Variable/amp-screen.git
+# Ensure origin remote is configured (preserves custom user/fork remote if already present)
+if [ -n "$AMP_SCREEN_REMOTE" ]; then
+    git remote set-url origin "$AMP_SCREEN_REMOTE"
+elif ! git remote get-url origin >/dev/null 2>&1; then
+    git remote add origin ssh://git@ssh.github.com:443/Your-Random-Variable/amp-screen.git
+fi
 
 # Check if there are any changes
 if [ -z "$(git status --porcelain)" ]; then
