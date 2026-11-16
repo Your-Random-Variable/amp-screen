@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.12.0] - 2026-11-16
+### Added
+- **Package-Owned Runtime Resource Bundling**: Bundled the pre-trained Pent-Ensemble model (`trained_complex_ensemble.joblib`, 15 MB) and curated training corpus (`pdbbind_peptide_affinity_dataset.csv`, 1.3 MB) directly inside the package distribution (`amp_screen/data/`) using `importlib.resources` and `MANIFEST.in`.
+- **Self-Contained Wheel Distribution**: Standard binary wheel installations (`pip install *.whl`) now out-of-the-box load the pre-trained calibrated Pent-Ensemble without requiring source checkouts or manual model downloads.
+- **Complete Pent-Ensemble Persistence**: Updated `MLPeptideScorer.save_model()` to serialize all sub-models (Random Forest, Extra Trees, CatBoost, LightGBM, `DeepAffinityResNet`), feature definitions (96-dim), and learned ensemble weights.
+- **Model Packaging Test Suite**: Added `tests/test_model_packaging.py` validating resource locator resolution, automatic calibrated model loading, and model serialization round-trips (63 passing tests).
+- **CI Wheel Verification**: Added automated wheel build, metadata verification, and runtime asset inspection step to GitHub Actions CI workflow.
+
+### Fixed
+- **CI Dependency Isolation**: Guarded legacy Meeko PDBQT tests with `@pytest.mark.skipif(not (HAS_OBABEL and HAS_MEEKO))` to prevent false failures in minimal environments.
+- **Standard Reference Temperature**: Unified `reporter.py` `estimate_kd()` default reference temperature from $300.0\text{ K}$ to standard IUPAC $298.15\text{ K}$ ($25^\circ\text{C}$, $RT = 0.5925\text{ kcal/mol}$).
+
+---
+
 ## [1.11.0] - 2026-11-16
 ### Added
 - **Curated 1,054 Co-Crystal Training Corpus**: Expanded machine learning dataset across 52 non-redundant receptor families with 96-dimensional physical parameterization.

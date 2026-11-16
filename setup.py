@@ -2,13 +2,17 @@ from setuptools import setup, find_packages
 
 setup(
     name="amp-screen",
-    version="1.11.0",
+    version="1.12.0",
     description="High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     author="Ankur Singh",
     url="https://github.com/Your-Random-Variable/amp-screen",
     packages=find_packages(),
+    package_data={
+        "amp_screen": ["data/*"],
+    },
+    include_package_data=True,
     python_requires=">=3.9",
     install_requires=[
         "numpy>=1.24.0",

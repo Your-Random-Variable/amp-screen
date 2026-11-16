@@ -25,6 +25,12 @@ PYTHON = sys.executable
 OBABEL = shutil.which("obabel") or (str(Path(sys.prefix) / "bin" / "obabel") if (Path(sys.prefix) / "bin" / "obabel").exists() else None)
 HAS_OBABEL = OBABEL is not None
 
+try:
+    import meeko
+    HAS_MEEKO = True
+except ImportError:
+    HAS_MEEKO = False
+
 
 def test_auto_pocket():
     target_pdb = ROOT / "examples" / "receptors" / "target.pdb"
@@ -44,7 +50,7 @@ def test_ensemble_folding():
         assert len(folded) == 3, f"Expected 3 ensemble conformers, got {len(folded)}"
 
 
-@pytest.mark.skipif(not HAS_OBABEL, reason="OpenBabel binary not available")
+@pytest.mark.skipif(not (HAS_OBABEL and HAS_MEEKO), reason="OpenBabel binary or Meeko library not available")
 def test_disulfide_locking():
     pdb_text = """ATOM      1  N   CYS A   1       0.000   0.000   0.000  1.00 20.00           N
 ATOM      2  CA  CYS A   1       1.450   0.000   0.000  1.00 20.00           C

@@ -12,7 +12,7 @@ import json
 import urllib.request
 import urllib.error
 from pathlib import Path
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, List, Tuple, Union
 
 import gemmi
 import numpy as np
@@ -59,7 +59,7 @@ def fetch_alphafold_target(
     ensure_dir(out_pdb.parent)
 
     api_url = f"https://alphafold.ebi.ac.uk/api/prediction/{uid}"
-    req = urllib.request.Request(api_url, headers={"User-Agent": "AMP-Screen/1.11.0"})
+    req = urllib.request.Request(api_url, headers={"User-Agent": "AMP-Screen/1.12.0"})
 
     logger.info(f"Querying AlphaFold Database for UniProt accession: {uid}...")
     try:
@@ -79,7 +79,7 @@ def fetch_alphafold_target(
     global_plddt = float(entry.get("globalMetricValue", 0.0))
     logger.info(f"Downloading AlphaFold structure from {pdb_url} (Global pLDDT: {global_plddt:.1f})...")
 
-    dl_req = urllib.request.Request(pdb_url, headers={"User-Agent": "AMP-Screen/1.11.0"})
+    dl_req = urllib.request.Request(pdb_url, headers={"User-Agent": "AMP-Screen/1.12.0"})
     try:
         with urllib.request.urlopen(dl_req, timeout=30) as resp:
             raw_pdb = resp.read().decode("utf-8")
@@ -128,7 +128,7 @@ def fetch_uniprot_sequence(uniprot_id: str) -> Tuple[str, str]:
     """
     uid = uniprot_id.strip().upper()
     url = f"https://rest.uniprot.org/uniprotkb/{uid}.fasta"
-    req = urllib.request.Request(url, headers={"User-Agent": "AMP-Screen/1.11.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "AMP-Screen/1.12.0"})
     with urllib.request.urlopen(req, timeout=15) as resp:
         text = resp.read().decode("utf-8").strip()
     lines = text.split("\n")
@@ -240,7 +240,8 @@ def score_alphafold_complex(
     target_chain: str = "A",
     peptide_chain: str = "B",
     pocket_residues: Optional[List[str]] = None,
-    ml_scorer: Optional[MLPeptideScorer] = None
+    ml_scorer: Optional[MLPeptideScorer] = None,
+    ml_model_path: Optional[Union[str, Path]] = None
 ) -> Dict[str, Any]:
     """
     Evaluates an AlphaFold-Multimer or AF3 predicted co-complex structure:
@@ -314,8 +315,7 @@ def score_alphafold_complex(
 
     # 5. Calibrated 96D ML Affinity
     if ml_scorer is None:
-        model_file = Path(__file__).resolve().parent.parent / "data" / "trained_complex_ensemble.joblib"
-        ml_scorer = MLPeptideScorer(model_path=model_file if model_file.exists() else None)
+        ml_scorer = MLPeptideScorer(model_path=ml_model_path)
 
     hit_meta = {
         "sequence": pep_seq,

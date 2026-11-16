@@ -18,11 +18,11 @@ from amp_screen.peptide_prep import create_docked_pristine_pdb
 from amp_screen.html_reporter import generate_interactive_html_report
 
 
-def estimate_kd(affinity_kcal_mol: float, temp_kelvin: float = 300.0) -> str:
+def estimate_kd(affinity_kcal_mol: float, temp_kelvin: float = 298.15) -> str:
     """
     Estimates dissociation constant (Kd) from Gibbs free energy:
     ΔG = R * T * ln(Kd)  =>  Kd = exp(ΔG / (R * T))
-    R = 1.9872e-3 kcal/(mol*K); T = 300 K (calibration temperature)
+    R = 1.9872e-3 kcal/(mol*K); T = 298.15 K (standard reference temperature 25 °C)
     """
     if affinity_kcal_mol >= 0:
         return "> 1.0 mM"

@@ -69,10 +69,6 @@ def run_multi_pocket_blind_docking(
     ligand_paths = prepare_native_peptides(peptide_pdbs, peptides_pdb_dir)
 
     model_file = getattr(args, "ml_model", None)
-    if model_file is None:
-        default_pkg_model = Path(__file__).resolve().parent.parent / "data" / "trained_complex_ensemble.joblib"
-        if default_pkg_model.exists():
-            model_file = default_pkg_model
     ml_scorer = MLPeptideScorer(model_path=model_file)
 
     cpx_dir = out_dir / "top_complexes"
@@ -641,10 +637,6 @@ def run_pipeline(args: argparse.Namespace) -> None:
 
         # Determine ML model path (auto-load default pre-trained ensemble if present)
         model_file = getattr(args, "ml_model", None)
-        if model_file is None:
-            default_pkg_model = Path(__file__).resolve().parent.parent / "data" / "trained_complex_ensemble.joblib"
-            if default_pkg_model.exists():
-                model_file = default_pkg_model
         ml_scorer = MLPeptideScorer(model_path=model_file)
 
         complex_dir = out_dir / "top_complexes"
@@ -1288,11 +1280,6 @@ def run_score_cli(args: argparse.Namespace) -> None:
     )
 
     model_file = getattr(args, "ml_model", None)
-    if model_file is None:
-        default_pkg_model = Path(__file__).resolve().parent.parent / "data" / "trained_complex_ensemble.joblib"
-        if default_pkg_model.exists():
-            model_file = default_pkg_model
-
     ml_scorer = MLPeptideScorer(model_path=model_file)
     ml_res = ml_scorer.score_complex(
         complex_pdb=eval_pdb,

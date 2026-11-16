@@ -7,7 +7,7 @@ import shutil
 import re
 import logging
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 UNIPROT_REGEX = re.compile(
     r"^(?:[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9](?:[A-Z][A-Z0-9]{2}[0-9]){1,2})$"
@@ -127,3 +127,54 @@ def read_fasta(fasta_path: Path) -> Dict[str, str]:
                 
     logger.info(f"Loaded {len(records)} peptide sequences from {fasta_path.name}")
     return records
+
+
+def get_default_model_path() -> Optional[Path]:
+    """
+    Locates the default trained complex affinity ensemble model (.joblib).
+    Checks package data directory first (for installed wheels), then parent repo data directory.
+    """
+    # 1. Check inside package data (installed wheel location: amp_screen/data/)
+    pkg_data = Path(__file__).resolve().parent / "data" / "trained_complex_ensemble.joblib"
+    if pkg_data.exists():
+        return pkg_data
+
+    # 2. Check importlib.resources (Python 3.9+)
+    try:
+        import importlib.resources as pkg_resources
+        ref = pkg_resources.files("amp_screen").joinpath("data", "trained_complex_ensemble.joblib")
+        if ref.is_file():
+            return Path(str(ref))
+    except Exception:
+        pass
+
+    # 3. Check root repository data/ (editable install / source checkout)
+    repo_data = Path(__file__).resolve().parent.parent / "data" / "trained_complex_ensemble.joblib"
+    if repo_data.exists():
+        return repo_data
+
+    return None
+
+
+def get_default_dataset_path() -> Optional[Path]:
+    """
+    Locates the 1,054 complex PDBbind affinity dataset CSV.
+    Checks package data directory first (for installed wheels), then parent repo data directory.
+    """
+    pkg_csv = Path(__file__).resolve().parent / "data" / "pdbbind_peptide_affinity_dataset.csv"
+    if pkg_csv.exists():
+        return pkg_csv
+
+    try:
+        import importlib.resources as pkg_resources
+        ref = pkg_resources.files("amp_screen").joinpath("data", "pdbbind_peptide_affinity_dataset.csv")
+        if ref.is_file():
+            return Path(str(ref))
+    except Exception:
+        pass
+
+    repo_csv = Path(__file__).resolve().parent.parent / "data" / "pdbbind_peptide_affinity_dataset.csv"
+    if repo_csv.exists():
+        return repo_csv
+
+    return None

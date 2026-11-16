@@ -154,7 +154,7 @@ We evaluated AMP-Screen head-to-head against 7 widely utilized computational mod
 | **HDOCK** | Hybrid template + FFT docking | Rigid-body FFT + local minimization | Contact-based score | $5 - 15\text{ min}$ | ~100–200 | ❌ None |
 | **Rosetta FlexPepDock** | High-resolution Monte Carlo + all-atom minimization | Fully flexible backbone and side chains | Rosetta Energy Units (REU) | $30 - 120\text{ min}$ | ~10–30 | ❌ None |
 | **AutoDock CrankPep (ADCP)** | Rigid fragment assembly + Monte Carlo | Fragment assembly while folding | Empirical contact score | $15 - 45\text{ min}$ | ~30–75 | ❌ None |
-| **AMP-Screen (v1.11.0)** | **Cartesian Surface Fit + HADDOCK Physics + 96D Pent-Ensemble** | **Priors ($\alpha,\beta,\text{PPII}$) + Cleft SVD + Simplex Relax** | **Prospective blind $\text{MAE}=1.29\text{ kcal/mol}$ ($r=0.529$, $<35\%$ homology)** | **$2 - 5\text{ sec}$** | **>10,000 / day** | **✅ Included (>100k/hr)** |
+| **AMP-Screen (v1.12.0)** | **Cartesian Surface Fit + HADDOCK Physics + 96D Pent-Ensemble** | **Priors ($\alpha,\beta,\text{PPII}$) + Cleft SVD + Simplex Relax** | **Prospective blind $\text{MAE}=1.29\text{ kcal/mol}$ ($r=0.529$, $<35\%$ homology)** | **$2 - 5\text{ sec}$** | **>10,000 / day** | **✅ Included (>100k/hr)** |
 
 ### 3.4 Multi-Target CAPRI Pose Accuracy & Mutational Hotspots
 To rigorously evaluate structural pose recovery beyond single case studies, we evaluated docking pose quality across **7 diverse protein–peptide fold classes** representing canonical chaperone clefts (1DKX), prolyl isomerase active sites (1AWR), polyproline-II grooves (1CKA), amphipathic $\alpha$-helical grooves (1YCR), canonical C-terminal PDZ pockets (1BE9), internal peptide PDZ grooves (1VJ6), and bilobal aspartic protease clefts (1ER8).

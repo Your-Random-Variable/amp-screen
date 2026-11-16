@@ -2,12 +2,12 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11-blue?logo=python" alt="Python Version">
-  <img src="https://img.shields.io/badge/Version-1.11.0-brightgreen" alt="Version 1.11.0">
+  <img src="https://img.shields.io/badge/Version-1.12.0-brightgreen" alt="Version 1.12.0">
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT">
   <img src="https://img.shields.io/badge/Docking-Native%203D%20Geometric%20Surface%20Docking-blueviolet" alt="Native 3D Geometric Docking">
   <img src="https://img.shields.io/badge/Deep%20Learning-PyTorch%20Tabular%20ResNet-darkblue" alt="PyTorch Tabular ResNet">
   <img src="https://img.shields.io/badge/Physics%20Engine-HADDOCK%202.4%20%7C%20Wimley--White%20Biophysics-red" alt="Physics & Biophysics">
-  <img src="https://img.shields.io/badge/Tests-60%20Passing-brightgreen" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-63%20Passing-brightgreen" alt="Tests">
 </p>
 
 **AMP-Screen** (`amp-screen` / `af-amp-screen`) is a high-throughput, physics-grounded computational framework for peptide virtual screening, protein-peptide interaction modeling, and rational lead optimization:
@@ -21,7 +21,7 @@
 
 ## 🚀 Why AMP-Screen?
 
-| Metric / Feature | Traditional Peptide Docking (Rosetta FlexPepDock, CrankPep, HADDOCK Web) | Standard Small-Molecule Docking (Vina, Glide, AutoDock 4) | **AMP-Screen (v1.11.0)** |
+| Metric / Feature | Traditional Peptide Docking (Rosetta FlexPepDock, CrankPep, HADDOCK Web) | Standard Small-Molecule Docking (Vina, Glide, AutoDock 4) | **AMP-Screen (v1.12.0)** |
 | :--- | :--- | :--- | :--- |
 | **Sequence AMP Screening** | Not supported | Not supported | **>100,000 peptides / hour (Wimley-White + DeepSTAMP)** |
 | **Target Docking Speed** | 15–120 minutes / peptide | 1–5 minutes | **2–5 seconds / peptide (100% Native Cartesian PDB)** |
@@ -194,7 +194,7 @@ To strictly test **out-of-distribution, blind generalization** on protein-peptid
 
 To understand how AMP-Screen compares against the latest published protein-peptide (PP) docking literature (e.g. **PepPCBench** *J. Chem. Inf. Model.* 2025, **AutoDock CrankPep** *J. Chem. Theory Comput.* 2020, **Rosetta FlexPepDock** *PLoS ONE* 2011, and **AlphaFold-Multimer / AlphaFold 3** *Nature* 2024):
 
-| Feature / Criterion | AutoDock CrankPep (ADCP) | Rosetta FlexPepDock | AlphaFold-Multimer / AF3 (PepPCBench 2025) | **AMP-Screen (v1.11.0)** |
+| Feature / Criterion | AutoDock CrankPep (ADCP) | Rosetta FlexPepDock | AlphaFold-Multimer / AF3 (PepPCBench 2025) | **AMP-Screen (v1.12.0)** |
 | :--- | :--- | :--- | :--- | :--- |
 | **Primary Method** | Rigid-body fragment assembly + Monte Carlo | High-resolution Monte Carlo + all-atom minimization | End-to-end deep learning (Evoformer / Diffusion) | Conformational priors + Native 3D Geometric Docking + HADDOCK Physics + 96D ML Ensemble |
 | **Typical Pose Accuracy ($L$-RMSD)** | $2.0 - 4.5\text{ \AA}$ (blind pocket) | $1.0 - 2.5\text{ \AA}$ (requires initial pose) | **$1.0 - 1.8\text{ \AA}$** (state-of-the-art folding) | $1.5 - 3.2\text{ \AA}$ (with native geometric cleft alignment) |
@@ -277,20 +277,21 @@ conda activate amp-screen
 AMP-Screen requires **no external docking binaries** (AutoDock Vina is completely removed). Standard Python packages handle all docking, coordinates, and biophysics:
 
 ```bash
-# Optional: install OpenBabel if interface force-field relaxation (UFF) is desired:
-# Ubuntu / Debian:
-sudo apt-get update && sudo apt-get install -y openbabel python3-openbabel
+# Base installation (includes pre-trained 1,054-complex Pent-Ensemble and dataset):
+pip install .
 
-# Or with Conda:
-conda install -c conda-forge openbabel
+# Optional extras:
+pip install ".[relaxation]"   # Enables OpenBabel UFF interface force-field relaxation
+pip install ".[legacy]"       # Enables legacy Meeko PDBQT export interoperability
+pip install ".[all]"          # Installs all optional extras
 
-# Install AMP-Screen package with optional native force-field relaxation:
-pip install ".[relaxation]"
-# Or base installation:
-pip install -e .
+# Development / Editable install:
+pip install -e ".[all]"
 ```
 
-> **Note on OpenBabel & Interface Relaxation:** OpenBabel is optional and used only for optional interface force-field relaxation (UFF / MMFF94) before scoring (`--relax`). If OpenBabel is absent, the pipeline runs and scores native PDB structures directly without crashing.
+> **Note on Optional Extensions:**
+> - **OpenBabel (`.[relaxation]`):** Optional force-field interface relaxation (UFF / MMFF94) before scoring (`--relax`). If absent, the pipeline runs and scores native PDB structures directly.
+> - **Meeko (`.[legacy]`):** Preserved exclusively for backwards interoperability with legacy PDBQT pipelines (`prepare_peptide_pdbqt`). Core screening operates 100% in native Cartesian coordinates ($\text{\AA}$) without PDBQT.
 
 Verify installation:
 ```bash
@@ -617,7 +618,7 @@ If you use **AMP-Screen** in your research, please cite:
   author = {Singh, Ankur},
   title = {AMP-Screen: High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer},
   url = {https://github.com/Your-Random-Variable/amp-screen},
-  version = {1.11.0},
+  version = {1.12.0},
   year = {2026}
 }
 ```

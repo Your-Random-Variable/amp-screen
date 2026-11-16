@@ -131,8 +131,8 @@ def test_p0_3_repulsive_wall():
 
 def test_p0_4_ml_scorer_uncalibrated_consensus():
     """P0-4: ML Scorer transparently marks is_calibrated=False on uncalibrated instance and computes physical consensus."""
-    scorer = MLPeptideScorer()
-    assert scorer.is_calibrated is False, "Default instance must be marked uncalibrated"
+    scorer = MLPeptideScorer(auto_load_default=False)
+    assert scorer.is_calibrated is False, "Uncalibrated instance must be marked is_calibrated=False"
     score = scorer.compute_consensus_score(vina_affinity=-8.5, haddock_score=-40.0)
     assert score > 0.0, f"Expected positive consensus score, got {score}"
 

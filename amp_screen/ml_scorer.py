@@ -8,14 +8,14 @@ Combines:
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Tuple, Any, Union
 import numpy as np
 from scipy.spatial.distance import cdist
 import gemmi
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, ExtraTreesRegressor
 import joblib
 
-from amp_screen.utils import logger, AA_3TO1
+from amp_screen.utils import logger, AA_3TO1, get_default_model_path
 from amp_screen.physics_engine import calculate_haddock_physics_score
 from amp_screen.amp_analyzer import (
     analyze_cocomplex_contacts,
@@ -386,8 +386,9 @@ class MLPeptideScorer:
 
     def __init__(
         self,
-        model_path: Optional[Path] = None,
-        consensus_weights: Tuple[float, float, float] = (0.35, 0.35, 0.30)
+        model_path: Optional[Union[str, Path]] = None,
+        consensus_weights: Tuple[float, float, float] = (0.35, 0.35, 0.30),
+        auto_load_default: bool = True
     ):
         self.rf_model = None
         self.gb_model = None
@@ -399,6 +400,9 @@ class MLPeptideScorer:
         self.feature_names = []
         self.is_calibrated = False
         self.consensus_weights = consensus_weights
+
+        if model_path is None and auto_load_default:
+            model_path = get_default_model_path()
 
         if model_path and Path(model_path).exists():
             self._load_model(Path(model_path))
@@ -452,6 +456,12 @@ class MLPeptideScorer:
         }
         if self.et_model is not None:
             payload["et"] = self.et_model
+        if self.cb_model is not None:
+            payload["cb"] = self.cb_model
+        if self.lgb_model is not None:
+            payload["lgb"] = self.lgb_model
+        if self.ensemble_weights is not None:
+            payload["ensemble_weights"] = self.ensemble_weights
         if self.dl_model is not None:
             payload["dl"] = self.dl_model.to_dict()
         joblib.dump(payload, str(out_path), compress=3)
