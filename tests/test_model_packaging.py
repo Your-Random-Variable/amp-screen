@@ -7,13 +7,13 @@ import tempfile
 import unittest
 import joblib
 
-from amp_screen.utils import get_default_model_path, get_default_dataset_path
+from amp_screen.utils import get_default_model_path, get_default_dataset_path, get_default_manifest_path
 from amp_screen.ml_scorer import MLPeptideScorer
 
 
 class TestModelPackaging(unittest.TestCase):
     def test_default_resource_resolution(self):
-        """Verifies that default model and dataset paths resolve to real files."""
+        """Verifies that default model, dataset, and manifest paths resolve to real files."""
         model_path = get_default_model_path()
         self.assertIsNotNone(model_path, "Default model path must not be None")
         self.assertTrue(Path(model_path).exists(), f"Model file must exist at {model_path}")
@@ -23,6 +23,11 @@ class TestModelPackaging(unittest.TestCase):
         self.assertIsNotNone(dataset_path, "Default dataset path must not be None")
         self.assertTrue(Path(dataset_path).exists(), f"Dataset file must exist at {dataset_path}")
         self.assertGreater(Path(dataset_path).stat().st_size, 500000, "Dataset file must be > 500 KB")
+
+        manifest_path = get_default_manifest_path()
+        self.assertIsNotNone(manifest_path, "Default manifest path must not be None")
+        self.assertTrue(Path(manifest_path).exists(), f"Manifest file must exist at {manifest_path}")
+        self.assertGreater(Path(manifest_path).stat().st_size, 100000, "Manifest file must be > 100 KB")
 
     def test_default_scorer_auto_loads_calibrated(self):
         """Verifies that MLPeptideScorer() initializes in calibrated mode with zero arguments."""

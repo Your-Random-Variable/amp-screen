@@ -20,7 +20,7 @@ from amp_screen.amp_analyzer import (
     calculate_hydrophobic_moment,
     calculate_boman_index
 )
-from amp_screen.utils import AA_3TO1, logger
+from amp_screen.utils import AA_3TO1, logger, get_default_dataset_path
 from amp_screen.ml_scorer import MLPeptideScorer
 
 EXTERNAL_BENCHMARKS = {
@@ -445,6 +445,26 @@ EXTERNAL_BENCHMARKS = {
 }
 
 
+def compute_max_peptide_identity(query_seq: str, train_seqs: list) -> float:
+    """Computes the maximum normalized sequence identity match against all training peptides."""
+    q = str(query_seq).strip().upper()
+    if not q:
+        return 0.0
+    max_sim = 0.0
+    for t in train_seqs:
+        t = str(t).strip().upper()
+        if not t:
+            continue
+        if q == t:
+            return 1.0
+        # Character-level overlap on aligned length
+        matches = sum(1 for a, b in zip(q, t) if a == b)
+        sim = matches / max(len(q), len(t))
+        if sim > max_sim:
+            max_sim = sim
+    return round(float(max_sim), 3)
+
+
 def run_external_benchmark(
     benchmarks_dir: Path = Path("benchmarks/external_test_set"),
     out_csv: Path = Path("benchmarks/external_test_set/external_benchmark_results.csv")
@@ -452,18 +472,42 @@ def run_external_benchmark(
     benchmarks_dir = Path(benchmarks_dir).resolve()
     ml_scorer = MLPeptideScorer()
 
+    # Fail-closed training dataset loading and PDB-ID disjointness assertion
+    train_csv = get_default_dataset_path()
+    if train_csv is None or not Path(train_csv).exists():
+        raise FileNotFoundError(f"Required canonical training dataset not found at {train_csv}")
+    
+    tdf = pd.read_csv(train_csv)
+    if "peptide_sequence" not in tdf.columns or "pdb_id" not in tdf.columns:
+        raise ValueError(f"Malformed training dataset at {train_csv}: missing expected columns.")
+    
+    train_pdbs = set(tdf["pdb_id"].astype(str).str.strip().str.upper())
+    train_seqs = list(tdf["peptide_sequence"].astype(str).str.strip().str.upper())
+    train_seqs_set = set(train_seqs)
+
+    # Programmatic Assertion 1: Strict PDB accession disjointness
+    ext_pdbs = set(k.upper() for k in EXTERNAL_BENCHMARKS.keys())
+    common_pdbs = ext_pdbs & train_pdbs
+    if common_pdbs:
+        raise RuntimeError(f"Data leakage detected! External test set shares PDB accessions with training: {common_pdbs}")
+
+    # Programmatic Assertion 2: All 52 PDB coordinate files must be present (fail-closed)
+    for pdb_id in EXTERNAL_BENCHMARKS:
+        pdb_file = benchmarks_dir / f"{pdb_id.lower()}.pdb"
+        if not pdb_file.exists():
+            raise FileNotFoundError(f"Missing external benchmark PDB structure: {pdb_file}")
+
     results = []
 
     print("\n" + "=" * 125)
-    print("      AMP-SCREEN: EXPANDED EXTERNAL BLIND BENCHMARK EVALUATION (N=52, 0% OVERLAP WITH 1,054 TRAINING SET)")
+    print("      AMP-SCREEN: EXPANDED EXTERNAL BLIND BENCHMARK EVALUATION (N=52)")
+    print(f"      • PDB Accession Overlap: Strictly 0% (0 of {len(EXTERNAL_BENCHMARKS)} PDB IDs in Training Corpus)")
+    print(f"      • Training Corpus: {len(tdf)} complexes from {train_csv.name}")
     print("=" * 125)
     print(f"Benchmarking directory: {benchmarks_dir} ({len(EXTERNAL_BENCHMARKS)} external complexes)\n")
 
     for pdb_id, meta in EXTERNAL_BENCHMARKS.items():
         pdb_path = benchmarks_dir / f"{pdb_id.lower()}.pdb"
-        if not pdb_path.exists():
-            logger.warning(f"File not found: {pdb_path}")
-            continue
 
         st = gemmi.read_structure(str(pdb_path))
         seq = "".join(
@@ -520,6 +564,9 @@ def run_external_benchmark(
             ml_kd = ml_res["ml_kd"]
             ml_pkd = ml_res["ml_pkd"]
 
+        # Calculate maximum sequence identity to any training peptide
+        max_pep_id = compute_max_peptide_identity(seq, train_seqs)
+
         results.append({
             "pdb_id": pdb_id,
             "target": meta["target"],
@@ -538,18 +585,13 @@ def run_external_benchmark(
             "ml_pkd": round(ml_pkd, 2) if ml_pkd is not None else None,
             "exp_delta_g": meta["exp_delta_g"],
             "exp_kd": meta["exp_kd_str"],
+            "max_train_peptide_seq_identity": max_pep_id,
             "citation": meta["citation"]
         })
 
-    train_csv = Path(__file__).resolve().parent / "amp_screen" / "data" / "pdbbind_peptide_affinity_dataset.csv"
-    train_seqs = set()
-    if train_csv.exists():
-        try:
-            tdf = pd.read_csv(train_csv)
-            if "peptide_sequence" in tdf.columns:
-                train_seqs = set(tdf["peptide_sequence"].astype(str).str.strip().str.upper())
-        except Exception as e:
-            logger.warning(f"Could not load training sequences for overlap audit: {e}")
+    # Assert exactly 52 complexes processed
+    if len(results) != 52:
+        raise ValueError(f"Expected 52 evaluated complexes, but only {len(results)} were processed!")
 
     df = pd.DataFrame(results)
     df["err_phys"] = np.abs(df["phys_delta_g"] - df["exp_delta_g"])
@@ -558,10 +600,15 @@ def run_external_benchmark(
     # Overlap and cohort classification
     rigid_inhibitors = {"1SFI", "3P8F", "1CP3"}
     df["clean_seq"] = df["sequence"].astype(str).str.strip().str.upper()
-    df["shared_sequence_with_training"] = df["clean_seq"].isin(train_seqs)
+    df["shared_sequence_with_training"] = df["clean_seq"].isin(train_seqs_set)
     df["is_signaling_cohort"] = ~df["pdb_id"].isin(rigid_inhibitors)
     df["is_sequence_disjoint_cohort"] = df["is_signaling_cohort"] & (~df["shared_sequence_with_training"])
     df = df.drop(columns=["clean_seq"])
+
+    # Assert cohort sizes
+    assert len(df) == 52, f"Cohort 1 size mismatch: expected 52, got {len(df)}"
+    assert int(df["is_signaling_cohort"].sum()) == 49, f"Cohort 2 size mismatch: expected 49, got {df['is_signaling_cohort'].sum()}"
+    assert int(df["is_sequence_disjoint_cohort"].sum()) == 46, f"Cohort 3 size mismatch: expected 46, got {df['is_sequence_disjoint_cohort'].sum()}"
 
     # Pretty print summary table
     fmt = "%-6s | %-22s | %-16s | %-8s | %-8s | %-8s | %-8s | %-10s | %-10s"

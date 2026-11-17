@@ -5,6 +5,21 @@ All notable changes to **AMP-Screen** (`amp-screen` / `af-amp-screen`) will be d
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.4] - 2026-11-17
+### Added
+- **Enriched Row-Level Primary Literature Citations**: Queried the RCSB PDB GraphQL API (`https://data.rcsb.org/graphql`) across all 1,054 training complexes to populate row-level primary citations in `amp_screen/data/pdbbind_peptide_affinity_dataset.csv` and `amp_screen/data/training_set_source_manifest.csv`, replacing accession-code placeholders with 933 verified publication DOIs (`doi:...`), 957 PubMed IDs (`PMID:...`), primary article titles, journal abbreviations, and publication years.
+- **Package-Owned Provenance Manifest in Binary Wheels**: Relocated canonical `training_set_source_manifest.csv` into package directory `amp_screen/data/` (with a root symlink `data/training_set_source_manifest.csv`), added package resource locator `get_default_manifest_path()` in `amp_screen/utils.py`, updated `tests/test_model_packaging.py` and `scripts/verify_wheel.py` to assert manifest presence and 1,054-row schema in sterile venv wheel installs.
+- **Fail-Closed External Benchmark Suite**: Hardened `run_external_benchmark.py` with fail-closed integrity checks: verifies all 52 PDB structures exist before executing, programmatically asserts 0 shared PDB accessions with the training corpus, computes and records `max_train_peptide_seq_identity` for all 52 external peptides, and enforces hard assertions on cohort sample sizes ($N=52, 49, 46$).
+- **Reproducible Leave-14-Out Cross-Validation Script**: Added `scripts/evaluate_leave_14_out.py` and committed output `benchmarks/leave_14_out_results.csv`, establishing an exact, out-of-sample leave-14-out reference cross-validation ($\text{MAE} = 0.89\text{ kcal/mol}$, $\text{RMSE} = 1.01\text{ kcal/mol}$, Pearson $r = 0.686$ [$p = 6.76 \times 10^{-3}$], Spearman $\rho = 0.554$ [$p = 0.0396$]).
+- **Strict Mode & Sequence-Aware Featurizer**: Added `--strict` fail-closed flag and sequence-aware peptide chain identification to `data/generate_expanded_dataset.py`, accurately distinguishing `Exact 3D Coordinates (wwPDB Crystallographic)` (14 rows) from `Deterministic Sequence Biophysics + Empirical Interface Prior Distribution` (1,040 rows).
+- **CI Benchmark Artifact Retention**: Updated `.github/workflows/ci.yml` with `tags: ['v*']` trigger, automated execution of `scripts/evaluate_leave_14_out.py`, and artifact upload (`actions/upload-artifact@v4`) for all benchmark CSV results.
+
+### Fixed
+- **Synchronized Documentation P-Values & Metrics**: Corrected Cohort 3 sequence-disjoint p-values in `README.md` and `BENCHMARKS.md` ($p = 8.26 \times 10^{-5}$ and $p = 4.79 \times 10^{-4}$), and synchronized leave-14-out benchmark metrics ($\text{MAE} = 0.89\text{ kcal/mol}$) across `README.md`, `BENCHMARKS.md`, and manuscript files.
+- **Version Bump & Metadata Synchronization**: Bumped version to 1.12.4 across `amp_screen/__init__.py`, `pyproject.toml`, `setup.py`, `CITATION.cff`, `README.md`, `BENCHMARKS.md`, and manuscript files.
+
+---
+
 ## [1.12.3] - 2026-11-17
 ### Added
 - **RCSB Automated Structure Downloader & Multi-Chain Featurizer**: Added `--download-pdbs` and `--cache-dir` options to `data/generate_expanded_dataset.py`, enabling automated online retrieval of raw PDB structures from RCSB and true multi-chain 3D Cartesian featurization.

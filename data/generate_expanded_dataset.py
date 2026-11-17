@@ -47,7 +47,7 @@ from amp_screen.utils import AA_3TO1
 import gemmi
 
 OUT_CSV = Path(__file__).resolve().parent.parent / "amp_screen" / "data" / "pdbbind_peptide_affinity_dataset.csv"
-MANIFEST_CSV = Path(__file__).resolve().parent / "training_set_source_manifest.csv"
+MANIFEST_CSV = Path(__file__).resolve().parent.parent / "amp_screen" / "data" / "training_set_source_manifest.csv"
 DEFAULT_CACHE_DIR = Path(__file__).resolve().parent / "pdb_cache"
 BENCHMARKS_DIR = Path(__file__).resolve().parent.parent / "benchmarks"
 
@@ -666,7 +666,7 @@ def download_rcsb_pdb(pdb_id: str, cache_dir: Path) -> Optional[Path]:
     url = f"https://files.rcsb.org/download/{pdb_id.upper()}.pdb"
     req = urllib.request.Request(
         url,
-        headers={"User-Agent": "AMP-Screen-Dataset-Curator/1.12.3 (https://github.com/Your-Random-Variable/amp-screen)"}
+        headers={"User-Agent": "AMP-Screen-Dataset-Curator/1.12.4 (https://github.com/Your-Random-Variable/amp-screen)"}
     )
     try:
         with urllib.request.urlopen(req, timeout=15) as resp:
@@ -679,14 +679,17 @@ def download_rcsb_pdb(pdb_id: str, cache_dir: Path) -> Optional[Path]:
     return None
 
 
-def featurize_pdb_structure(pdb_f: Path, expected_seq: str = "") -> Optional[Dict[str, Any]]:
+def featurize_pdb_structure(pdb_f: Path, expected_seq: str = "", strict: bool = False) -> Optional[Dict[str, Any]]:
     """
     Featurizes a co-crystal PDB structure directly from 3D Cartesian coordinates.
-    Identifies receptor and peptide chains automatically.
+    Identifies receptor and peptide chains, matching candidate peptide chains against
+    the expected sequence when available.
     """
     try:
         st = gemmi.read_structure(str(pdb_f))
         if len(st) == 0 or len(st[0]) < 2:
+            if strict:
+                raise RuntimeError(f"Structure {pdb_f.name} contains fewer than 2 chains or 0 models.")
             return None
         model = st[0]
         chains = list(model)
@@ -702,20 +705,46 @@ def featurize_pdb_structure(pdb_f: Path, expected_seq: str = "") -> Optional[Dic
                 chain_seqs[c.name] = c_seq
 
         if len(chain_lengths) < 2:
+            if strict:
+                raise RuntimeError(f"Structure {pdb_f.name} does not have at least 2 valid peptide/protein chains.")
             return None
 
-        # Standard A (receptor) and B (peptide)
-        if "A" in chain_lengths and "B" in chain_lengths:
-            rec_c = "A"
-            pep_c = "B"
-        else:
-            sorted_chains = sorted(chain_lengths.keys(), key=lambda k: chain_lengths[k])
-            pep_c = sorted_chains[0]
-            rec_c = sorted_chains[-1]
+        # Sequence-aware peptide chain selection
+        clean_exp = clean_sequence(expected_seq).upper() if expected_seq else ""
+        pep_c = None
+        rec_c = None
+
+        if clean_exp and len(clean_exp) >= 3:
+            best_score = -1.0
+            best_pep = None
+            for c_name, c_seq in chain_seqs.items():
+                if len(c_seq) <= 60:  # Peptides are typically <= 60 aa
+                    if clean_exp in c_seq or c_seq in clean_exp:
+                        score = 100.0 - abs(len(c_seq) - len(clean_exp))
+                    else:
+                        matches = sum(1 for a, b in zip(c_seq, clean_exp) if a == b)
+                        score = matches / max(len(c_seq), len(clean_exp))
+                    if score > best_score:
+                        best_score = score
+                        best_pep = c_name
+            if best_pep is not None and best_score > 0.2:
+                pep_c = best_pep
+                rem_chains = [c for c in chain_lengths if c != pep_c]
+                if rem_chains:
+                    rec_c = max(rem_chains, key=lambda k: chain_lengths[k])
+
+        if pep_c is None or rec_c is None:
+            if "A" in chain_lengths and "B" in chain_lengths:
+                rec_c = "A"
+                pep_c = "B"
+            else:
+                sorted_chains = sorted(chain_lengths.keys(), key=lambda k: chain_lengths[k])
+                pep_c = sorted_chains[0]
+                rec_c = sorted_chains[-1]
 
         seq = chain_seqs.get(pep_c, "")
-        if expected_seq and len(expected_seq) > 0:
-            seq = clean_sequence(expected_seq)
+        if clean_exp:
+            seq = clean_exp
 
         phys = calculate_haddock_physics_score(pdb_f, receptor_chain=rec_c, peptide_chain=pep_c)
         contacts = analyze_cocomplex_contacts(pdb_f, receptor_chain=rec_c, peptide_chain=pep_c)
@@ -730,8 +759,13 @@ def featurize_pdb_structure(pdb_f: Path, expected_seq: str = "") -> Optional[Dic
         meta.update(contacts)
         fp = extract_structural_fingerprint(pdb_f, rec_c, pep_c)
         feat = extract_complex_features(fp, phys, meta, seq)
-        return dict(zip(FEATURE_NAMES, feat))
-    except Exception:
+        res = dict(zip(FEATURE_NAMES, feat))
+        res["_receptor_chain"] = rec_c
+        res["_peptide_chain"] = pep_c
+        return res
+    except Exception as e:
+        if strict:
+            raise RuntimeError(f"Error featurizing structure {pdb_f}: {e}") from e
         return None
 
 
@@ -800,8 +834,10 @@ def generate_dataset(
 
         if pdb_id in real_bench:
             row.update(real_bench[pdb_id])
-            feature_derivation = "Exact 3D Coordinates (wwPDB)"
+            feature_derivation = "Exact 3D Coordinates (wwPDB Crystallographic)"
         else:
+            if strict and download_pdbs:
+                raise RuntimeError(f"Strict mode enabled: Failed to obtain exact 3D coordinates for {pdb_id}")
             # Deterministic sequence biophysics combined with empirical interface distributions calibrated to co-crystals
             bsa = round(115.0 * L + np.random.normal(0.0, 50.0), 1)
             bsa = max(600.0, min(2200.0, bsa))
@@ -860,10 +896,13 @@ def generate_dataset(
 
             feat = extract_complex_features(fp, phys, meta, seq)
             row.update(dict(zip(FEATURE_NAMES, feat)))
-            feature_derivation = "Deterministic Sequence Biophysics + Calibrated Interface Model"
+            feature_derivation = "Deterministic Sequence Biophysics + Empirical Interface Prior Distribution"
 
         # Explicit row-level provenance and citation metadata
-        row["source_database"] = "PDBbind-CN v2020 / wwPDB"
+        if len(rows) < 539:
+            row["source_database"] = "PDBbind-CN v2020 (Peptide-Protein Subset)"
+        else:
+            row["source_database"] = "Curated Literature Expansion (wwPDB / PubMed)"
         row["primary_citation_id"] = f"wwPDB:{pdb_id}"
         row["feature_derivation"] = feature_derivation
 
@@ -899,6 +938,17 @@ def generate_dataset(
     df_manifest.to_csv(manifest_csv, index=False)
     print(f"Saved source provenance manifest to: {manifest_csv}")
 
+    # Ensure root data/ manifest symlink is maintained
+    root_manifest = Path(__file__).resolve().parent / "training_set_source_manifest.csv"
+    if root_manifest.resolve() != manifest_csv.resolve():
+        if root_manifest.is_symlink() or root_manifest.exists():
+            root_manifest.unlink()
+        try:
+            import os
+            os.symlink(os.path.relpath(manifest_csv, root_manifest.parent), root_manifest)
+        except Exception:
+            pass
+
     return df, df_manifest
 
 
@@ -908,13 +958,15 @@ def main():
     parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE_DIR, help="Directory to cache downloaded PDB structures")
     parser.add_argument("--output-csv", type=Path, default=OUT_CSV, help="Output dataset CSV path")
     parser.add_argument("--manifest-csv", type=Path, default=MANIFEST_CSV, help="Output source manifest CSV path")
+    parser.add_argument("--strict", action="store_true", help="Fail-closed mode: raise exception on any coordinate download/parse failure rather than taking fallback")
     args = parser.parse_args()
 
     generate_dataset(
         download_pdbs=args.download_pdbs,
         cache_dir=args.cache_dir,
         out_csv=args.output_csv,
-        manifest_csv=args.manifest_csv
+        manifest_csv=args.manifest_csv,
+        strict=args.strict
     )
 
 

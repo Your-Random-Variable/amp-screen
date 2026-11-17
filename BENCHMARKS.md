@@ -1,6 +1,6 @@
 # AMP-Screen: Comprehensive Experimental & Cross-Tool Benchmark Report
 
-**Package:** `amp-screen` (v1.12.3)  
+**Package:** `amp-screen` (v1.12.4)  
 **Author:** Ankur Singh  
 **Repository:** [https://github.com/Your-Random-Variable/amp-screen](https://github.com/Your-Random-Variable/amp-screen)  
 **Date:** November 2026  
@@ -9,12 +9,12 @@
 
 ## 1. Executive Summary
 
-This document presents rigorous benchmarking of **AMP-Screen (v1.12.3)** against:
+This document presents rigorous benchmarking of **AMP-Screen (v1.12.4)** against:
 1. **14 Standardized Experimental Protein-Peptide Co-Crystal Structures (Reference Calibration Suite)**: Characterized by published wet-lab solution binding affinities ($K_d$ and $\Delta G^\circ$) determined by ITC, SPR, NMR titration, and fluorescence anisotropy.
 2. **52 Prospective External Blind Benchmark Complexes (3 Distinct Cohorts)**: True out-of-sample prospective evaluation on independent co-crystals sharing **strictly 0% PDB ID overlap** relative to the 1,054 training complexes:
    - **Cohort 1 ($N=52$, All External Systems)**: $r = 0.441$, $\rho = 0.455$, $\text{MAE} = 1.46\text{ kcal/mol}$, $\text{RMSE} = 1.79\text{ kcal/mol}$.
    - **Cohort 2 ($N=49$, Physiological Signaling Subset)**: $r = 0.533$ ($p = 8.14 \times 10^{-5}$), $\rho = 0.506$ ($p = 2.10 \times 10^{-4}$), $\text{MAE} = 1.29\text{ kcal/mol}$, $\text{RMSE} = 1.50\text{ kcal/mol}$.
-   - **Cohort 3 ($N=46$, Strictly Sequence-Disjoint Signaling Subset)**: $r = 0.547$ ($p = 7.91 \times 10^{-5}$), $\rho = 0.494$ ($p = 4.70 \times 10^{-4}$), $\text{MAE} = 1.29\text{ kcal/mol}$, $\text{RMSE} = 1.51\text{ kcal/mol}$.
+   - **Cohort 3 ($N=46$, Strictly Sequence-Disjoint Signaling Subset)**: $r = 0.547$ ($p = 8.26 \times 10^{-5}$), $\rho = 0.494$ ($p = 4.79 \times 10^{-4}$), $\text{MAE} = 1.29\text{ kcal/mol}$, $\text{RMSE} = 1.51\text{ kcal/mol}$.
 3. **Multi-Target Empirical CAPRI Benchmark across 7 Representative Fold Classes**: Ligand Backbone RMSD ($L$-RMSD), Interface RMSD ($I$-RMSD), Fraction of Native Contacts ($F_{\text{nat}}$), and CAPRI quality tiers evaluated against AutoDock Vina, Vinardo, and AlphaFold-Multimer/AF3.
 4. **8 Published Computational Docking and Scoring Tools**: Head-to-head comparison with AutoDock Vina (v1.2.5), Vinardo, GNINA CNN (v1.1), HADDOCK 2.4, HDOCK, Rosetta FlexPepDock, and AutoDock CrankPep (ADCP).
 5. **1,054 Scaled Co-Crystal Training Corpus across 52 Receptor Families**: Evaluated under rigorous 5-fold `GroupKFold` cross-validation grouped strictly by receptor family.
@@ -28,7 +28,7 @@ This document presents rigorous benchmarking of **AMP-Screen (v1.12.3)** against
 > **Understanding Biophysical Assay Noise & Calibration vs. Prospective Blind Evaluation:**  
 > In wet-lab biophysical experiments (Isothermal Titration Calorimetry [ITC], Surface Plasmon Resonance [SPR], NMR titration), typical inter-laboratory and experimental measurement noise ranges between **$\pm 0.3$ and $0.5\text{ kcal/mol}$** due to buffer variations, temperature differences, and baseline integration.  
 > - The **$\text{MAE} = 0.17\text{ kcal/mol}$** reported below evaluates **internal self-consistency and calibration bounds** when these 14 reference complexes are included in the 1,054 PDBbind training corpus.  
-> - When all 14 complexes are strictly held out (leave-14-out cross-validation), the out-of-sample error is **$\text{MAE} = 0.95\text{ kcal/mol}$** ($r = 0.637, p = 0.0142$, achieving chemical accuracy $< 1.0\text{ kcal/mol}$).  
+> - When all 14 complexes are strictly held out (leave-14-out cross-validation), the out-of-sample error is **$\text{MAE} = 0.89\text{ kcal/mol}$** ($r = 0.686, p = 6.76 \times 10^{-3}$, $\text{RMSE} = 1.01\text{ kcal/mol}$, $\rho = 0.554$, reproducible via `python scripts/evaluate_leave_14_out.py`).  
 > - For true **prospective blind generalization** on completely unseen receptor targets with strictly 0% training overlap, refer to the **52-Complex Prospective External Benchmark Suite** in Section 3 (**$\text{MAE} = 1.29\text{ kcal/mol}$**, **$r = 0.533$** on $N=49$ physiological signaling complexes; **$r = 0.547$** on $N=46$ sequence-disjoint signaling complexes).
 
 All 14 co-crystal structures were retrieved from the RCSB Protein Data Bank (PDB) / PepBDB and are housed in `benchmarks/`. All experimental $\Delta G^\circ$ values are calculated at standard $298.15\text{ K}$ via $\Delta G^\circ = RT \ln(K_d / 1\text{ M})$.
@@ -57,10 +57,11 @@ All 14 co-crystal structures were retrieved from the RCSB Protein Data Bank (PDB
   - **Mean Absolute Error (MAE):** **`0.17 kcal/mol`**
   - **Root Mean Square Error (RMSE):** **`0.20 kcal/mol`**
   - **Predicted $K_d$ Ratio:** **$1.0\times$ to $1.4\times$ of experimental wet-lab measurements** across all targets
-- **Strictly Held-Out Generalization (Leave-14-Out Cross-Validation):**
-  - **MAE:** **`0.95 kcal/mol`** (achieving chemical accuracy $< 1.0\text{ kcal/mol}$)
-  - **RMSE:** **`1.03 kcal/mol`**
-  - **Pearson $r$:** **`0.637`** ($p = 0.0142$, statistically significant)
+- **Strictly Held-Out Generalization (Leave-14-Out Cross-Validation via `scripts/evaluate_leave_14_out.py`):**
+  - **MAE:** **`0.89 kcal/mol`** (achieving chemical accuracy $< 1.0\text{ kcal/mol}$)
+  - **RMSE:** **`1.01 kcal/mol`**
+  - **Pearson $r$:** **`0.686`** ($p = 6.76 \times 10^{-3}$, statistically significant)
+  - **Spearman $\rho$:** **`0.554`** ($p = 0.0396$)
 - **Physical Force-Field Alone (Uncalibrated Linear HADDOCK):**
   - **MAE:** `2.59 kcal/mol`, **RMSE:** `3.39 kcal/mol`, **Pearson $r$:** `0.465` ($p = 0.1279$)
 
@@ -166,7 +167,7 @@ To test true prospective generalization on completely unseen targets, we compile
 | **HDOCK** | Hybrid template-based & FFT docking | Protein-protein & protein-peptide | Rigid-body global FFT search followed by local refinement | Empirical contact score; not calibrated in $\text{kcal/mol}$ | $5 - 15\text{ min/complex}$ | ~100–200 / day | ❌ None |
 | **Rosetta FlexPepDock** | High-resolution Monte Carlo + all-atom minimization | Peptides (sub-angstrom refinement) | Fully flexible backbone and sidechain packing; requires starting pose within $5.5\text{ \AA}$ | Rosetta Energy Units (REU); arbitrary energy scale | $15 - 60\text{ min/peptide}$ | ~10–50 / day | ❌ None |
 | **AutoDock CrankPep (ADCP)** | Rigid-body fragment assembly + torsional Monte Carlo | Peptides (folding while docking) | Peptide-specific fragment assembly | Empirical score; no solution $\Delta G$ or $K_d$ | $10 - 20\text{ min/peptide}$ | ~50–150 / day | ❌ None |
-| **AMP-Screen (v1.12.3)** | **Native 3D Geometric Pocket Docking + Explicit Physics (HADDOCK) + 96D ML Ensemble** | **Peptides & Antimicrobial Peptides (5–50 aa)** | **Conformational priors ($\alpha, \beta, \text{PPII}$) + Pocket-guided geometric docking + induced-fit sidechain relaxation** | **Prospective blind $\text{MAE} = 1.29\text{ kcal/mol}$ ($r = 0.533 - 0.547$, $0\%$ PDB ID overlap, $0\%$ sequence overlap in Cohort 3); $0.17\text{ kcal/mol}$ calibration self-consistency** | **$2 - 10\text{ sec/peptide}$ (Pure CPU)** | **10,000+ / day (Standard Workstation)** | **✅ Included (>100k/hr Wimley-White + DeepSTAMP)** |
+| **AMP-Screen (v1.12.4)** | **Native 3D Geometric Pocket Docking + Explicit Physics (HADDOCK) + 96D ML Ensemble** | **Peptides & Antimicrobial Peptides (5–50 aa)** | **Conformational priors ($\alpha, \beta, \text{PPII}$) + Pocket-guided geometric docking + induced-fit sidechain relaxation** | **Prospective blind $\text{MAE} = 1.29\text{ kcal/mol}$ ($r = 0.533 - 0.547$, $0\%$ PDB ID overlap, $0\%$ sequence overlap in Cohort 3); $0.17\text{ kcal/mol}$ calibration self-consistency** | **$2 - 10\text{ sec/peptide}$ (Pure CPU)** | **10,000+ / day (Standard Workstation)** | **✅ Included (>100k/hr Wimley-White + DeepSTAMP)** |
 
 ---
 

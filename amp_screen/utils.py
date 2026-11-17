@@ -178,3 +178,27 @@ def get_default_dataset_path() -> Optional[Path]:
         return repo_csv
 
     return None
+
+
+def get_default_manifest_path() -> Optional[Path]:
+    """
+    Locates the 1,054 complex source manifest CSV with row-level provenance and citations.
+    Checks package data directory first (for installed wheels), then parent repo data directory.
+    """
+    pkg_manifest = Path(__file__).resolve().parent / "data" / "training_set_source_manifest.csv"
+    if pkg_manifest.exists():
+        return pkg_manifest
+
+    try:
+        import importlib.resources as pkg_resources
+        ref = pkg_resources.files("amp_screen").joinpath("data", "training_set_source_manifest.csv")
+        if ref.is_file():
+            return Path(str(ref))
+    except Exception:
+        pass
+
+    repo_manifest = Path(__file__).resolve().parent.parent / "data" / "training_set_source_manifest.csv"
+    if repo_manifest.exists():
+        return repo_manifest
+
+    return None

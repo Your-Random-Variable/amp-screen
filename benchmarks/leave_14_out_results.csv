@@ -1,0 +1,15 @@
+pdb_id,receptor_family,peptide_sequence,assay_type,experimental_pkd,predicted_pkd,exp_delta_g,predicted_delta_g,abs_error_kcal
+1AWR,Prolyl Isomerase,HAGPIA,Binding assay,5.26,6.45,-7.18,-8.8,1.63
+1CKA,SH3 Domain,PPPALPPKK,ITC,5.7,6.11,-7.78,-8.34,0.56
+1BBZ,SH3 Domain,APSYSPPPPP,NMR titr.,5.82,6.41,-7.94,-8.74,0.8
+1PRL,SH3 Domain,VSLSKPPRPLP,Fluorescence,5.1,6.5,-6.96,-8.86,1.91
+1SEM,SH3 Domain,VPPPVPPRRR,NMR,4.92,5.63,-6.71,-7.67,0.96
+1SSH,SH3 Domain,GPPPAMPARPT,Binding assay,5.64,6.05,-7.69,-8.25,0.56
+1B07,SH3 Domain,PPQVPSRPNRAP,SPR,5.74,6.3,-7.83,-8.59,0.76
+1GBQ,SH3 Domain,VPPPVPPR,ITC,5.24,5.99,-7.15,-8.17,1.03
+1LCJ,SH2 Domain,EPQPYEEIPI,SPR,6.46,6.75,-8.81,-9.2,0.39
+1BE9,PDZ Domain,KQTSV,Fluorescence,5.49,5.98,-7.49,-8.16,0.67
+1VJ6,PDZ Domain,TEFCA,ITC,6.66,6.11,-9.09,-8.33,0.76
+1ER8,Aspartic Protease,HPFHLLVY,Renin mimetic,7.92,7.33,-10.8,-9.99,0.81
+1DKX,Chaperone,NRLLLTG,Fluorescence,6.4,6.45,-8.73,-8.8,0.07
+1YCR,Apoptosis Regulator,ETFSDLWKLLPEN,ITC,6.22,7.32,-8.49,-9.98,1.5

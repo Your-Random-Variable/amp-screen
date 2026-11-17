@@ -10,7 +10,6 @@ include requirements.txt
 include environment.yml
 recursive-include amp_screen/data *
 recursive-include data *.py *.json *.md
-include data/training_set_source_manifest.csv
 recursive-include benchmarks *.pdb *.csv
 recursive-include examples *
 recursive-include manuscript *

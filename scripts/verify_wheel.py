@@ -33,12 +33,14 @@ def verify_wheel_archive(wheel_path: Path):
         
     has_model = any("amp_screen/data/trained_complex_ensemble.joblib" in n for n in names)
     has_dataset = any("amp_screen/data/pdbbind_peptide_affinity_dataset.csv" in n for n in names)
+    has_manifest = any("amp_screen/data/training_set_source_manifest.csv" in n for n in names)
     has_init = any("amp_screen/data/__init__.py" in n for n in names)
     
     assert has_model, "Wheel archive is missing 'amp_screen/data/trained_complex_ensemble.joblib'!"
     assert has_dataset, "Wheel archive is missing 'amp_screen/data/pdbbind_peptide_affinity_dataset.csv'!"
+    assert has_manifest, "Wheel archive is missing 'amp_screen/data/training_set_source_manifest.csv'!"
     assert has_init, "Wheel archive is missing 'amp_screen/data/__init__.py'!"
-    print("✔ Archive inspection: Pre-trained model (15 MB), dataset CSV, and __init__.py verified in wheel.")
+    print("✔ Archive inspection: Pre-trained model (15 MB), dataset CSV, source manifest CSV, and __init__.py verified in wheel.")
 
 
 def verify_wheel_installation_in_clean_venv(wheel_path: Path):
@@ -64,19 +66,32 @@ def verify_wheel_installation_in_clean_venv(wheel_path: Path):
         
         smoke_test_code = """
 import sys
+import pandas as pd
 from pathlib import Path
-from amp_screen.utils import get_default_model_path, get_default_dataset_path
+from amp_screen.utils import get_default_model_path, get_default_dataset_path, get_default_manifest_path
 from amp_screen.ml_scorer import MLPeptideScorer
 
 # 1. Assert resource paths resolve inside installed package
 m_path = get_default_model_path()
 d_path = get_default_dataset_path()
+mani_path = get_default_manifest_path()
+
 assert m_path is not None, "get_default_model_path() returned None in wheel install!"
 assert Path(m_path).exists(), f"Model path does not exist on disk: {m_path}"
 assert d_path is not None, "get_default_dataset_path() returned None in wheel install!"
 assert Path(d_path).exists(), f"Dataset path does not exist on disk: {d_path}"
+assert mani_path is not None, "get_default_manifest_path() returned None in wheel install!"
+assert Path(mani_path).exists(), f"Manifest path does not exist on disk: {mani_path}"
 
-# 2. Assert MLPeptideScorer auto-loads calibrated Pent-Ensemble
+# 2. Assert manifest integrity
+manifest_df = pd.read_csv(mani_path)
+assert len(manifest_df) == 1054, f"Expected 1054 rows in manifest, found {len(manifest_df)}"
+assert "primary_citation_id" in manifest_df.columns, "primary_citation_id column missing from manifest!"
+assert "source_database" in manifest_df.columns, "source_database column missing from manifest!"
+assert "feature_derivation" in manifest_df.columns, "feature_derivation column missing from manifest!"
+assert not (manifest_df["primary_citation_id"].str.startswith("wwPDB:").all()), "Manifest citations should contain real DOIs/PMIDs, not just wwPDB placeholders!"
+
+# 3. Assert MLPeptideScorer auto-loads calibrated Pent-Ensemble
 scorer = MLPeptideScorer()
 assert scorer.is_calibrated is True, "Default MLPeptideScorer instance MUST be calibrated!"
 assert scorer.rf_model is not None, "Random Forest model is missing!"
@@ -88,7 +103,7 @@ assert scorer.dl_model is not None, "PyTorch DeepAffinityResNet model is missing
 assert scorer.ensemble_weights is not None, "Ensemble weights are missing!"
 assert len(scorer.feature_names) == 96, f"Expected 96 features, got {len(scorer.feature_names)}"
 
-print("✔ Clean virtualenv smoke test PASSED: Model & dataset loaded and calibrated.")
+print("✔ Clean virtualenv smoke test PASSED: Model, dataset, & source manifest verified and calibrated.")
 """
         print("--> Executing end-to-end smoke test in isolated virtual environment (no source checkout context)...")
         # Run from tmp_dir so it cannot see the repo source files
