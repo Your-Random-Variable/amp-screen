@@ -3,12 +3,13 @@ include LICENSE
 include CITATION.cff
 include CHANGELOG.md
 include CONTRIBUTING.md
+include DATA_PROVENANCE_AND_LICENSE.md
 include pyproject.toml
 include setup.py
 include requirements.txt
 include environment.yml
 recursive-include amp_screen/data *
-recursive-include data *
+recursive-include data *.py *.json *.md
 recursive-include benchmarks *.pdb *.csv
 recursive-include examples *
 recursive-include manuscript *

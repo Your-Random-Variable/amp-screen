@@ -8,17 +8,23 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.10", "3.11"]
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: ${{ matrix.python-version }}
 
     - name: Install System Dependencies
+      if: runner.os == 'Linux'
       run: |
         sudo apt-get update
         sudo apt-get install -y openbabel python3-openbabel
@@ -29,11 +35,11 @@ jobs:
         pip install -r requirements.txt pytest wheel
         pip install -e ".[all]"
 
-    - name: Build Wheel Package and Validate Runtime Assets
+    - name: Build Wheel Package and Validate Isolated Clean Installation
       run: |
         python -m pip wheel --no-deps --no-build-isolation . -w dist/
         ls -lh dist/
-        python -c "from pathlib import Path; import zipfile; z = zipfile.ZipFile(list(Path('dist').glob('*.whl'))[0]); assert any('trained_complex_ensemble.joblib' in name for name in z.namelist()), 'Wheel missing model!'; print('✔ Wheel contains trained model and datasets.')"
+        python scripts/verify_wheel.py dist/*.whl
 
     - name: Run Standardized Co-Crystal Benchmarks
       run: |

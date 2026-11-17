@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11-blue?logo=python" alt="Python Version">
-  <img src="https://img.shields.io/badge/Version-1.12.0-brightgreen" alt="Version 1.12.0">
+  <img src="https://img.shields.io/badge/Version-1.12.1-brightgreen" alt="Version 1.12.1">
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT">
   <img src="https://img.shields.io/badge/Docking-Native%203D%20Geometric%20Surface%20Docking-blueviolet" alt="Native 3D Geometric Docking">
   <img src="https://img.shields.io/badge/Deep%20Learning-PyTorch%20Tabular%20ResNet-darkblue" alt="PyTorch Tabular ResNet">
@@ -13,7 +13,7 @@
 **AMP-Screen** (`amp-screen` / `af-amp-screen`) is a high-throughput, physics-grounded computational framework for peptide virtual screening, protein-peptide interaction modeling, and rational lead optimization:
 1. **AlphaFold Suite (`amp-screen alphafold`)**: Full integration with the AlphaFold ecosystem—automatic AlphaFold Database (AFDB) receptor fetching via UniProt IDs, AlphaFold-Multimer / AlphaFold 3 input preparation, and co-complex evaluation (interface pLDDT, HADDOCK force fields, 96D ML calibrated binding affinity, and toxicity triage).
 2. **Membrane Mode (`amp-screen membrane`)**: Ultra-fast sequence-first peptide membrane biophysical profiling leveraging **Wimley-White interfacial thermodynamics** ($\Delta G_{\text{w}\to\text{if}}$, $\Delta G_{\text{w}\to\text{oct}}$, Eisenberg amphipathic moments $\mu_H$, Membrane Permeabilization Index MPI, and in silico therapeutic index)—screening **>100,000 peptides/hour** with pure biophysics (no external model weights required).
-3. **Target Mode (`amp-screen target` / `run`)**: Pure **Native 3D Geometric Surface Docking Engine** operating 100% in Cartesian coordinates ($\text{\AA}$) via Gemmi & NumPy—completely replacing AutoDock Vina, PDBQT files, and Meeko. Integrates longitudinal pocket cleft alignment, continuous soft-core Lennard-Jones, distance-dependent Coulomb electrostatics, downhill simplex interface refinement, and **HADDOCK 2.4 explicit physics**.
+3. **Target Mode (`amp-screen target` / `run`)**: Pure **Native 3D Geometric Surface Docking Engine** operating 100% in Cartesian coordinates ($\text{\AA}$) via Gemmi & NumPy—eliminating AutoDock Vina, PDBQT conversions, and Meeko runtime requirements from core docking. Integrates longitudinal pocket cleft alignment, continuous soft-core Lennard-Jones, distance-dependent Coulomb electrostatics, downhill simplex interface refinement, and **HADDOCK 2.4 explicit physics**.
 5. **Prospective Blind & Wet-Lab Calibrated Affinity Engine**: Tuned Pent-Ensemble (Random Forest + Extra Trees + CatBoost + LightGBM + PyTorch `DeepAffinityResNet`) achieving **Pearson $r = 0.529$ ($p = 9.44 \times 10^{-5}$)**, **Spearman $\rho = 0.494$**, and **$\text{MAE} = 1.29\text{ kcal/mol}$** on an independent prospective blind external benchmark suite ($N=52$ co-crystals with strictly 0% training overlap, $<35\%$ homology), combined with high-fidelity reference calibration on 14 standardized complexes ($\text{MAE} = 0.12\text{ kcal/mol}$ self-consistency; $\text{MAE} = 0.95\text{ kcal/mol}$ leave-14-out).
 6. **In Silico Lead Optimization (`amp-screen optimize-hit`)**: Automated alanine scanning to pinpoint hotspot residues and rational mutation scanning for structure-based affinity maturation.
 
@@ -21,12 +21,12 @@
 
 ## 🚀 Why AMP-Screen?
 
-| Metric / Feature | Traditional Peptide Docking (Rosetta FlexPepDock, CrankPep, HADDOCK Web) | Standard Small-Molecule Docking (Vina, Glide, AutoDock 4) | **AMP-Screen (v1.12.0)** |
+| Metric / Feature | Traditional Peptide Docking (Rosetta FlexPepDock, CrankPep, HADDOCK Web) | Standard Small-Molecule Docking (Vina, Glide, AutoDock 4) | **AMP-Screen (v1.12.1)** |
 | :--- | :--- | :--- | :--- |
 | **Sequence AMP Screening** | Not supported | Not supported | **>100,000 peptides / hour (Wimley-White + DeepSTAMP)** |
 | **Target Docking Speed** | 15–120 minutes / peptide | 1–5 minutes | **2–5 seconds / peptide (100% Native Cartesian PDB)** |
 | **Coordinate Representation** | Complex internal coordinates | Artificial PDBQT united-atoms & empirical grid | **100% Native 3D Cartesian coordinates ($\text{\AA}$)** |
-| **External Binary Calls** | Many external wrappers | Subprocess calls to `vina`, Meeko, OpenBabel | **Zero external binary calls (Pure Python/Gemmi/NumPy)** |
+| **External Binary Calls** | Many external wrappers | Subprocess calls to `vina`, Meeko, OpenBabel | **Zero external binary calls in core docking engine (Pure Python/Gemmi/NumPy)** |
 | **Unknown Target Discovery** | Requires manual AlphaFold download | Requires PDB search | **Automated AFDB resolution via UniProt ID (e.g. P04637)** |
 | **Blind Docking / Cavities** | Days of global random sampling | Requires manual search box coordinates | **Automated 7-Ray PSP 5-Pocket Discovery & 0–100 Druggability** |
 | **Experimental Accuracy** | Gas-phase or uncalibrated ($\pm 3-5\text{ kcal/mol}$) | Empirical score with weak solution $K_d$ correlation | **Prospective blind $\text{MAE} = 1.29\text{ kcal/mol}$, $r = 0.529$ ($N=49$ signaling; $0\%$ training overlap, $<35\%$ homology); $0.12\text{ kcal/mol}$ on 14-complex calibration suite** |
@@ -210,7 +210,7 @@ To understand how AMP-Screen compares against the latest published protein-pepti
    - Deep learning methods like **AlphaFold 3** and **AlphaFold-Multimer** excel at de novo coordinate folding ($L$-RMSD $\le 1.5\text{ \AA}$ on defined interfaces in PepPCBench). However, their confidence outputs ($\text{pLDDT}$, $\text{ipTM}$) reflect structural prediction certainty, not physical binding affinity ($\Delta G$ or $K_d$). They cannot quantitatively rank candidate binders by potency.
 2. **Complete Elimination of AutoDock Vina:**
    - Standard AutoDock Vina was parameterized on rigid small molecules (20–50 atoms). On flexible peptides (100–300 atoms), Vina's empirical scoring merely counts contacts, frequently ranking non-native folded knots or distorted poses as Mode 1.
-   - **AMP-Screen Solution:** AutoDock Vina, PDBQT united-atom conversions, and Meeko have been **completely eliminated**. In their place, AMP-Screen employs a **Pure Native 3D Geometric Surface Docking Engine**:
+   - **AMP-Screen Solution:** AutoDock Vina, PDBQT united-atom conversions, and Meeko have been **completely eliminated from the core docking and screening pipeline** (retaining an optional legacy CLI for backward compatibility with external Vina workflows). In their place, AMP-Screen employs a **Pure Native 3D Geometric Surface Docking Engine**:
      - Operates 100% in Cartesian coordinates ($\text{\AA}$) directly on standard PDB files via Gemmi & NumPy.
      - Aligns peptide longitudinal axis with pocket cleft eigenvectors ($u_{\text{long}} \parallel \pm v_{\text{long}}$).
      - Samples longitudinal rolls and solvent outward normal depths.
@@ -594,7 +594,7 @@ python run_benchmarks.py
 # 3. Run Prospective Blind External Validation Benchmark Suite (52 zero-overlap complexes)
 python run_external_benchmark.py
 
-# 4. Run Complete Automated Test Suite (60 unit & integration tests)
+# 4. Run Complete Automated Test Suite (63 unit & integration tests)
 pytest tests/
 ```
 
@@ -618,13 +618,15 @@ If you use **AMP-Screen** in your research, please cite:
   author = {Singh, Ankur},
   title = {AMP-Screen: High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer},
   url = {https://github.com/Your-Random-Variable/amp-screen},
-  version = {1.12.0},
+  version = {1.12.1},
   year = {2026}
 }
 ```
 
 ---
 
-## 📄 License
+## 📄 License & Data Provenance
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+- **Software Source Code & Pre-trained Model Weights:** Licensed under the permissive [MIT License](LICENSE).
+- **Curated Complex Affinity Dataset:** Distributed under [ODC-By v1.0 / CC-BY 4.0](DATA_PROVENANCE_AND_LICENSE.md) for academic research and computational reproduction.
+- **Data Provenance & Terms of Use:** For detailed data provenance, primary wwPDB coordinate credits, and PDBbind / PepBDB academic attributions, see [DATA_PROVENANCE_AND_LICENSE.md](DATA_PROVENANCE_AND_LICENSE.md).

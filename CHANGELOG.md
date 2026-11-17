@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.12.1] - 2026-11-17
+### Added
+- **Dataset Provenance & Legal Rights Document**: Added [`DATA_PROVENANCE_AND_LICENSE.md`](DATA_PROVENANCE_AND_LICENSE.md) establishing explicit licensing distinctions between the permissive MIT software code, wwPDB CC0 primary coordinate files, factual literature binding constants, and ODC-By v1.0 / CC-BY 4.0 derived 96-dimensional physical descriptors.
+- **Academic Third-Party Attribution**: Added formal citations and terms-of-use compliance notices for PDBbind (Wang et al., 2004, 2005; Liu et al., 2017), PepBDB (Wen et al., 2019), and wwPDB (Berman et al., 2000).
+- **Automated Wheel & Clean Virtualenv Smoke Test**: Added [`scripts/verify_wheel.py`](scripts/verify_wheel.py) which verifies package data contents, creates an isolated temporary virtualenv, installs the built wheel, and asserts calibrated scorer loading in a sterile execution context.
+- **Multi-Python CI Matrix**: Configured GitHub Actions CI across Python 3.10 and 3.11 with automated clean-venv wheel verification.
+
+### Fixed
+- **PyPI Availability Statement Reconciled**: Updated manuscript (`Bioinformatics_Application_Note.md` and `.tex`) and documentation to clarify that installation is currently available via GitHub releases / git checkout, with PyPI distribution scheduled upon peer-reviewed acceptance.
+- **Eliminated Duplicate 16 MB Binary Assets**: Replaced duplicate copies of `trained_complex_ensemble.joblib` and `pdbbind_peptide_affinity_dataset.csv` in `data/` with relative symlinks pointing to canonical `amp_screen/data/`, reducing source distribution archive size from ~32 MB to ~16 MB.
+- **Updated Documentation Test Count**: Synchronized all documentation (`README.md` and `CONTRIBUTING.md`) to reflect the complete 63 passing unit and integration tests.
+- **Refined Core-vs-Optional Wording**: Clarified that AutoDock Vina, PDBQT, and Meeko are completely eliminated from the core native Cartesian docking engine, while preserving optional legacy interop utilities (`amp-screen-legacy`).
+
+---
+
 ## [1.12.0] - 2026-11-16
 ### Added
 - **Package-Owned Runtime Resource Bundling**: Bundled the pre-trained Pent-Ensemble model (`trained_complex_ensemble.joblib`, 15 MB) and curated training corpus (`pdbbind_peptide_affinity_dataset.csv`, 1.3 MB) directly inside the package distribution (`amp_screen/data/`) using `importlib.resources` and `MANIFEST.in`.

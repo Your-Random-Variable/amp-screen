@@ -39,7 +39,7 @@ from amp_screen.ml_scorer import (
     RT_LN10
 )
 from amp_screen.physics_engine import calculate_haddock_physics_score
-from amp_screen.utils import logger, ensure_dir
+from amp_screen.utils import logger, ensure_dir, get_default_model_path, get_default_dataset_path
 from amp_screen.deep_model import DeepAffinityRegressor
 
 
@@ -55,13 +55,17 @@ def train_and_evaluate(
     X: np.ndarray,
     y: np.ndarray,
     groups: np.ndarray = None,
-    out_model_path: Path = Path("data/trained_complex_ensemble.joblib"),
+    out_model_path: Optional[Path] = None,
     n_splits: int = 5
 ) -> dict:
     """
     Trains the Tuned Pent-Ensemble (RF, ET, CatBoost, LightGBM, DL ResNet, and GB fallback).
     Evaluates cross-validation performance under GroupKFold by receptor family.
     """
+    if out_model_path is None:
+        out_model_path = get_default_model_path() or Path("amp_screen/data/trained_complex_ensemble.joblib")
+    out_model_path = Path(out_model_path)
+
     print("\n" + "=" * 110)
     print("      PROTEIN-PEPTIDE COMPLEX AFFINITY: TUNED PENT-ENSEMBLE TRAINING (96 PARAMETERS, 1,054 SAMPLES)")
     print("=" * 110)
@@ -206,8 +210,10 @@ def train_and_evaluate(
 
 def main():
     parser = argparse.ArgumentParser(description="Train custom 96-parameter tuned pent-ensemble affinity model for AMP-Screen")
-    parser.add_argument("--data", default="data/pdbbind_peptide_affinity_dataset.csv", help="Dataset CSV with experimental affinities and features")
-    parser.add_argument("--output", default="data/trained_complex_ensemble.joblib", help="Output model path")
+    default_data = str(get_default_dataset_path() or "amp_screen/data/pdbbind_peptide_affinity_dataset.csv")
+    default_output = str(get_default_model_path() or "amp_screen/data/trained_complex_ensemble.joblib")
+    parser.add_argument("--data", default=default_data, help="Dataset CSV with experimental affinities and features")
+    parser.add_argument("--output", default=default_output, help="Output model path")
     args = parser.parse_args()
 
     data_path = Path(args.data)

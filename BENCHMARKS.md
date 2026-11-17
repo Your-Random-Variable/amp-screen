@@ -1,6 +1,6 @@
 # AMP-Screen: Comprehensive Experimental & Cross-Tool Benchmark Report
 
-**Package:** `amp-screen` (v1.12.0)  
+**Package:** `amp-screen` (v1.12.1)  
 **Author:** Ankur Singh  
 **Repository:** [https://github.com/Your-Random-Variable/amp-screen](https://github.com/Your-Random-Variable/amp-screen)  
 **Date:** November 2026  
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-This document presents rigorous benchmarking of **AMP-Screen (v1.12.0)** against:
+This document presents rigorous benchmarking of **AMP-Screen (v1.12.1)** against:
 1. **14 Standardized Experimental Protein-Peptide Co-Crystal Structures (Reference Calibration Suite)**: Characterized by published wet-lab solution binding affinities ($K_d$ and $\Delta G^\circ$) determined by ITC, SPR, NMR titration, and fluorescence anisotropy.
 2. **52 Prospective External Blind Benchmark Complexes**: True out-of-sample prospective evaluation on independent co-crystals sharing **strictly 0% overlap** and **$<35\%$ sequence identity** relative to the 1,054 training complexes (with 22 targets belonging to entirely unrepresented protein families).
 3. **Multi-Target Empirical CAPRI Benchmark across 7 Representative Fold Classes**: Ligand Backbone RMSD ($L$-RMSD), Interface RMSD ($I$-RMSD), Fraction of Native Contacts ($F_{\text{nat}}$), and CAPRI quality tiers evaluated against AutoDock Vina, Vinardo, and AlphaFold-Multimer/AF3.
@@ -157,7 +157,7 @@ To test true prospective generalization on completely unseen targets, we compile
 | **HDOCK** | Hybrid template-based & FFT docking | Protein-protein & protein-peptide | Rigid-body global FFT search followed by local refinement | Empirical contact score; not calibrated in $\text{kcal/mol}$ | $5 - 15\text{ min/complex}$ | ~100–200 / day | ❌ None |
 | **Rosetta FlexPepDock** | High-resolution Monte Carlo + all-atom minimization | Peptides (sub-angstrom refinement) | Fully flexible backbone and sidechain packing; requires starting pose within $5.5\text{ \AA}$ | Rosetta Energy Units (REU); arbitrary energy scale | $15 - 60\text{ min/peptide}$ | ~10–50 / day | ❌ None |
 | **AutoDock CrankPep (ADCP)** | Rigid-body fragment assembly + torsional Monte Carlo | Peptides (folding while docking) | Peptide-specific fragment assembly | Empirical score; no solution $\Delta G$ or $K_d$ | $10 - 20\text{ min/peptide}$ | ~50–150 / day | ❌ None |
-| **AMP-Screen (v1.12.0)** | **Native 3D Geometric Pocket Docking + Explicit Physics (HADDOCK) + 96D ML Ensemble** | **Peptides & Antimicrobial Peptides (5–50 aa)** | **Conformational priors ($\alpha, \beta, \text{PPII}$) + Pocket-guided geometric docking + induced-fit sidechain relaxation** | **Prospective blind $\text{MAE} = 1.29\text{ kcal/mol}$ ($r = 0.529$, $0\%$ training overlap, $<35\%$ homology); $0.12\text{ kcal/mol}$ calibration fit** | **$2 - 10\text{ sec/peptide}$ (Pure CPU)** | **10,000+ / day (Standard Workstation)** | **✅ Included (>100k/hr Wimley-White + DeepSTAMP)** |
+| **AMP-Screen (v1.12.1)** | **Native 3D Geometric Pocket Docking + Explicit Physics (HADDOCK) + 96D ML Ensemble** | **Peptides & Antimicrobial Peptides (5–50 aa)** | **Conformational priors ($\alpha, \beta, \text{PPII}$) + Pocket-guided geometric docking + induced-fit sidechain relaxation** | **Prospective blind $\text{MAE} = 1.29\text{ kcal/mol}$ ($r = 0.529$, $0\%$ training overlap, $<35\%$ homology); $0.12\text{ kcal/mol}$ calibration fit** | **$2 - 10\text{ sec/peptide}$ (Pure CPU)** | **10,000+ / day (Standard Workstation)** | **✅ Included (>100k/hr Wimley-White + DeepSTAMP)** |
 
 ---
 

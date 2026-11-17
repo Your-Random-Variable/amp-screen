@@ -9,6 +9,7 @@ from pathlib import Path
 
 from amp_screen.deep_model import DeepAffinityResNet, DeepAffinityRegressor, TabularResBlock
 from amp_screen.ml_scorer import MLPeptideScorer, FEATURE_NAMES
+from amp_screen.utils import get_default_model_path
 
 
 def test_tabular_resblock_forward():
@@ -65,8 +66,8 @@ def test_deep_affinity_regressor_fit_predict():
 
 
 def test_ml_scorer_with_hybrid_ensemble():
-    model_path = Path("data/trained_complex_ensemble.joblib")
-    if not model_path.exists():
+    model_path = get_default_model_path()
+    if model_path is None or not model_path.exists():
         pytest.skip("Trained ensemble not found on disk")
 
     scorer = MLPeptideScorer(model_path=model_path)

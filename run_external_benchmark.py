@@ -450,8 +450,7 @@ def run_external_benchmark(
     out_csv: Path = Path("benchmarks/external_test_set/external_benchmark_results.csv")
 ) -> pd.DataFrame:
     benchmarks_dir = Path(benchmarks_dir).resolve()
-    ml_model_file = Path("data/trained_complex_ensemble.joblib").resolve()
-    ml_scorer = MLPeptideScorer(model_path=ml_model_file) if ml_model_file.exists() else None
+    ml_scorer = MLPeptideScorer()
 
     results = []
 

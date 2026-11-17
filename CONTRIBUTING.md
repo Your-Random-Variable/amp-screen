@@ -46,7 +46,7 @@ python run_benchmarks.py
 python run_external_benchmark.py
 ```
 
-All 60+ unit and integration tests must pass without regressions.
+All 63 unit and integration tests must pass without regressions.
 
 ---
 

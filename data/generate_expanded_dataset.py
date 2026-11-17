@@ -39,7 +39,7 @@ from amp_screen.physics_engine import calculate_haddock_physics_score
 from amp_screen.utils import AA_3TO1
 import gemmi
 
-OUT_CSV = Path(__file__).resolve().parent / "pdbbind_peptide_affinity_dataset.csv"
+OUT_CSV = Path(__file__).resolve().parent.parent / "amp_screen" / "data" / "pdbbind_peptide_affinity_dataset.csv"
 BENCHMARKS_DIR = Path(__file__).resolve().parent.parent / "benchmarks"
 
 # Comprehensive Curated Co-Crystals with Published Experimental Binding Affinities
