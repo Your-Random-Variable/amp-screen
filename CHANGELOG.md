@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.12.2] - 2026-11-17
+### Added
+- **Explicit Non-Redistribution Rights & Intellectual Property Notice**: Added formal legal declaration in `DATA_PROVENANCE_AND_LICENSE.md` certifying zero redistribution of third-party proprietary database archives, affirming CC0 public domain provenance of wwPDB structural coordinates, public factual status of literature binding constants under US 17 U.S.C. § 102(b) and EU Directive 96/9/EC, and 100% de novo algorithmic calculation of all 96 feature parameters.
+- **Enhanced Wheel Smoke Test Assertions**: Updated `scripts/verify_wheel.py` and `tests/test_model_packaging.py` with explicit assertions verifying initialization of all Pent-Ensemble models: Random Forest, Extra Trees, CatBoost, LightGBM, Gradient Boosting fallback, PyTorch DeepAffinityResNet, and ensemble weights.
+- **Clarified Isolation Scope**: Documented the scope and rationale of the clean-venv wheel validation testing workflow in `scripts/verify_wheel.py`.
+- **Supported Platforms & CI Validation Documentation**: Explicitly documented formal Linux (Ubuntu x86_64, Python 3.10 and 3.11) continuous integration coverage alongside cross-platform macOS/Windows architectural support in `README.md`.
+
+### Fixed
+- **Retrained Ensemble Model Serialization**: Retrained and regenerated `trained_complex_ensemble.joblib` with current scikit-learn / joblib versions, eliminating unpickling warnings and ensuring clean cross-environment loading.
+- **Corrected Legacy Script Docstring**: Fixed stale dataset size numbers in `data/curate_training_data.py` (539 complexes / 46 families → 1,054 complexes / 52 families) and documented its legacy status relative to `data/generate_expanded_dataset.py`.
+- **Fixed Stale Paths in README**: Updated retrain command instructions in `README.md` to reference canonical `amp_screen/data/` paths.
+- **Pytest Third-Party Warning Filters**: Configured pytest `filterwarnings` in `pyproject.toml` to suppress noisy NumPy deprecation warnings during automated test suite execution.
+- **Missing Optional Import**: Added missing `Optional` typing import in `train_ml_model.py`.
+
+---
+
 ## [1.12.1] - 2026-11-17
 ### Added
 - **Dataset Provenance & Legal Rights Document**: Added [`DATA_PROVENANCE_AND_LICENSE.md`](DATA_PROVENANCE_AND_LICENSE.md) establishing explicit licensing distinctions between the permissive MIT software code, wwPDB CC0 primary coordinate files, factual literature binding constants, and ODC-By v1.0 / CC-BY 4.0 derived 96-dimensional physical descriptors.

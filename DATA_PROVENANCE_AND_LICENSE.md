@@ -23,13 +23,25 @@ The AMP-Screen repository and distribution packages distinguish between software
 
 The bundled training corpus consists of 1,054 high-resolution protein–peptide co-crystal complexes spanning 52 non-redundant receptor fold families. The dataset is structured into three distinct provenance tiers:
 
+### Statement on Non-Redistribution of Third-Party Database Files
+
+To address data governance, licensing compliance, and intellectual property terms:
+1. **Zero Database File Redistribution:** AMP-Screen does **NOT** redistribute, host, mirror, or bundle any database archives, proprietary tables, or data files from PDBbind-CN, PepBDB, or any other proprietary database.
+2. **Public Domain Structural Coordinates (CC0):** All 3D macromolecular structures referenced in this package originate from the Worldwide Protein Data Bank ([wwPDB](https://www.wwpdb.org/) / [RCSB PDB](https://www.rcsb.org/)), deposited under the **Public Domain (CC0 1.0 Universal)** license.
+3. **Primary Literature Scientific Facts:** All experimental binding affinity measurements ($\Delta G^\circ$, $K_d$, $K_i$, $\text{p}K_d$) are historical, factual scientific observations transcribed from primary peer-reviewed literature (ITC, SPR, NMR titration, fluorescence polarization). Under international copyright conventions (including US Copyright Act 17 U.S.C. § 102(b) and EU Directive 96/9/EC), raw factual scientific measurements and natural physical constants are not copyrightable subject matter.
+4. **100% De Novo Feature Engineering:** All 96 numerical feature columns in `pdbbind_peptide_affinity_dataset.csv`—including atomic element-pair distance shells, explicit HADDOCK 2.4 physics terms (`e_vdw`, `e_elec`, `e_desolv`, `bsa`, `haddock_score`), Wimley–White interfacial partition scales, and Eisenberg amphipathic moments—were calculated *de novo* in silico using AMP-Screen's internal geometry and physics engines. None of these 96 descriptor columns exist in or are extracted from raw PDBbind database files.
+5. **Pre-Trained Statistical Weights:** The bundled ensemble weights (`trained_complex_ensemble.joblib`) represent mathematical regression parameters (decision tree split thresholds and neural network matrix coefficients) fitted across continuous physical dimensions. They do not store, expose, or reconstruct raw underlying database records.
+6. **Scholarly Attribution:** Citations to PDBbind and PepBDB are provided strictly as academic literature references to credit prior bibliographic curation efforts in the structural biology field, not because their database files are redistributed.
+
+---
+
 ### Tier 1: Primary Structural Coordinates (Columns: `pdb_id`, `resolution_angstrom`)
 * **Source:** Worldwide Protein Data Bank ([wwPDB](https://www.wwpdb.org/) / [RCSB PDB](https://www.rcsb.org/)).
 * **Terms:** All 3D atomic coordinates are deposited under the **Public Domain (CC0 1.0 Universal)** license.
 * **Reference:** Berman, H.M. et al. (2000). The Protein Data Bank. *Nucleic Acids Res.*, 28(1), 235–242.
 
 ### Tier 2: Published Experimental Binding Affinities (Columns: `assay_type`, `experimental_kd_umolar`, `experimental_pkd`, `experimental_delta_g_kcal`)
-* **Source:** Extracted from primary peer-reviewed scientific literature (isothermal titration calorimetry [ITC], surface plasmon resonance [SPR], fluorescence polarization [FP], and NMR titration) as indexed by primary wwPDB publication records, [BindingDB](https://www.bindingdb.org/), and cross-referenced with public indices including [PDBbind-CN v2020](http://www.pdbbind.org.cn/) and [PepBDB](http://huanglab.phys.hust.edu.cn/pepbdb/).
+* **Source:** Extracted from primary peer-reviewed scientific literature (isothermal titration calorimetry [ITC], surface plasmon resonance [SPR], fluorescence polarization [FP], and NMR titration) as indexed by primary wwPDB publication records, [BindingDB](https://www.bindingdb.org/), and cross-referenced with public literature indices including [PDBbind-CN v2020](http://www.pdbbind.org.cn/) and [PepBDB](http://huanglab.phys.hust.edu.cn/pepbdb/).
 * **Character:** Historical factual scientific measurements. Factual biological measurements and dissociation constants are not subject to copyright.
 * **Citations & Credit:** See Section 4 below for full academic attribution of PDBbind and PepBDB curation efforts.
 

@@ -3,9 +3,16 @@
 Wheel Package & Clean-Environment Installation Smoke Test.
 Verifies:
 1. Built wheel archive contains pre-trained Pent-Ensemble model and training dataset.
-2. Wheel can be installed cleanly into an isolated, sterile virtual environment.
+2. Wheel can be installed cleanly into an isolated virtual environment without source tree.
 3. Default MLPeptideScorer loads as calibrated without requiring a source checkout.
 4. Runtime resource locators resolve correctly via importlib.resources.
+
+NOTE ON ISOLATION SCOPE:
+This smoke test uses `python -m venv --system-site-packages` to leverage pre-installed
+heavy scientific dependencies (PyTorch, scikit-learn, CatBoost, LightGBM) to avoid
+re-downloading multi-gigabyte wheels over the network in CI runners. It tests file
+isolation, importlib.resources runtime resolution, wheel packaging integrity, and model
+deserialization in a standalone directory without git source context.
 """
 
 import sys
@@ -76,6 +83,9 @@ assert scorer.rf_model is not None, "Random Forest model is missing!"
 assert scorer.et_model is not None, "Extra Trees model is missing!"
 assert scorer.cb_model is not None, "CatBoost model is missing!"
 assert scorer.lgb_model is not None, "LightGBM model is missing!"
+assert scorer.gb_model is not None, "Gradient Boosting fallback model is missing!"
+assert scorer.dl_model is not None, "PyTorch DeepAffinityResNet model is missing!"
+assert scorer.ensemble_weights is not None, "Ensemble weights are missing!"
 assert len(scorer.feature_names) == 96, f"Expected 96 features, got {len(scorer.feature_names)}"
 
 print("✔ Clean virtualenv smoke test PASSED: Model & dataset loaded and calibrated.")

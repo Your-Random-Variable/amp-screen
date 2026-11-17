@@ -29,8 +29,11 @@ class TestModelPackaging(unittest.TestCase):
         scorer = MLPeptideScorer()
         self.assertTrue(scorer.is_calibrated, "MLPeptideScorer() must auto-load default model and be calibrated")
         self.assertIsNotNone(scorer.rf_model, "Random Forest model must be present")
+        self.assertIsNotNone(scorer.et_model, "Extra Trees model must be present")
         self.assertIsNotNone(scorer.cb_model, "CatBoost model must be present in Pent-Ensemble")
         self.assertIsNotNone(scorer.lgb_model, "LightGBM model must be present in Pent-Ensemble")
+        self.assertIsNotNone(scorer.gb_model, "Gradient Boosting fallback model must be present")
+        self.assertIsNotNone(scorer.dl_model, "PyTorch DeepAffinityResNet model must be present")
         self.assertIsNotNone(scorer.ensemble_weights, "Ensemble weights must be present")
 
     def test_model_save_load_round_trip(self):

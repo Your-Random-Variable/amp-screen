@@ -22,6 +22,7 @@ Key Scientific Safeguards:
 import sys
 import argparse
 from pathlib import Path
+from typing import Optional
 import pandas as pd
 import numpy as np
 import joblib

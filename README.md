@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11-blue?logo=python" alt="Python Version">
-  <img src="https://img.shields.io/badge/Version-1.12.1-brightgreen" alt="Version 1.12.1">
+  <img src="https://img.shields.io/badge/Version-1.12.2-brightgreen" alt="Version 1.12.2">
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT">
   <img src="https://img.shields.io/badge/Docking-Native%203D%20Geometric%20Surface%20Docking-blueviolet" alt="Native 3D Geometric Docking">
   <img src="https://img.shields.io/badge/Deep%20Learning-PyTorch%20Tabular%20ResNet-darkblue" alt="PyTorch Tabular ResNet">
@@ -14,14 +14,14 @@
 1. **AlphaFold Suite (`amp-screen alphafold`)**: Full integration with the AlphaFold ecosystem—automatic AlphaFold Database (AFDB) receptor fetching via UniProt IDs, AlphaFold-Multimer / AlphaFold 3 input preparation, and co-complex evaluation (interface pLDDT, HADDOCK force fields, 96D ML calibrated binding affinity, and toxicity triage).
 2. **Membrane Mode (`amp-screen membrane`)**: Ultra-fast sequence-first peptide membrane biophysical profiling leveraging **Wimley-White interfacial thermodynamics** ($\Delta G_{\text{w}\to\text{if}}$, $\Delta G_{\text{w}\to\text{oct}}$, Eisenberg amphipathic moments $\mu_H$, Membrane Permeabilization Index MPI, and in silico therapeutic index)—screening **>100,000 peptides/hour** with pure biophysics (no external model weights required).
 3. **Target Mode (`amp-screen target` / `run`)**: Pure **Native 3D Geometric Surface Docking Engine** operating 100% in Cartesian coordinates ($\text{\AA}$) via Gemmi & NumPy—eliminating AutoDock Vina, PDBQT conversions, and Meeko runtime requirements from core docking. Integrates longitudinal pocket cleft alignment, continuous soft-core Lennard-Jones, distance-dependent Coulomb electrostatics, downhill simplex interface refinement, and **HADDOCK 2.4 explicit physics**.
-5. **Prospective Blind & Wet-Lab Calibrated Affinity Engine**: Tuned Pent-Ensemble (Random Forest + Extra Trees + CatBoost + LightGBM + PyTorch `DeepAffinityResNet`) achieving **Pearson $r = 0.529$ ($p = 9.44 \times 10^{-5}$)**, **Spearman $\rho = 0.494$**, and **$\text{MAE} = 1.29\text{ kcal/mol}$** on an independent prospective blind external benchmark suite ($N=52$ co-crystals with strictly 0% training overlap, $<35\%$ homology), combined with high-fidelity reference calibration on 14 standardized complexes ($\text{MAE} = 0.12\text{ kcal/mol}$ self-consistency; $\text{MAE} = 0.95\text{ kcal/mol}$ leave-14-out).
+5. **Prospective Blind & Wet-Lab Calibrated Affinity Engine**: Tuned Pent-Ensemble (Random Forest + Extra Trees + CatBoost + LightGBM + PyTorch `DeepAffinityResNet`) achieving **Pearson $r = 0.533$ ($p = 8.14 \times 10^{-5}$)**, **Spearman $\rho = 0.506$**, and **$\text{MAE} = 1.29\text{ kcal/mol}$** on an independent prospective blind external benchmark suite ($N=52$ co-crystals with strictly 0% training overlap, $<35\%$ homology), combined with high-fidelity reference calibration on 14 standardized complexes ($\text{MAE} = 0.17\text{ kcal/mol}$ self-consistency; $\text{MAE} = 0.95\text{ kcal/mol}$ leave-14-out).
 6. **In Silico Lead Optimization (`amp-screen optimize-hit`)**: Automated alanine scanning to pinpoint hotspot residues and rational mutation scanning for structure-based affinity maturation.
 
 ---
 
 ## 🚀 Why AMP-Screen?
 
-| Metric / Feature | Traditional Peptide Docking (Rosetta FlexPepDock, CrankPep, HADDOCK Web) | Standard Small-Molecule Docking (Vina, Glide, AutoDock 4) | **AMP-Screen (v1.12.1)** |
+| Metric / Feature | Traditional Peptide Docking (Rosetta FlexPepDock, CrankPep, HADDOCK Web) | Standard Small-Molecule Docking (Vina, Glide, AutoDock 4) | **AMP-Screen (v1.12.2)** |
 | :--- | :--- | :--- | :--- |
 | **Sequence AMP Screening** | Not supported | Not supported | **>100,000 peptides / hour (Wimley-White + DeepSTAMP)** |
 | **Target Docking Speed** | 15–120 minutes / peptide | 1–5 minutes | **2–5 seconds / peptide (100% Native Cartesian PDB)** |
@@ -292,6 +292,10 @@ pip install -e ".[all]"
 > **Note on Optional Extensions:**
 > - **OpenBabel (`.[relaxation]`):** Optional force-field interface relaxation (UFF / MMFF94) before scoring (`--relax`). If absent, the pipeline runs and scores native PDB structures directly.
 > - **Meeko (`.[legacy]`):** Preserved exclusively for backwards interoperability with legacy PDBQT pipelines (`prepare_peptide_pdbqt`). Core screening operates 100% in native Cartesian coordinates ($\text{\AA}$) without PDBQT.
+
+### Supported Platforms & CI Validation
+- **Continuous Integration (CI):** Formally validated on **Ubuntu Linux (x86_64, Python 3.10 and 3.11)** via GitHub Actions with automated 63-test test suites, wheel packaging smoke tests, and benchmark reproduction.
+- **Cross-Platform Compatibility:** **macOS** and **Windows** are architecturally supported (pure Python/Gemmi/NumPy implementations with cross-platform path handling), but automated CI matrix runs currently focus on Linux.
 
 Verify installation:
 ```bash
@@ -575,7 +579,11 @@ AMP-Screen ships with curated, reproducible training and validation datasets in 
   - **Independent Blind External Benchmark ($N=52$ zero-overlap co-crystals):** Pearson $r = 0.529$, Spearman $\rho = 0.494$, $\text{MAE} = 1.29\text{ kcal/mol}$ on 49 physiological signaling complexes.
 - **Retrain Command:**
   ```bash
-  python train_ml_model.py --data data/pdbbind_peptide_affinity_dataset.csv --output data/trained_complex_ensemble.joblib
+  # Defaults automatically resolve to the package-bundled dataset and model
+  python train_ml_model.py
+
+  # Or, specifying paths explicitly (using the canonical package-data locations):
+  python train_ml_model.py --data amp_screen/data/pdbbind_peptide_affinity_dataset.csv --output amp_screen/data/trained_complex_ensemble.joblib
   ```
 
 ---
@@ -618,7 +626,7 @@ If you use **AMP-Screen** in your research, please cite:
   author = {Singh, Ankur},
   title = {AMP-Screen: High-Throughput AlphaFold & Biophysics-Grounded Protein-Peptide Virtual Screening, 7-Ray PSP Multi-Pocket Blind Docking, Physics Engine, & In Silico Lead Optimizer},
   url = {https://github.com/Your-Random-Variable/amp-screen},
-  version = {1.12.1},
+  version = {1.12.2},
   year = {2026}
 }
 ```
