@@ -610,7 +610,7 @@ full_seq_csv = OUT_DIR / "full_training_set_sequence.csv"
 df_full_seq.to_csv(full_seq_csv, index=False)
 print(f"Saved {len(df_full_seq)} combined training sequences to {full_seq_csv}")
 
-# D. Protein-Peptide Complex Affinity Dataset (539 complexes with 96 physical parameters)
+# D. Protein-Peptide Complex Affinity Dataset (1,054 complexes across 52 families with 96 physical parameters)
 try:
     from data.generate_expanded_dataset import generate_dataset
 except ImportError:

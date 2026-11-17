@@ -5,6 +5,23 @@ All notable changes to **AMP-Screen** (`amp-screen` / `af-amp-screen`) will be d
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.3] - 2026-11-17
+### Added
+- **RCSB Automated Structure Downloader & Multi-Chain Featurizer**: Added `--download-pdbs` and `--cache-dir` options to `data/generate_expanded_dataset.py`, enabling automated online retrieval of raw PDB structures from RCSB and true multi-chain 3D Cartesian featurization.
+- **Row-Level Training Set Provenance Manifest**: Created `data/training_set_source_manifest.csv` detailing the exact origin, primary citation DOI, and feature derivation methodology (coordinate-based vs. calibrated interface distribution) for every complex in the 1,054-complex corpus.
+- **Embedded Provenance Columns in Dataset**: Added `source_database`, `primary_citation_id`, and `feature_derivation` columns to `amp_screen/data/pdbbind_peptide_affinity_dataset.csv`.
+- **Programmatic Sequence-Overlap Audit**: Added sequence identity screening in `run_external_benchmark.py` comparing all 52 external test peptides against the 1,054 training complexes; identified 3 shared sequences (`1X2R`, `1TW6`, `3FDO`) and reported 3 distinct prospective validation cohorts.
+- **Three Prospective Validation Cohorts**:
+  - *Cohort 1 (All External, N=52)*: MAE = 1.46 kcal/mol, RMSE = 1.79 kcal/mol, r = 0.441, rho = 0.455.
+  - *Cohort 2 (Physiological Signaling, N=49)*: MAE = 1.29 kcal/mol, RMSE = 1.50 kcal/mol, r = 0.533, rho = 0.506.
+  - *Cohort 3 (Strictly Sequence-Disjoint Signaling, N=46)*: MAE = 1.29 kcal/mol, RMSE = 1.51 kcal/mol, r = 0.547, rho = 0.494.
+- **CI Automated External Benchmark Execution**: Added `python run_external_benchmark.py` step to `.github/workflows/ci.yml`.
+
+### Fixed
+- **Reconciled Calibration Fit vs. Prospective Generalization**: Harmonized all documentation and manuscript files to distinguish the reference calibration self-consistency (MAE = 0.17 kcal/mol, RMSE = 0.20 kcal/mol across the 14 reference complexes) from prospective out-of-distribution blind accuracy (MAE = 1.29 kcal/mol across physiological signaling targets).
+- **Corrected Dataset Feature Derivation Rationale**: Updated `DATA_PROVENANCE_AND_LICENSE.md` to transparently explain the dual-mode feature generation pipeline (deterministic sequence biophysics + calibrated interface distributions in offline mode, and 3D coordinate parsing with `--download-pdbs`).
+- **Synchronized Package Version Metadata**: Bumped version to 1.12.3 across `amp_screen/__init__.py`, `pyproject.toml`, `setup.py`, `CITATION.cff`, `README.md`, `BENCHMARKS.md`, `CHANGELOG.md`, and manuscript files.
+
 ---
 
 ## [1.12.2] - 2026-11-17

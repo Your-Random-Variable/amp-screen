@@ -13,6 +13,7 @@ The AMP-Screen repository and distribution packages distinguish between software
 | **Software Source Code** | `amp_screen/`, `tests/`, `scripts/`, `setup.py`, `pyproject.toml` | **MIT License** | Permissive open-source; free modification and distribution with attribution. |
 | **Pre-trained Ensemble Weights** | `amp_screen/data/trained_complex_ensemble.joblib` | **MIT License** | Mathematical parameter tensors and tree splits learned across public structural patterns. |
 | **Derived Feature Dataset** | `amp_screen/data/pdbbind_peptide_affinity_dataset.csv` | **ODC-By v1.0 / CC-BY 4.0** | Open Data Commons Attribution / Creative Commons Attribution for academic research & reproducibility. |
+| **Source Provenance Manifest** | `data/training_set_source_manifest.csv` | **ODC-By v1.0 / CC-BY 4.0** | Row-level bibliographic metadata, primary wwPDB links, and derivation methods. |
 | **External Benchmark Set** | `benchmarks/external_test_set/` | **Public Domain (wwPDB / CC0)** | Primary co-crystal structures from RCSB PDB with primary literature affinity values. |
 
 > **Notice:** The permissive MIT software license covers the algorithmic source code, user interfaces, and model weight binaries. It does not automatically transfer or modify the copyright or licensing terms of third-party primary data sources.
@@ -29,7 +30,10 @@ To address data governance, licensing compliance, and intellectual property term
 1. **Zero Database File Redistribution:** AMP-Screen does **NOT** redistribute, host, mirror, or bundle any database archives, proprietary tables, or data files from PDBbind-CN, PepBDB, or any other proprietary database.
 2. **Public Domain Structural Coordinates (CC0):** All 3D macromolecular structures referenced in this package originate from the Worldwide Protein Data Bank ([wwPDB](https://www.wwpdb.org/) / [RCSB PDB](https://www.rcsb.org/)), deposited under the **Public Domain (CC0 1.0 Universal)** license.
 3. **Primary Literature Scientific Facts:** All experimental binding affinity measurements ($\Delta G^\circ$, $K_d$, $K_i$, $\text{p}K_d$) are historical, factual scientific observations transcribed from primary peer-reviewed literature (ITC, SPR, NMR titration, fluorescence polarization). Under international copyright conventions (including US Copyright Act 17 U.S.C. § 102(b) and EU Directive 96/9/EC), raw factual scientific measurements and natural physical constants are not copyrightable subject matter.
-4. **100% De Novo Feature Engineering:** All 96 numerical feature columns in `pdbbind_peptide_affinity_dataset.csv`—including atomic element-pair distance shells, explicit HADDOCK 2.4 physics terms (`e_vdw`, `e_elec`, `e_desolv`, `bsa`, `haddock_score`), Wimley–White interfacial partition scales, and Eisenberg amphipathic moments—were calculated *de novo* in silico using AMP-Screen's internal geometry and physics engines. None of these 96 descriptor columns exist in or are extracted from raw PDBbind database files.
+4. **Transparent In Silico Feature Derivation:** All 96 numerical feature columns in `pdbbind_peptide_affinity_dataset.csv` are calculated *in silico* by AMP-Screen using a transparent hybrid methodology:
+   * **Deterministic Sequence Biophysics (60+ parameters):** Calculated deterministically from the peptide primary sequence using exact biophysical equations—including Eisenberg hydrophobic moments, Boman indices, Henderson–Hasselbalch net charge at pH 7.4, Wimley–White interfacial partition free energies, and secondary structure propensities.
+   * **Interface Physical & RF-Score Descriptors:** For complexes with 3D Cartesian coordinates present or fetched from wwPDB, descriptors are extracted directly from 3D coordinates via `amp_screen.physics_engine` and `gemmi`. In offline generation mode without cached PDB files, interface parameters are generated using empirical interface parameter distributions calibrated to experimental co-crystal geometries.
+   * **Row-Level Provenance & Manifest:** Every row in `pdbbind_peptide_affinity_dataset.csv` explicitly declares its `source_database`, `primary_citation_id`, and `feature_derivation` method, also recorded in `data/training_set_source_manifest.csv`.
 5. **Pre-Trained Statistical Weights:** The bundled ensemble weights (`trained_complex_ensemble.joblib`) represent mathematical regression parameters (decision tree split thresholds and neural network matrix coefficients) fitted across continuous physical dimensions. They do not store, expose, or reconstruct raw underlying database records.
 6. **Scholarly Attribution:** Citations to PDBbind and PepBDB are provided strictly as academic literature references to credit prior bibliographic curation efforts in the structural biology field, not because their database files are redistributed.
 
@@ -46,9 +50,12 @@ To address data governance, licensing compliance, and intellectual property term
 * **Citations & Credit:** See Section 4 below for full academic attribution of PDBbind and PepBDB curation efforts.
 
 ### Tier 3: In Silico Physicochemical & Structural Descriptors (Columns: 11–106, 96 features)
-* **Source:** **Independently generated *de novo* by AMP-Screen.**
-* **Description:** All 96 numerical feature columns—including RF-Score element-pair distance shell bins (`pair_C_C_close` through `pair_S_S_medium`), explicit HADDOCK 2.4 physics terms (`e_vdw`, `e_elec`, `e_desolv`, `bsa`, `haddock_score`), charge architectures, Wimley–White interfacial partition free energies, and Eisenberg hydrophobic moments—were calculated in silico using AMP-Screen's internal geometry and physics engines (`amp_screen.physics_engine`, `amp_screen.amp_analyzer`, and `amp_screen.ml_scorer`).
+* **Source:** **Independently generated by AMP-Screen.**
+* **Description:** 
+  - Sequence-based physicochemical features (Eisenberg hydrophobic moments, Boman indices, net charges at pH 7.4, Wimley–White interfacial partition free energies, and secondary structure propensities) are calculated deterministically from peptide sequence equations.
+  - Structural interface features (RF-Score element-pair distance shells, explicit HADDOCK 2.4 physics terms `e_vdw`, `e_elec`, `e_desolv`, `bsa`, `haddock_score`) are computed directly from 3D atomic coordinates when PDB files are parsed or downloaded from wwPDB via `--download-pdbs`, or derived from calibrated empirical protein-peptide interface parameter distributions in offline generation mode.
 * **Distinction:** None of these 96 descriptor columns exist in or are extracted from raw PDBbind database files.
+* **Manifest:** Full row-by-row provenance and derivation classification is tracked in `data/training_set_source_manifest.csv`.
 
 ---
 
@@ -84,18 +91,26 @@ Users and publications utilizing AMP-Screen, its pre-trained model, or the deriv
 
 ## 5. Independent Dataset Reproduction from Scratch
 
-To ensure 100% independent data reproduction without reliance on pre-distributed tabular files, AMP-Screen provides an automated data curation pipeline:
+To ensure 100% independent data reproduction without reliance on pre-distributed tabular files, AMP-Screen provides an automated data curation pipeline with two execution modes:
 
+### Mode A: Offline Deterministic Biophysics + Calibrated Interface Model (Fast, No Network)
 ```bash
-# Fetch raw coordinate files from public RCSB PDB and compute all 96 descriptors de novo:
+# Computes exact sequence biophysics and calibrated interface features locally:
 python data/generate_expanded_dataset.py
 ```
 
-This script:
-1. Downloads the 1,054 target co-crystal PDB structures directly from RCSB PDB (`https://files.rcsb.org/download/{PDB}.pdb`).
-2. Extracts atomic coordinates for receptor and peptide chains.
+### Mode B: Full 3D Cartesian Coordinate Download from wwPDB
+```bash
+# Downloads raw coordinate files directly from public RCSB PDB and featurizes Cartesian coordinates:
+python data/generate_expanded_dataset.py --download-pdbs --cache-dir data/pdb_cache
+```
+
+This pipeline:
+1. Interrogates local PDB structures and fetches missing coordinate files from RCSB PDB (`https://files.rcsb.org/download/{PDB}.pdb`).
+2. Extracts atomic coordinates for receptor and peptide chains via `gemmi`.
 3. Computes the complete 96-parameter physical descriptor matrix.
 4. Outputs the validated feature table to `amp_screen/data/pdbbind_peptide_affinity_dataset.csv`.
+5. Emits `data/training_set_source_manifest.csv` with full row-level provenance and primary citations.
 
 ---
 

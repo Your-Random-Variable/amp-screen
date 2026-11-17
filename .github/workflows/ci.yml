@@ -41,9 +41,13 @@ jobs:
         ls -lh dist/
         python scripts/verify_wheel.py dist/*.whl
 
-    - name: Run Standardized Co-Crystal Benchmarks
+    - name: Run Standardized Co-Crystal Calibration Benchmarks
       run: |
         python run_benchmarks.py
+
+    - name: Run Prospective Blind External Benchmarks (N=52 across 3 Cohorts)
+      run: |
+        python run_external_benchmark.py
 
     - name: Run Full Automated Test Suite
       run: |

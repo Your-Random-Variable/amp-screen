@@ -541,9 +541,27 @@ def run_external_benchmark(
             "citation": meta["citation"]
         })
 
+    train_csv = Path(__file__).resolve().parent / "amp_screen" / "data" / "pdbbind_peptide_affinity_dataset.csv"
+    train_seqs = set()
+    if train_csv.exists():
+        try:
+            tdf = pd.read_csv(train_csv)
+            if "peptide_sequence" in tdf.columns:
+                train_seqs = set(tdf["peptide_sequence"].astype(str).str.strip().str.upper())
+        except Exception as e:
+            logger.warning(f"Could not load training sequences for overlap audit: {e}")
+
     df = pd.DataFrame(results)
     df["err_phys"] = np.abs(df["phys_delta_g"] - df["exp_delta_g"])
     df["err_ml"] = np.abs(df["ml_delta_g"] - df["exp_delta_g"])
+
+    # Overlap and cohort classification
+    rigid_inhibitors = {"1SFI", "3P8F", "1CP3"}
+    df["clean_seq"] = df["sequence"].astype(str).str.strip().str.upper()
+    df["shared_sequence_with_training"] = df["clean_seq"].isin(train_seqs)
+    df["is_signaling_cohort"] = ~df["pdb_id"].isin(rigid_inhibitors)
+    df["is_sequence_disjoint_cohort"] = df["is_signaling_cohort"] & (~df["shared_sequence_with_training"])
+    df = df.drop(columns=["clean_seq"])
 
     # Pretty print summary table
     fmt = "%-6s | %-22s | %-16s | %-8s | %-8s | %-8s | %-8s | %-10s | %-10s"
@@ -559,35 +577,48 @@ def run_external_benchmark(
         ))
     print("=" * 125)
 
+    # Cohort 1: All N=52 External Complexes (0% PDB-ID Overlap)
     mae_phys = float(np.mean(df["err_phys"]))
     rmse_phys = float(np.sqrt(np.mean(df["err_phys"] ** 2)))
     r_phys, p_phys = pearsonr(df["phys_delta_g"], df["exp_delta_g"])
     rho_phys, p_rho_phys = spearmanr(df["phys_delta_g"], df["exp_delta_g"])
 
-    mae_ml = float(np.mean(df["err_ml"]))
-    rmse_ml = float(np.sqrt(np.mean(df["err_ml"] ** 2)))
-    r_ml, p_ml = pearsonr(df["ml_delta_g"], df["exp_delta_g"])
-    rho_ml, p_rho_ml = spearmanr(df["ml_delta_g"], df["exp_delta_g"])
-    chem_acc_all = int(np.sum(df["err_ml"] < 1.0))
+    mae_ml_1 = float(np.mean(df["err_ml"]))
+    rmse_ml_1 = float(np.sqrt(np.mean(df["err_ml"] ** 2)))
+    r_ml_1, p_ml_1 = pearsonr(df["ml_delta_g"], df["exp_delta_g"])
+    rho_ml_1, p_rho_ml_1 = spearmanr(df["ml_delta_g"], df["exp_delta_g"])
+    chem_acc_1 = int(np.sum(df["err_ml"] < 1.0))
 
-    print(f"\nDescriptive Performance on Completely Unseen External Test Set (All N={len(df)}):")
+    print(f"\nCohort 1: All External Systems (N={len(df)}, 0% PDB-ID Overlap with Training Corpus):")
     print(f"  • Physical Force-Field: MAE = {mae_phys:.2f} kcal/mol, RMSE = {rmse_phys:.2f} kcal/mol, r = {r_phys:.3f} (p = {p_phys:.2e}), ρ = {rho_phys:.3f} (p = {p_rho_phys:.2e})")
-    print(f"  • 96D ML Ensemble:      MAE = {mae_ml:.2f} kcal/mol, RMSE = {rmse_ml:.2f} kcal/mol, r = {r_ml:.3f} (p = {p_ml:.2e}), ρ = {rho_ml:.3f} (p = {p_rho_ml:.2e})")
-    print(f"  • Chemical Accuracy (< 1.0 kcal/mol): {chem_acc_all}/{len(df)} complexes ({chem_acc_all/len(df)*100:.1f}%)")
+    print(f"  • 96D ML Ensemble:      MAE = {mae_ml_1:.2f} kcal/mol, RMSE = {rmse_ml_1:.2f} kcal/mol, r = {r_ml_1:.3f} (p = {p_ml_1:.2e}), ρ = {rho_ml_1:.3f} (p = {p_rho_ml_1:.2e})")
+    print(f"  • Chemical Accuracy (< 1.0 kcal/mol): {chem_acc_1}/{len(df)} complexes ({chem_acc_1/len(df)*100:.1f}%)")
 
-    # Physiological signaling subset (excluding rigid cyclic/covalent protease & caspase inhibitors: 1SFI, 3P8F, 1CP3)
-    rigid_inhibitors = {"1SFI", "3P8F", "1CP3"}
-    df_signaling = df[~df["pdb_id"].isin(rigid_inhibitors)]
-    if len(df_signaling) < len(df):
-        mae_ml_sig = float(np.mean(df_signaling["err_ml"]))
-        rmse_ml_sig = float(np.sqrt(np.mean(df_signaling["err_ml"] ** 2)))
-        r_ml_sig, p_ml_sig = pearsonr(df_signaling["ml_delta_g"], df_signaling["exp_delta_g"])
-        rho_ml_sig, p_rho_ml_sig = spearmanr(df_signaling["ml_delta_g"], df_signaling["exp_delta_g"])
-        chem_acc = int(np.sum(df_signaling["err_ml"] < 1.0))
+    # Cohort 2: Standard Physiological Signaling Complexes (N=49, excl. rigid cyclic/covalent protease/caspase inhibitors 1SFI, 3P8F, 1CP3)
+    df_sig = df[df["is_signaling_cohort"]]
+    mae_ml_2 = float(np.mean(df_sig["err_ml"]))
+    rmse_ml_2 = float(np.sqrt(np.mean(df_sig["err_ml"] ** 2)))
+    r_ml_2, p_ml_2 = pearsonr(df_sig["ml_delta_g"], df_sig["exp_delta_g"])
+    rho_ml_2, p_rho_ml_2 = spearmanr(df_sig["ml_delta_g"], df_sig["exp_delta_g"])
+    chem_acc_2 = int(np.sum(df_sig["err_ml"] < 1.0))
 
-        print(f"\nStandard Physiological Signaling Complexes (N={len(df_signaling)}, excl. rigid cyclic/covalent protease/caspase inhibitors 1SFI, 3P8F, 1CP3):")
-        print(f"  • 96D ML Ensemble:      MAE = {mae_ml_sig:.2f} kcal/mol, RMSE = {rmse_ml_sig:.2f} kcal/mol, r = {r_ml_sig:.3f} (p = {p_ml_sig:.2e}), ρ = {rho_ml_sig:.3f} (p = {p_rho_ml_sig:.2e})")
-        print(f"  • Chemical Accuracy (< 1.0 kcal/mol): {chem_acc}/{len(df_signaling)} complexes ({chem_acc/len(df_signaling)*100:.1f}%)")
+    print(f"\nCohort 2: Physiological Signaling Targets (N={len(df_sig)}, excl. rigid cyclic/covalent protease/caspase inhibitors 1SFI, 3P8F, 1CP3):")
+    print(f"  • 96D ML Ensemble:      MAE = {mae_ml_2:.2f} kcal/mol, RMSE = {rmse_ml_2:.2f} kcal/mol, r = {r_ml_2:.3f} (p = {p_ml_2:.2e}), ρ = {rho_ml_2:.3f} (p = {p_rho_ml_2:.2e})")
+    print(f"  • Chemical Accuracy (< 1.0 kcal/mol): {chem_acc_2}/{len(df_sig)} complexes ({chem_acc_2/len(df_sig)*100:.1f}%)")
+
+    # Cohort 3: Strictly Sequence-Disjoint Physiological Signaling Targets (N=46, excl. 1SFI, 3P8F, 1CP3 and sequence matches 1X2R, 1TW6, 3FDO)
+    df_disjoint = df[df["is_sequence_disjoint_cohort"]]
+    shared_entries = df[df["shared_sequence_with_training"]]
+    shared_str = ", ".join(f"{r['pdb_id']} ({r['sequence']})" for _, r in shared_entries.iterrows())
+    mae_ml_3 = float(np.mean(df_disjoint["err_ml"]))
+    rmse_ml_3 = float(np.sqrt(np.mean(df_disjoint["err_ml"] ** 2)))
+    r_ml_3, p_ml_3 = pearsonr(df_disjoint["ml_delta_g"], df_disjoint["exp_delta_g"])
+    rho_ml_3, p_rho_ml_3 = spearmanr(df_disjoint["ml_delta_g"], df_disjoint["exp_delta_g"])
+    chem_acc_3 = int(np.sum(df_disjoint["err_ml"] < 1.0))
+
+    print(f"\nCohort 3: Strictly Sequence-Disjoint Signaling Targets (N={len(df_disjoint)}, excl. shared sequences: {shared_str}):")
+    print(f"  • 96D ML Ensemble:      MAE = {mae_ml_3:.2f} kcal/mol, RMSE = {rmse_ml_3:.2f} kcal/mol, r = {r_ml_3:.3f} (p = {p_ml_3:.2e}), ρ = {rho_ml_3:.3f} (p = {p_rho_ml_3:.2e})")
+    print(f"  • Chemical Accuracy (< 1.0 kcal/mol): {chem_acc_3}/{len(df_disjoint)} complexes ({chem_acc_3/len(df_disjoint)*100:.1f}%)")
     print("=" * 125 + "\n")
 
     out_csv.parent.mkdir(parents=True, exist_ok=True)
